@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sideline Tendencies</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef2ec;--card:#fff;--ink:#12251a;--mute:#5d6f63;--line:#cfd9cf;--acc:#12251a;--accink:#f2c230;--run:#d9712a;--pass:#2f7fc1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1b12;--card:#13291d;--ink:#eaf0e8;--mute:#8da396;--line:#274133;--acc:#f2c230;--accink:#0b1b12;--run:#f08a3e;--pass:#58aef0}}
+:root[data-theme="dark"]{--bg:#0b1b12;--card:#13291d;--ink:#eaf0e8;--mute:#8da396;--line:#274133;--acc:#f2c230;--accink:#0b1b12;--run:#f08a3e;--pass:#58aef0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.4 Barlow,system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:14px 14px 40px}
+h1{font:700 22px 'Barlow Condensed',sans-serif;margin:0 0 10px;letter-spacing:.02em}
+.seg{display:flex;gap:6px;margin-bottom:10px}
+.seg button,.chip{flex:1;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:10px 8px;border-radius:8px;font:600 15px Barlow,sans-serif;cursor:pointer}
+.seg button[aria-pressed=true],.chip[aria-pressed=true]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+#q{width:100%;font:700 44px 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-align:center;padding:8px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
+#q::placeholder{font-size:20px;letter-spacing:.02em}
+.mic{width:100%;margin:8px 0 0;padding:14px;border-radius:10px;border:2px solid var(--ink);background:var(--card);color:var(--ink);font:700 20px 'Barlow Condensed',sans-serif;letter-spacing:.04em;cursor:pointer}
+.mic[aria-pressed=true]{background:var(--run);color:#fff;border-color:var(--run)}
+#heard{min-height:20px;color:var(--mute);font-size:14px;margin-top:6px}
+.hint{color:var(--mute);font-size:13px;margin:6px 0 10px}
+.chips{display:flex;gap:6px;margin-bottom:14px}
+.sit{font:700 34px/1.05 'Barlow Condensed',sans-serif;margin:6px 0 2px}
+.sub{color:var(--mute);margin-bottom:12px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.card.on{border-color:var(--ink);border-width:2.5px}
+.hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.hd b{font:700 22px 'Barlow Condensed',sans-serif}
+.n{color:var(--mute);font-size:13px}
+.bar{display:flex;height:34px;border-radius:6px;overflow:hidden;font:700 17px/34px 'Barlow Condensed',sans-serif;color:#fff}
+.bar span{padding-left:8px;white-space:nowrap;overflow:hidden}
+.bar .r{background:var(--run)}.bar .p{background:var(--pass)}
+.row{margin-top:8px;font-size:15px}.row i{font-style:normal;color:var(--mute)}
+.warn{border-left:4px solid var(--acc);padding:6px 10px;margin-top:8px;font-size:13px;color:var(--mute);background:transparent}
+.none{color:var(--mute);padding:6px 0}
+.foot{color:var(--mute);font-size:12px;margin-top:16px}
+</style></head><body><main>
+<h1>Sideline Tendencies</h1>
+<div class="seg" id="team"></div>
+<input id="q" inputmode="text" autocomplete="off" placeholder="Tap, then use keyboard mic" aria-label="Down, distance, hash">
+<button class="mic" id="mic" aria-pressed="false">Tap to listen</button>
+<div id="heard"></div>
+<div class="hint">Say "third and five middle", or numbers: down, distance, hash (1 left, 2 middle, 3 right). Say "first play of drive", "goal", "two point", or "new play" to reset. You can also type, or use your keyboard's mic.</div>
+<div class="chips">
+<button class="chip" id="fp" aria-pressed="false">First play of drive</button>
+<button class="chip" id="gl" aria-pressed="false">Goal to go</button>
+<button class="chip" id="tp" aria-pressed="false">2-pt try</button>
+</div>
+<div id="out"></div>
+<div class="foot">Call names were parsed from the PDF text, so which hash a call sits under may be off. Check against the sheet before betting on a specific call. Small samples are leans, not tendencies.</div>
+</main>
+<script>
+const H=['Left hash','Middle','Right hash'];
+const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n});
+const same=(x)=>[x,x,x];
+const V={name:'VCA vs Kings Christian',data:{
+fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),
+ c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),
+ c(71.4,28.6,'57.1% R / 14.3% L / 28.6% M',['Fake TB power QB keeper','TB power','Reverse','FB dive','Short crossing routes','Out routes','QB keeper'])],
+d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),
+ c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing routes','TB sweep toss left','Out routes','Corner routes']),
+ c(56,44,'40% R / 10% L / 50% M',['Fake TB power QB keeper','TB power','Reverse','FB dive','QB keeper'])],
+a:[c(100,0,'',['Fake sweep toss left','FB dive']),c(0,100,'',['Fake crossbuck','Short crossing routes']),c(100,0,'',[])],
+b:[c(100,0,'0% R / 100% L',['Fake sweep toss left','FB dive']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route'])],
+e:same(c(25,75,'33.3% R / 66.7% L',['Out routes','Power pass','TB sweep toss right','Slot motion L return drag L'])),
+f:same(c(100,0,'',[])),
+g:same(c(0,100,'',['Out routes'])),
+h:same(c(0,100,'',['Fake crossbuck TE post','Power pass'])),
+i:[c(0,100,'',['Short crossing routes']),c(0,100,'',['RB screen']),null],
+pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
+notes:{f:'Sheet shows 100% right on one hash only; column unclear.',i:'Two columns logged; right hash empty by my read.',pt:'Sheet gives one 2-pt line, not split by hash.',d1:'Call lists are the most column-scrambled part of this sheet.',a:'Call placement is a best read of scrambled columns.',b:'Call placement is a best read of scrambled columns.'}};
+const A={name:'Alpaugh',data:{
+fp:[c(50,50,'33.3% R / 66.7% L',['TB power','Go routes w/ curl','QB sweep','QB sweep'],4),c(50,50,'50% R / 50% L',['Cross and w/ RB leak','QB sweep'],2),c(50,50,'25% R / 75% L',['QB power','Go routes','Pro go route TE drag RB swing'],4)],
+d1:[c(50,50,'80% R / 20% L',['QB power','Jet sweep','Go routes w/ curl','QB sweep','QB sweep'],6),c(0,100,'100% R',['Cross and w/ RB leak'],1),c(50,50,'33.3% R / 66.7% L',['QB power','Go routes','TE leak','Pro go route TE drag RB swing'],6)],
+a:[null,c(100,0,'100% L',['QB power'],2),c(0,100,'',['Curls w/ post route'],1)],
+b:[null,null,null],
+e:[c(100,0,'50% R / 50% L',['QB power','QB keeper'],2),null,c(0,100,'50% R / 50% L',['Flood','Motion L pro out route RB go route'],2)],
+f:[null,null,c(100,0,'100% L',['QB power'],1)],
+g:[null,null,null],
+h:[c(100,0,'100% R',['Jet sweep'],1),c(0,100,'',['Wheel route crossing routes underneath'],1),c(0,100,'',['Wheel route crossing routes underneath'],1)],
+i:[null,null,null],
+g1:[c(100,0,'100% L',['TB power'],1),c(100,0,'100% L',['QB sweep'],1),c(100,0,'100% L',['TE sweep'],1)],
+pt:same(c(100,0,'100% R',['QB power'],2))},
+notes:{d1:'Only 1st & 10 is logged for first down. No 4th-down data.',pt:'2 plays total, hash not logged.'}};
+const T={vca:V,alp:A};let team='vca',fp=false,gl=false,tp=false;
+const $=id=>document.getElementById(id);
+function bucket(dn,ds){
+ if(tp)return'pt';
+ if(fp)return'fp';
+ if(gl&&team==='alp'&&dn===1)return'g1';
+ if(dn===1)return'd1';
+ if(dn===2)return ds<=3?'a':ds<=7?'b':'e';
+ if(dn===3)return ds<=3?'f':ds<=6?'g':ds<=9?'h':'i';
+ return null}
+function label(dn,ds){return tp?'2-point try':fp?'First play of drive':(dn+(['','st','nd','rd'][dn])+' & '+(gl?'Goal':ds))}
+function card(x,i,on){
+ const h='<div class="hd"><b>'+H[i]+'</b><span class="n">'+(x&&x.n!=null?'n = '+x.n:'')+'</span></div>';
+ if(!x||x.c.length===0&&x.r===undefined)return'<div class="card'+(on?' on':'')+'">'+h+'<div class="none">No plays logged.</div></div>';
+ return'<div class="card'+(on?' on':'')+'">'+h+'<div class="bar"><span class="r" style="width:'+Math.max(x.r,0)+'%">'+(x.r?'Run '+x.r+'%':'')+'</span><span class="p" style="width:'+x.p+'%">'+(x.p?'Pass '+x.p+'%':'')+'</span></div>'
+ +(x.d?'<div class="row"><i>Direction</i> '+x.d+'</div>':'')
+ +(x.c.length?'<div class="row"><i>Calls</i> '+x.c.join(', ')+'</div>':'<div class="row"><i>Calls</i> none listed</div>')+'</div>'}
+function render(){
+ const t=T[team],m=($('q').value.match(/\d+/g)||[]);
+ let tk=m;if(m.length===1&&m[0].length===3)tk=m[0].split('');
+ let dn=+tk[0],ds=+tk[1],hs=+tk[2];
+ if(!tp&&!fp&&(!dn||(!gl&&!ds&&ds!==0))){$('out').innerHTML='<div class="none">Enter down, distance, hash.</div>';return}
+ if(dn===4&&!tp&&!fp){$('out').innerHTML='<div class="sit">4th down</div><div class="none">No 4th-down plays are logged on either sheet.</div>';return}
+ if(!tp&&!fp&&(dn<1||dn>3)){$('out').innerHTML='<div class="none">Down must be 1 to 3.</div>';return}
+ const k=bucket(dn,ds);const rows=t.data[k];
+ if(!rows){$('out').innerHTML='<div class="none">That situation is not on this sheet.</div>';return}
+ const hv=hs>=1&&hs<=3?hs-1:-1;
+ let o='<div class="sit">'+label(dn,ds)+'</div><div class="sub">'+(hv>=0?H[hv]+' · ':'All hashes · ')+t.name+'</div>';
+ const order=hv>=0?[hv,...[0,1,2].filter(j=>j!==hv)]:[0,1,2];
+ order.forEach(j=>{o+=card(rows[j],j,j===hv)});
+ if(t.notes[k])o+='<div class="warn">'+t.notes[k]+'</div>';
+ $('out').innerHTML=o}
+function seg(){ $('team').innerHTML=Object.keys(T).map(k=>'<button aria-pressed="'+(k===team)+'" data-k="'+k+'">'+T[k].name+'</button>').join('');
+ document.querySelectorAll('#team button').forEach(b=>b.onclick=()=>{team=b.dataset.k;seg();render()})}
+[['fp',v=>fp=v],['gl',v=>gl=v],['tp',v=>tp=v]].forEach(([id,set])=>{$(id).onclick=()=>{const b=$(id),on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);set(on);render()}});
+$('q').addEventListener('input',render);
+
+/* ================= VOICE ================= */
+// Spoken words -> numbers. Includes common mishears (won, to, for, free, sweet, ate).
+const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20};
+function flag(id,v){$(id).setAttribute('aria-pressed',v)}
+
+// Takes any phrase ("third and five middle", "3 5 2", "first play of drive right")
+// and writes canonical numbers into the box, then renders.
+function speech(raw){
+ const t=raw.toLowerCase();
+ if(/new play|clear|reset/.test(t)){fp=gl=tp=false;['fp','gl','tp'].forEach(i=>flag(i,false));$('q').value='';render();return}
+ fp=/first play|drive/.test(t);gl=/goal/.test(t);tp=/two[- ]?point|2[- ]?point|2 ?pt/.test(t);
+ flag('fp',fp);flag('gl',gl);flag('tp',tp);
+ // Hash words: left=1, middle=2, right=3 ("white"/"bright" count as right)
+ let hw=/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
+ const nums=[];
+ t.split(/[^a-z0-9]+/).forEach(w=>{
+  if(/^\d+$/.test(w))nums.push(+w);
+  else if(w in NUM&&!(w==='first'&&fp))nums.push(NUM[w])});
+ let dn,ds,hs;
+ if(hw){[dn,ds]=nums;hs=hw}else{[dn,ds,hs]=nums;if(fp||tp)hs=nums[nums.length-1]}
+ if(fp||tp){dn=1;ds=10}else if(gl&&ds===undefined)ds=0;
+ if(hs===undefined&&!fp&&!tp&&nums.length<3&&!hw){$('q').value=nums.join(' ');render();return}
+ $('q').value=[dn,ds,hs].filter(x=>x!==undefined).join(' ');render()}
+
+// Keyboard-mic path: dictating words into the box runs the same parser.
+$('q').addEventListener('input',e=>{if(/[a-z]/i.test(e.target.value))speech(e.target.value)});
+
+// In-page mic. Needs HTTPS or localhost, and a host that allows mic access.
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,on=false;
+$('mic').onclick=()=>{
+ if(!SR){$('heard').textContent='Voice is not supported in this browser. Tap the number box above and hit the mic on your keyboard.';$('q').focus();return}
+ if(on){on=false;rec&&rec.stop();flag('mic',false);$('mic').textContent='Tap to listen';return}
+ rec=new SR();rec.continuous=true;rec.interimResults=false;rec.lang='en-US';
+ rec.onresult=e=>{const r=e.results[e.results.length-1][0].transcript.trim();$('heard').textContent='Heard: "'+r+'"';speech(r)};
+ rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){on=false;flag('mic',false);$('mic').textContent='Tap to listen';$('heard').textContent='Mic is blocked on this page. Tap the number box above and hit the mic on your keyboard. Say it the same way.';$('q').focus()}};
+ rec.onend=()=>{if(on)try{rec.start()}catch(_){}};
+ on=true;flag('mic',true);$('mic').textContent='Listening. Tap to stop';rec.start()};
+
+seg();render();
+</script></body></html>
