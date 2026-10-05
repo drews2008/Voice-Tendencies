@@ -21,6 +21,11 @@ h1{font:700 22px 'Barlow Condensed',sans-serif;margin:0 0 10px;letter-spacing:.0
 .mic{width:100%;margin:8px 0 0;padding:14px;border-radius:10px;border:2px solid var(--ink);background:var(--card);color:var(--ink);font:700 20px 'Barlow Condensed',sans-serif;letter-spacing:.04em;cursor:pointer}
 .mic[aria-pressed=true]{background:var(--run);color:#fff;border-color:var(--run)}
 #heard{min-height:20px;color:var(--mute);font-size:14px;margin-top:6px}
+.sum{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:14px;margin-bottom:12px}
+.sum p{margin:0 0 10px;font-size:17px;line-height:1.5}
+.sumbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sumbar button{border:1.5px solid var(--ink);background:var(--acc);color:var(--accink);padding:10px 16px;border-radius:8px;font:700 16px Barlow,sans-serif;cursor:pointer}
+.sumbar label{font-size:14px;color:var(--mute)}
 .hint{color:var(--mute);font-size:13px;margin:6px 0 10px}
 .chips{display:flex;gap:6px;margin-bottom:14px}
 .sit{font:700 34px/1.05 'Barlow Condensed',sans-serif;margin:6px 0 2px}
@@ -49,6 +54,7 @@ h1{font:700 22px 'Barlow Condensed',sans-serif;margin:0 0 10px;letter-spacing:.0
 <button class="chip" id="gl" aria-pressed="false">Goal to go</button>
 <button class="chip" id="tp" aria-pressed="false">2-pt try</button>
 </div>
+<div class="sum" id="sumwrap" hidden><p id="sumtxt"></p><div class="sumbar"><button id="rd">Read aloud</button><button id="st">Stop</button><label><input type="checkbox" id="auto"> Auto-read after voice</label></div></div>
 <div id="out"></div>
 <div class="foot">Call names were parsed from the PDF text, so which hash a call sits under may be off. Check against the sheet before betting on a specific call. Small samples are leans, not tendencies.</div>
 </main>
@@ -103,6 +109,7 @@ function card(x,i,on){
  +(x.d?'<div class="row"><i>Direction</i> '+x.d+'</div>':'')
  +(x.c.length?'<div class="row"><i>Calls</i> '+x.c.join(', ')+'</div>':'<div class="row"><i>Calls</i> none listed</div>')+'</div>'}
 function render(){
+ lastSum='';$('sumwrap').hidden=true;
  const t=T[team],m=($('q').value.match(/\d+/g)||[]);
  let tk=m;if(m.length===1&&m[0].length===3)tk=m[0].split('');
  let dn=+tk[0],ds=+tk[1],hs=+tk[2];
@@ -116,7 +123,8 @@ function render(){
  const order=hv>=0?[hv,...[0,1,2].filter(j=>j!==hv)]:[0,1,2];
  order.forEach(j=>{o+=card(rows[j],j,j===hv)});
  if(t.notes[k])o+='<div class="warn">'+t.notes[k]+'</div>';
- $('out').innerHTML=o}
+ $('out').innerHTML=o;
+ lastSum=summarize(t,rows,hv,label(dn,ds),k);$('sumtxt').textContent=lastSum;$('sumwrap').hidden=false}
 function seg(){ $('team').innerHTML=Object.keys(T).map(k=>'<button aria-pressed="'+(k===team)+'" data-k="'+k+'">'+T[k].name+'</button>').join('');
  document.querySelectorAll('#team button').forEach(b=>b.onclick=()=>{team=b.dataset.k;seg();render()})}
 [['fp',v=>fp=v],['gl',v=>gl=v],['tp',v=>tp=v]].forEach(([id,set])=>{$(id).onclick=()=>{const b=$(id),on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);set(on);render()}});
@@ -159,6 +167,35 @@ $('mic').onclick=()=>{
  rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){on=false;flag('mic',false);$('mic').textContent='Tap to listen';$('heard').textContent='Mic is blocked on this page. Tap the number box above and hit the mic on your keyboard. Say it the same way.';$('q').focus()}};
  rec.onend=()=>{if(on)try{rec.start()}catch(_){}};
  on=true;flag('mic',true);$('mic').textContent='Listening. Tap to stop';rec.start()};
+
+/* ================= SUMMARY + READ ALOUD ================= */
+// Built from the sheet numbers with templates. No AI call, so it only says what the data says.
+let lastSum='';
+const HS=['left hash','middle','right hash'];
+function dirSpeak(d){return d.replace(/%\s*R\b/g,' percent right').replace(/%\s*L\b/g,' percent left').replace(/%\s*M\b/g,' percent middle').replace(/\s*\/\s*/g,', ')}
+function oneHash(x,i,tm){
+ if(!x||(x.r===undefined))return 'Nothing is logged on the '+HS[i]+'.';
+ let s='On the '+HS[i]+', they run '+x.r+' percent and pass '+x.p+' percent';
+ s+=x.r>=70?', so lean run.':x.p>=70?', so lean pass.':', so it is close to even.';
+ if(x.d)s+=' Direction is '+dirSpeak(x.d)+'.';
+ s+=x.c.length?' Calls logged: '+x.c.slice(0,4).join(', ')+'.':' No specific calls are listed.';
+ if(x.n!=null)s+=x.n<=3?' Only '+x.n+(x.n===1?' play':' plays')+' behind that, so treat it as a hint, not a tendency.':' Based on '+x.n+' plays, which is still a small sample.';
+ return s}
+function summarize(t,rows,hv,lab,k){
+ const head=lab.replace('&','and')+', '+t.name+'. ';
+ let body=hv>=0?oneHash(rows[hv],hv,t):[0,1,2].map(i=>oneHash(rows[i],i,t)).join(' ');
+ let tail=t.notes[k]?' Note: '+t.notes[k]:'';
+ if(t===V&&!tail.includes('column'))tail+=' Call placement by hash is a best read of the sheet.';
+ return head+body+tail}
+let spkT=null;
+function speak(){
+ if(!lastSum||!('speechSynthesis' in window))return;
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(lastSum);u.rate=1.05;speechSynthesis.speak(u)}
+$('rd').onclick=speak;
+$('st').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel()};
+const _sp=speech;
+speech=function(raw){_sp(raw);if($('auto').checked){clearTimeout(spkT);spkT=setTimeout(speak,700)}};
 
 seg();render();
 </script></body></html>
