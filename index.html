@@ -60,7 +60,7 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 <button id="mic" aria-pressed="false" hidden>Tap to listen</button>
 <div id="heard" aria-live="polite">Tap the box, then tap the mic on your keyboard and say it.</div>
 <details><summary>How to say it</summary>
-<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "firs[...]
+<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and goal", or "2 point try".</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
@@ -68,7 +68,7 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 <span class="lbl">Situation</span><div class="chips" id="mode" role="group"></div>
 
 <div id="res" aria-live="polite"></div>
-<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a ca[...]
+<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a call.</div>
 </main>
 <script>
 const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
@@ -210,8 +210,19 @@ function say(raw){
   if(mode==='gl'){S.mode='gl';S.dn=n[0];ok=true}
   else if(ds>=1){S.mode='play';S.dn=n[0];S.ds=Math.min(ds,25);ok=true}
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
- if(!ok){$('heard').textContent+=' — I did not catch a down and distance. Try “third and five, middle.”';return}
- upd();if(autoOn)setTimeout(speak,500)}
+ if(!ok){
+  $('heard').textContent+=' — I did not catch a down and distance. Try “third and five, middle.”';
+  lastSum='I did not catch the down and distance. Try “third and five, middle.” Want me to check the left, middle, or right hash?';
+  if(autoOn)setTimeout(speak,500);
+  return;
+ }
+ upd();
+ if(S.mode==='play' && S.dn && S.ds && S.hs===0 && !/left|middle|right/.test(t)){
+  const follow = ' Want me to check the left, middle, or right hash?';
+  lastSum += follow;
+  if(autoOn)setTimeout(speak,500);
+ }
+}
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(qt);say($('q').value);$('q').blur()}});
