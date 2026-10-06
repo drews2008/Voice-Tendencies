@@ -212,16 +212,13 @@ function say(raw){
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
  if(!ok){
   $('heard').textContent+=' — I did not catch a down and distance. Try “third and five, middle.”';
-  lastSum='I did not catch the down and distance. Try “third and five, middle.” Want me to check the left, middle, or right hash?';
-  if(autoOn)setTimeout(speak,500);
   return;
  }
  upd();
  if(S.mode==='play' && S.dn && S.ds && S.hs===0 && !/left|middle|right/.test(t)){
-  const follow = ' Want me to check the left, middle, or right hash?';
-  lastSum += follow;
-  if(autoOn)setTimeout(speak,500);
+  $('heard').textContent += ' — Need a hash? Say left, middle, or right.';
  }
+ if(autoOn)setTimeout(speak,500)
 }
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
