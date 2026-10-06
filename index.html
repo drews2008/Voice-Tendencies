@@ -14,7 +14,7 @@ body{margin:0;background:radial-gradient(circle at top,#f7f6ee 0%,var(--bg) 42%,
 main{max-width:560px;margin:0 auto;padding:14px 14px 48px}
 h1{font:700 24px 'Barlow Condensed',sans-serif;margin:0 0 10px;letter-spacing:.02em;color:var(--ink)}
 button{font-family:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--run);outline-offset:2px}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--run);outline-offset:2px}
 .grp{display:flex;gap:6px;margin-bottom:12px}
 .grp button,.step button{flex:1;min-height:48px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 1px 0 rgba(18,37,26,.06)}
 .grp button[aria-pressed=true]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
@@ -24,10 +24,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visi
 #mic[aria-pressed=true]{background:var(--run);border-color:var(--run);color:var(--barink)}
 #heard{min-height:22px;color:var(--mute);font-size:15px;margin:6px 0}
 details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min-height:32px}
+.pl{margin:12px 0}.pl summary{font-weight:600;color:var(--ink)}.pl div{padding:7px 0;border-bottom:1px solid var(--line);color:var(--ink)}
 .step{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .step button{flex:0 0 56px;font-size:24px}
 .step output{flex:1;text-align:center;font:700 40px 'Barlow Condensed',sans-serif}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .chips button{flex:1 0 44px;min-height:44px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font-weight:600}
 .chips button[aria-pressed=true]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 .off{opacity:.4}
@@ -55,18 +56,19 @@ details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min
 <div class="grp" id="team" role="group" aria-label="Scouting sheet"></div>
 
 <label class="lbl" for="q">Say or type the situation</label>
-<input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="third and five, middle">
+<input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="third and five, middle, ugly">
 <div id="heard" aria-live="polite">Tap Start hands-free once, then just talk. Or type here.</div>
 <details><summary>What you can say</summary>
-<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Also "first play of drive, right" or "2 point try". If you leave out the yards or the hash, I'll ask. Answer with just "five" or "left" ("all" works for hash). Then say "yes" for more detail or "no" to move on. Anytime: "what about left", "third and long", "repeat", "stop", "start over". Tap the big button while I'm talking to cut me off.</p></details>
+<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Also "first play of drive", "2 point try", "goal to go". Alpaugh only: add a formation ("ugly", "pro", "doubles", "trips", "tight", "wide"), "motion" or "no motion", "red zone". Say a formation alone ("what about ugly") for every down. "Any formation" clears filters. I'll ask for yards or hash if you skip them. Then "yes" for more or "no" to move on. Also "repeat", "stop", "start over".</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
 <span class="lbl">Hash</span><div class="grp" id="hs" role="group"></div>
 <span class="lbl">Situation</span><div class="chips" id="mode" role="group"></div>
+<div id="fl"><span class="lbl">Formation, motion, zone (Alpaugh)</span><div class="chips" id="fm" role="group"></div><div class="chips" id="mo" role="group"></div></div>
 
 <div id="res" aria-live="polite"></div>
-<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a call.</div>
+<div class="foot">Alpaugh is computed live from the logged plays (9/11 Maricopa, 9/25 LCA). VCA vs Kings Christian only has the sheet's summary tendencies, with call names read from PDF text. Small samples: treat as hints.</div>
 </main>
 <script>
 const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
@@ -79,21 +81,44 @@ e:same(c(25,75,'33.3% R / 66.7% L',['Out routes','Power pass','TB sweep toss rig
 f:same(c(100,0,'',[])),g:same(c(0,100,'',['Out routes'])),h:same(c(0,100,'',['Fake crossbuck TE post','Power pass'])),
 i:[c(0,100,'',['Short crossing routes']),c(0,100,'',['RB screen']),null],
 pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
-notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}},
-A={name:'Alpaugh',short:'Alpaugh',opp:'Alpaugh',data:{
-fp:[c(50,50,'33.3% R / 66.7% L',['TB power','Go routes w/ curl','QB sweep','QB sweep'],4),c(50,50,'50% R / 50% L',['Cross and w/ RB leak','QB sweep'],2),c(50,50,'25% R / 75% L',['QB power','Go routes','Jet sweep'],3)],
-d1:[c(50,50,'80% R / 20% L',['QB power','Jet sweep','Go routes w/ curl','QB sweep','QB sweep'],6),c(0,100,'100% R',['Cross and w/ RB leak'],1),c(50,50,'33.3% R / 66.7% L',['QB power','Go routes','Jet sweep'],3)],
-a:[null,c(100,0,'100% L',['QB power'],2),c(0,100,'',['Curls w/ post route'],1)],b:[null,null,null],
-e:[c(100,0,'50% R / 50% L',['QB power','QB keeper'],2),null,c(0,100,'50% R / 50% L',['Flood','Motion L pro out route RB go route'],2)],
-f:[null,null,c(100,0,'100% L',['QB power'],1)],g:[null,null,null],
-h:[c(100,0,'100% R',['Jet sweep'],1),c(0,100,'',['Wheel route crossing routes underneath'],1),c(0,100,'',['Wheel route crossing routes underneath'],1)],
-i:[null,null,null],
-g1:[c(100,0,'100% L',['TB power'],1),c(100,0,'100% L',['QB sweep'],1),c(100,0,'100% L',['TE sweep'],1)],
-pt:same(c(100,0,'100% R',['QB power'],2))},
-notes:{d1:'Only 1st and 10 is logged for first down.',pt:'Two plays total, and the hash was not logged.'}};
+notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}};
+/* Alpaugh raw log. Fields: game|down|dist|driveStarter|goal|zone|hash|personnel|formation|motion|type|call|dir|yards|outcome|success */
+const RAW=[
+"M|1|10|1|0|o2|3|22|Ugly R|0|R|QB power|L|2|Rush|N",
+"M|2|9|0|0|o2|1|22|Ugly R|0|R|QB power|R|6|Rush|Y",
+"M|3|3|0|0|o2|3|22|Ugly L|0|R|QB power|L|8|Rush|Y",
+"M|1|10|0|0|p2|1|22|Ugly R|0|R|QB power|R|7|Rush|Y",
+"M|2|3|0|0|p2|2|22|Ugly L|0|R|QB power|L|8|Rush|Y",
+"M|1|10|0|0|p2|1|22|Ugly R|0|R|QB power|R|7||Y",
+"M|2|3|0|0|p2|2|22|Ugly L|0|R|QB power|L|-3||N",
+"M|3|8|0|0|o2|2|11|Wide L Pro R|1|P|Wheel RTE Crossing RTE's underneath||36||Y",
+"M|T|0|0|0|p1|0|22|Ugly R|0|R|QB power|R|2|Rush|Y",
+"M|1|10|1|0|p1|3|01|Trips R|0|P|Go routes|R|0|Incomplete|N",
+"M|2|10|0|0|o2|3|11|Pro L Wide R|1|P|Flood|R|3|Complete|N",
+"M|3|7|0|0|o2|3|11|Pro L Wide R|1|P|Wheel RTE Crossing RTE's underneath||0|Incomplete|N",
+"M|1|8|1|1|p1|1|22|Tight Split Back|0|R|TB power|L|9|Rush, TD|Y",
+"L|1|10|1|0|o2|1|11|Pro L Wide R|1|P|||-5|Penalty|N",
+"L|1|15|0|0|o1|1|11|Pro L Wide R|1|P|Go routes with a drag|R|5|Complete|Y",
+"L|2|10|0|0|o2|3|21|Pro L|1|P|Motion L Pro out rte RB go rte|L|8|Complete|Y",
+"L|1|10|0|0|o2|1|11|Doubles L|1|R|Jet sweep|R|8||Y",
+"L|2|2|0|0|o2|3|12|Pro L|0|P|Curls with a post RTE||9|Scramble|Y",
+"L|1|10|0|0|p2|3|02|Doubles L|0|P|TE leak|L|31|TD|Y",
+"L|T|0|0|0||0|22|Ugly L|1|R|QB power|R|2|Good|Y",
+"L|1|10|1|0|o1|2|21|Pro R|0|P|Cross and with RB leak|R|0|Penalty|N",
+"L|1|10|0|0|o2|3|||0|R|QB power|R|52|TD|Y",
+"L|1|10|1|0|p1|1|11|Doubles L|0|P|Go routes with a curl|L|0|Incomplete|N",
+"L|2|10|0|0|p1|1|21|Pro L Wide R|0|R|QB keeper|L|1|Rush|N",
+"L|3|9|0|0|p1|1|21|Ugly R Wide R|0|R|Jet sweep|R|19|TD|Y",
+"L|1|10|1|0|p2|3|12|Pro L|0|P|Pro go RTE TE drag RB swing|L|0|Penalty|Y",
+"L|1|6|0|1|p1|3|22|Ugly L|0|R|TE sweep|L|6|TD|Y",
+"L|1|10|1|0|o2|1|22|Ugly R|0|R|QB sweep|R|16|First down|Y",
+"L|1|10|1|0|p1|3|22|Ugly L|0|R|QB sweep|L|14|TD|Y",
+"L|1|2|1|1|p1|2|22|Ugly L|0|R|QB sweep|L|2|Penalty|N"];
+const LOG=RAW.map(r=>{const a=r.split('|');return{g:a[0],dn:a[1]==='T'?'T':+a[1],ds:+a[2],s:+a[3],gl:+a[4],z:a[5],h:+a[6],pr:a[7],f:a[8],m:+a[9],t:a[10],c:a[11],d:a[12],y:+a[13],o:a[14],k:a[15]}});
+const A={name:'Alpaugh',short:'Alpaugh',opp:'Alpaugh',log:LOG,notes:{pt:'Hash was not logged on 2-point tries, so all three cards match.'}};
 const T={vca:V,alp:A},$=id=>document.getElementById(id);
-const S={team:'vca',dn:null,ds:null,hs:0,mode:'play'};
-const HN=['Left hash','Middle','Right hash'],HP=['On the left hash','In the middle','On the right hash'];
+const S={team:'alp',dn:null,ds:null,hs:0,mode:'play',fm:'',mo:'',rz:false};
+const HN=['Left hash','Middle','Right hash'],HP=['On the left hash','In the middle','On the right hash'],DW={L:'left',R:'right'};
 const ORD=['','1st','2nd','3rd','4th'],ORDW=['','first','second','third','fourth'];
 let lastSum='',lastMore='',lastMsg='',spk='',pending='';
 const bt=(a,v,txt,on)=>`<button data-a="${a}" data-v="${v}" aria-pressed="${on}">${txt}</button>`;
@@ -107,23 +132,43 @@ function ctl(){
  $('ds').className=play?'':'off';
  $('ds').innerHTML=`<div class="step"><button data-a="dsd" data-v="-1" aria-label="Fewer yards">−</button><output>${S.ds??'–'}</output><button data-a="dsd" data-v="1" aria-label="More yards">+</button></div>`;
  $('hs').innerHTML=[['Left',1],['Middle',2],['Right',3],['All',0]].map(([t,v])=>bt('hs',v,t,S.hs===v)).join('');
- $('mode').innerHTML=[['play','Regular'],['fp','First play of drive'],['gl','Goal to go'],['tp','2-point try']].map(([v,t])=>bt('mode',v,t,S.mode===v)).join('')}
+ $('mode').innerHTML=[['play','Regular'],['all','Any down'],['fp','First play of drive'],['gl','Goal to go'],['tp','2-point try']].map(([v,t])=>bt('mode',v,t,S.mode===v)).join('');
+ $('fl').className=T[S.team].log?'':'off';
+ $('fm').innerHTML=['','Ugly','Pro','Doubles','Trips','Tight','Wide'].map(f=>bt('fm',f,f||'Any formation',S.fm===f)).join('');
+ $('mo').innerHTML=[['','Any motion'],['1','Motion'],['0','No motion']].map(([v,t])=>bt('mo',v,t,S.mo===v)).join('')+bt('rz',1,'Red zone',S.rz)}
 document.addEventListener('click',e=>{const el=e.target.closest('button[data-a]');if(!el)return;const a=el.dataset.a,v=el.dataset.v;
  if(a==='team')S.team=v;else if(a==='dn')S.dn=+v;else if(a==='ds')S.ds=+v;
  else if(a==='dsd')S.ds=Math.max(1,Math.min(25,(S.ds||5)+ +v));
  else if(a==='hs')S.hs=+v;else if(a==='mode')S.mode=v;
+ else if(a==='fm')S.fm=v;else if(a==='mo')S.mo=v;else if(a==='rz')S.rz=!S.rz;
  pending='';stopSpeak();upd()});
 
-/* ---------- lookup ---------- */
+/* ---------- lookup and play-log math ---------- */
 function bucket(dn,ds){
  if(dn===1)return'd1';
  if(dn===2)return ds<=3?'a':ds<=7?'b':'e';
  return ds<=3?'f':ds<=6?'g':ds<=9?'h':'i'}
+const flt=p=>(!S.fm||p.f.split(' ')[0]===S.fm)&&(!S.mo||String(p.m)===S.mo)&&(!S.rz||p.z==='p1');
+const fl=t=>t.log?(S.fm?' out of '+S.fm:'')+(S.mo==='1'?' with motion':S.mo==='0'?' with no motion':'')+(S.rz?' in the red zone':''):'';
+function selPlays(t,key){return t.log.filter(flt).filter(p=>key==='all'?true:key==='fp'?p.s:key==='g1'?p.gl:key==='pt'?p.dn==='T':p.dn!=='T'&&bucket(p.dn,p.ds)===key)}
+function calc(ps){const n=ps.length;if(!n)return null;
+ const cnt=k=>{const m={};ps.forEach(p=>{if(p[k])m[p[k]]=(m[p[k]]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])},
+ R=ps.filter(p=>p.t==='R').length,r=+(R*100/n).toFixed(1),dl=ps.filter(p=>p.d==='L').length,dr=ps.filter(p=>p.d==='R').length,dt=dl+dr,
+ cs=cnt('c'),fs=cnt('f'),yp=ps.filter(p=>p.o!=='Penalty'),ks=ps.filter(p=>p.k),x=a=>a[0]+(a[1]>1?' ×'+a[1]:'');
+ return{r,p:+(100-r).toFixed(1),n,d:dt?`${Math.round(dr*100/dt)}% R / ${Math.round(dl*100/dt)}% L`:'',c:cs.map(a=>a[0]),cc:cs.map(x).join(', '),f:fs.map(x),
+  y:yp.length?+(yp.reduce((a,p)=>a+p.y,0)/yp.length).toFixed(1):null,sr:ks.length?Math.round(ks.filter(p=>p.k==='Y').length*100/ks.length):null,mo:ps.filter(p=>p.m).length}}
+function getRows(t,key){
+ if(!t.log)return t.data[key];
+ const sel=selPlays(t,key);return[1,2,3].map(h=>calc(key==='pt'?sel:sel.filter(p=>p.h===h)))}
+const playLine=p=>`<div>${p.g==='M'?'Maricopa':'LCA'} · ${p.dn==='T'?'2-pt try':p.dn+' & '+p.ds}${p.gl?' (goal)':''} · ${HN[p.h-1]||'no hash'} · ${p.f||'no formation'}${p.pr?' ('+p.pr+')':''}${p.m?' + motion':''} · <b>${p.c||(p.t==='R'?'run':'pass')}</b>${p.d?' '+DW[p.d]:''} · ${p.y} yds${p.o?' · '+p.o:''}</div>`;
 const msg=(t,h)=>{lastSum='';lastMore='';lastMsg=t;$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
 function upd(){
  ctl();const t=T[S.team];let key,lab;
  if(S.mode==='tp'){key='pt';lab='2-point try';spk='the two point try'}
  else if(S.mode==='fp'){key='fp';lab='First play of drive';spk='the first play of the drive'}
+ else if(S.mode==='all'){
+  if(!t.log)return msg('The VCA sheet only has situation tendencies, not a full play log. Switch to Alpaugh for the any-down view.','Any down');
+  key='all';lab='Any down';spk='any situation'}
  else if(S.mode==='gl'){
   if(S.team!=='alp')return msg('The VCA sheet does not track goal-to-go. Switch to Regular to see its normal tendencies.','Goal to go');
   if(S.dn&&S.dn!==1)return msg('Only 1st and goal is logged on this sheet.','Goal to go');
@@ -132,10 +177,13 @@ function upd(){
   if(!S.dn||!S.ds)return msg(S.dn?'How many yards?':'Pick a down and distance, or say it.');
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
   key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds;spk=ORDW[S.dn]+' and '+S.ds}
- const rows=t.data[key],hv=S.hs-1;
- let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button></div></div>`;
+ const rows=getRows(t,key),hv=S.hs-1;
+ let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}${fl(t)}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button></div></div>`;
  [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
+ if(!t.log&&(S.fm||S.mo||S.rz))o+=`<div class="warn">The VCA sheet has no formation, motion or zone data, so those filters are ignored.</div>`;
+ if(t.log){const sp=selPlays(t,key),pl=key==='pt'||hv<0?sp:sp.filter(p=>p.h===hv+1);
+  o+=`<details class="pl"><summary>${pl.length} logged plays</summary>${pl.map(playLine).join('')}</details>`}
  $('res').innerHTML=o;
  lastSum=summarize(t,rows,hv,key);lastMore=moreText(t,rows,hv,key);
  $('sumtxt').textContent=lastSum;
@@ -143,10 +191,10 @@ function upd(){
 function card(x,i,on){
  const h=`<div class="hd"><b>${HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
- return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}<div class="rw"><i>Calls</i> ${x.c.length?x.c.join(', '):'none listed'}</div></div>`}
+ return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}<div class="rw"><i>Calls</i> ${x.cc||(x.c.length?x.c.join(', '):'none listed')}</div>${x.f&&x.f.length?`<div class="rw"><i>Formations</i> ${x.f.join(', ')}</div>`:''}${x.y!=null?`<div class="rw"><i>Avg</i> ${x.y} yds${x.sr!=null?' · '+x.sr+'% success':''} · motion on ${x.mo} of ${x.n}</div>`:''}</div>`}
 
 /* ---------- spoken text ---------- */
-const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with ').replace(/\bL\b/g,'left').replace(/\bR\b/g,'right').replace(/\bM\b/g,'middle');
+const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with ').replace(/\bRTE('s)?\b/gi,'route').replace(/\bL\b/g,'left').replace(/\bR\b/g,'right').replace(/\bM\b/g,'middle');
 const J=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -174,7 +222,7 @@ function one(x,i){
  if(x.n!=null&&x.n<=3)s+=` Only ${plays(x.n)} behind that, so don't lean on it.`;
  return s}
 function summarize(t,rows,hv,k){
- let s=cap(spk)+' against '+t.opp+'. ';
+ let s=cap(spk)+fl(t)+' against '+t.opp+'. ';
  s+=hv>=0?one(rows[hv],hv):[0,1,2].map(i=>one(rows[i],i)).join(' ');
  return s+' More?'}
 function moreText(t,rows,hv,k){
@@ -183,6 +231,8 @@ function moreText(t,rows,hv,k){
   s+=`${HP[i]}, ${Math.round(x.r)} percent run, ${Math.round(x.p)} percent pass. `;
   const dl=dirLong(x.d);if(dl)s+=dl+' ';
   if(x.c.length)s+='Calls on the sheet: '+J(x.c.map(EX))+'. ';else s+='No calls listed. ';
+  if(x.f&&x.f.length)s+='Formations: '+J(x.f.slice(0,3).map(f=>EX(f).replace(/ ×(\d+)/,', $1 times')))+'. ';
+  if(x.y!=null)s+=`They average ${x.y} yards a play${x.sr!=null?', '+x.sr+' percent success':''}, with motion on ${x.mo} of ${x.n}. `;
   s+=x.n==null?"The sheet doesn't say how many plays that covers. ":x.n<=3?`That's only ${plays(x.n)}, so treat it as a hint. `:`That's ${plays(x.n)}, a decent look but not a lot. `});
  if(hv>=0){const o=[0,1,2].filter(j=>j!==hv&&rows[j]);
   if(o.length)s+='Other hashes: '+o.map(j=>`${HN[j].toLowerCase()} is ${Math.round(rows[j].r)} run, ${Math.round(rows[j].p)} pass`).join('; ')+'. '}
@@ -207,27 +257,34 @@ function ask(q,p){pending=p;$('heard').textContent=q;if(auto())speak(q)}
 function respond(noAsk){
  pending='';upd();
  if(S.mode==='play'&&S.dn&&!S.ds)return ask('How many yards?','ds');
- if(lastSum&&!noAsk&&S.hs===0&&S.mode!=='tp')return ask('Which hash?','hs');
+ if(lastSum&&!noAsk&&S.hs===0&&S.mode!=='tp'&&S.mode!=='all')return ask('Which hash?','hs');
  if(auto()){pending=lastSum?'more':'';speak(lastSum||lastMsg)}}
 function say(raw){
- const t=raw.toLowerCase().trim();if(!t)return;
+ const t0=raw.toLowerCase().trim();if(!t0)return;
  $('heard').textContent='Heard: "'+raw.trim()+'"';
+ const t=t0.replace(/\b(ugly|pro|doubles|trips|wide|tight)( split back)?\s+(left|right)\b/g,'$1');
  if(/tell me more|more detail|break it down|go deeper/.test(t)||(pending==='more'&&YES.test(t))){$('q').value='';doMore();return}
  if(pending==='more'&&NO.test(t)){pending='';$('q').value='';$('heard').textContent+=' — okay, next one.';return}
  if(/^(repeat|say that again|say again|again)\b/.test(t)){speak(lastSpoken);return}
  if(/^(stop|quiet|cancel|shut up)\b/.test(t)){pending='';stopSpeak();return}
- if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';pending='';$('q').value='';upd();if(auto())speak('Cleared. Go ahead.');return}
+ const clrF=/\b(any formation|all formations|clear filters?|no filters?)\b/.test(t);
+ if(!clrF&&/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';S.fm=S.mo='';S.rz=false;pending='';$('q').value='';upd();if(auto())speak('Cleared. Go ahead.');return}
  if(pending==='ds'){
   const n=nums(t),sh=/\bshort\b/.test(t)?2:/\bmedium\b/.test(t)?5:/\blong\b/.test(t)?(S.dn===3?10:8):null,d=sh??n[0],hw=hashOf(t);
   if(d>=1){S.ds=Math.min(d,25);if(hw)S.hs=hw;return respond(S.hs>0||allWord(t))}}
  if(pending==='hs'){
   const hw=hashOf(t);
   if(hw||allWord(t)){S.hs=hw;return respond(true)}}
+ let fchg=false;
+ if(clrF){S.fm=S.mo='';S.rz=false;fchg=true}
+ const fw=/\b(ugly|pro|doubles|trips|tight|wide)\b/.exec(t);if(fw){S.fm=cap(fw[1]);fchg=true}
+ if(/\b(no|without) motion\b/.test(t)){S.mo='0';fchg=true}else if(/\bmotion\b/.test(t)){S.mo='1';fchg=true}
+ if(/red ?zone/.test(t)){S.rz=true;fchg=true}
  const mode=/two[- ]?point|\b2[- ]?(pt|point)/.test(t)?'tp':/first play|drive/.test(t)?'fp':/goal/.test(t)?'gl':'play';
  const hw=hashOf(t);
  const n=nums(t.replace(/two[- ]?point|\b2[- ]?(pt|point)/g,''),mode==='fp');let ok=false;
  if(mode==='fp'||mode==='tp'){S.mode=mode;S.hs=hw||n.filter(x=>x>=1&&x<=3).pop()||0;ok=true}
- else if(n.length===0&&hw){S.hs=hw;ok=true}
+ else if(n.length===0&&(hw||fchg)){if(hw)S.hs=hw;if(fchg&&!S.dn&&S.mode==='play')S.mode='all';ok=true}
  else if(mode==='gl'&&!(n[0]>=1&&n[0]<=4)){S.mode='gl';S.hs=hw;ok=true}
  else if(n[0]===4&&mode==='play'){S.mode='play';S.dn=4;S.ds=n[1]||S.ds||1;ok=true}
  else if(n[0]>=1&&n[0]<=4){
@@ -238,7 +295,7 @@ function say(raw){
   else if(n.length===1){S.mode='play';S.dn=n[0];S.ds=null;ok=true}
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
  if(!ok){const m='Say that again?';$('heard').textContent+=' — I did not catch a down and distance. Try "third and five, middle."';if(auto())speak(m);return}
- respond(S.hs>0||allWord(t)||S.mode==='tp')}
+ respond(S.hs>0||allWord(t)||S.mode==='tp'||S.mode==='all'||(fchg&&n.length===0))}
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(qt);say($('q').value);$('q').blur()}});
