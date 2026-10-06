@@ -249,9 +249,9 @@ function nums(t,skipFirst){const out=[];
   if(/^\d+$/.test(w)){if(w.length===3)out.push(+w[0],+w[1],+w[2]);else if(w.length===4)out.push(+w[0],+w.slice(1,3),+w[3]);else out.push(+w)}
   else if(w in NUM&&!(skipFirst&&w==='first')){const n=NUM[w],l=out[out.length-1];if(n>0&&n<10&&l>=20&&l%10===0)out[out.length-1]=l+n;else out.push(n)}});
  return out}
-const YES=/^(yes|yeah|yep|yup|sure|okay|ok|please|go ahead|go on|more|do it)\b/,NO=/^(no|nope|nah|next|that'?s it|i'?m good|done|all good)\b/;
+const YES=/^(yes|yeah|yep|yup|sure|okay|ok|please|go ahead|go on|more|do it)\b/,NO=/^(no|nope|nah|skip|next|that'?s it|i'?m good|done|all good)\b/;
 const hashOf=t=>/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
-const allWord=t=>/\b(all|any|every|don'?t know|not sure)\b/.test(t);
+const allWord=t=>/\b(all|any|every|don'?t know|not sure|skip|no hash|none|doesn'?t matter|does not matter|whatever|never ?mind)\b/.test(t);
 const auto=()=>listening;
 function ask(q,p){pending=p;$('heard').textContent=q;if(auto())speak(q)}
 function respond(noAsk){
@@ -274,7 +274,7 @@ function say(raw){
   if(d>=1){S.ds=Math.min(d,25);if(hw)S.hs=hw;return respond(S.hs>0||allWord(t))}}
  if(pending==='hs'){
   const hw=hashOf(t);
-  if(hw||allWord(t)){S.hs=hw;return respond(true)}}
+  if(hw||allWord(t)||/^(no|nope|nah)\W*$/.test(t)){S.hs=hw;return respond(true)}}
  let fchg=false;
  if(clrF){S.fm=S.mo='';S.rz=false;fchg=true}
  const fw=/\b(ugly|pro|doubles|trips|tight|wide)\b/.exec(t);if(fw){S.fm=cap(fw[1]);fchg=true}
