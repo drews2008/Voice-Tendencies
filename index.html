@@ -59,7 +59,7 @@ details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min
 <input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="third and five, middle, ugly">
 <div id="heard" aria-live="polite">Tap Start hands-free once, then just talk. Or type here.</div>
 <details><summary>What you can say</summary>
-<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Also "first play of drive", "2 point try", "goal to go". Alpaugh only: add a formation ("ugly", "pro", "doubles", "trips", "tight", "wide"), "motion" or "no motion", "red zone". Say a formation alone ("what about ugly") for every down. "Any formation" clears filters. I'll ask for yards or hash if you skip them. Then "yes" for more or "no" to move on. Also "repeat", "stop", "start over".</p></details>
+<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Also "first play of drive", "2 point try", "goal to go". Alpaugh only: add a formation ("ugly", "pro", "doubles", "trips", "tight", "wide"), "motion" or "no motion", "red zone". Say a formation alone ("what about ugly") for every down. "Any formation" clears filters. I'll ask for yards or hash if you skip them. Say "all" for hash and you get one combined answer. Say "by hash" to split it into left, middle and right. Then "yes" for more or "no" to move on. Also "repeat", "stop", "start over".</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
@@ -131,7 +131,7 @@ function ctl(){
  $('dn').innerHTML=[1,2,3].map(n=>bt('dn',n,ORD[n],S.dn===n)).join('');
  $('ds').className=play?'':'off';
  $('ds').innerHTML=`<div class="step"><button data-a="dsd" data-v="-1" aria-label="Fewer yards">−</button><output>${S.ds??'–'}</output><button data-a="dsd" data-v="1" aria-label="More yards">+</button></div>`;
- $('hs').innerHTML=[['Left',1],['Middle',2],['Right',3],['All',0]].map(([t,v])=>bt('hs',v,t,S.hs===v)).join('');
+ $('hs').innerHTML=[['Left',1],['Middle',2],['Right',3],['All',0],['By hash',-1]].map(([t,v])=>bt('hs',v,t,S.hs===v)).join('');
  $('mode').innerHTML=[['play','Regular'],['all','Any down'],['fp','First play of drive'],['gl','Goal to go'],['tp','2-point try']].map(([v,t])=>bt('mode',v,t,S.mode===v)).join('');
  $('fl').className=T[S.team].log?'':'off';
  $('fm').innerHTML=['','Ugly','Pro','Doubles','Trips','Tight','Wide'].map(f=>bt('fm',f,f||'Any formation',S.fm===f)).join('');
@@ -177,9 +177,9 @@ function upd(){
   if(!S.dn||!S.ds)return msg(S.dn?'How many yards?':'Pick a down and distance, or say it.');
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
   key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds;spk=ORDW[S.dn]+' and '+S.ds}
- const rows=getRows(t,key),hv=S.hs-1;
- let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}${fl(t)}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button></div></div>`;
- [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
+ const hv=S.hs>0?S.hs-1:-1,ag=S.hs===0,full=getRows(t,key),rows=ag?[t.log?calc(selPlays(t,key)):aggRows(full)]:full;
+ let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:ag?'All hashes':'By hash'} · ${t.name}${fl(t)}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button></div></div>`;
+ if(ag)o+=card(rows[0],-1,true);else [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
  if(!t.log&&(S.fm||S.mo||S.rz))o+=`<div class="warn">The VCA sheet has no formation, motion or zone data, so those filters are ignored.</div>`;
  if(t.log){const sp=selPlays(t,key),pl=key==='pt'||hv<0?sp:sp.filter(p=>p.h===hv+1);
@@ -189,7 +189,7 @@ function upd(){
  $('sumtxt').textContent=lastSum;
  $('rd').onclick=()=>speak(lastSum);$('mr').onclick=doMore;$('st').onclick=stopSpeak}
 function card(x,i,on){
- const h=`<div class="hd"><b>${HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
+ const h=`<div class="hd"><b>${i<0?'All hashes':HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
  return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}<div class="rw"><i>Calls</i> ${x.cc||(x.c.length?x.c.join(', '):'none listed')}</div>${x.f&&x.f.length?`<div class="rw"><i>Formations</i> ${x.f.join(', ')}</div>`:''}${x.y!=null?`<div class="rw"><i>Avg</i> ${x.y} yds${x.sr!=null?' · '+x.sr+'% success':''} · motion on ${x.mo} of ${x.n}</div>`:''}</div>`}
 
@@ -200,6 +200,11 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const plays=n=>n+(n===1?' play':' plays');
 const SIDE={R:'right',L:'left',M:'middle'};
+const hp=i=>i<0?'Across all hashes':HP[i],SPL=/\b(by hash|split|each hash|every hash)\b/;
+function aggRows(rs){rs=rs.filter(Boolean);if(!rs.length)return null;
+ const m=k=>+(rs.reduce((a,x)=>a+x[k],0)/rs.length).toFixed(1),D={};let dn=0;
+ rs.forEach(x=>{const ps=dirParts(x.d);if(ps.length){dn++;ps.forEach(q=>{D[q.s]=(D[q.s]||0)+q.v})}});
+ return{r:m('r'),p:m('p'),n:rs.some(x=>x.n==null)?null:rs.reduce((a,x)=>a+x.n,0),d:dn?['R','L','M'].filter(k=>D[SIDE[k]]).map(k=>Math.round(D[SIDE[k]]/dn)+'% '+k).join(' / '):'',c:[...new Set(rs.flatMap(x=>x.c))]}}
 function dirParts(d){return d?d.split(/\s*\/\s*/).map(s=>{const g=s.match(/([\d.]+)%\s*([RLM])/);return g?{v:+g[1],s:SIDE[g[2]]}:null}).filter(Boolean).sort((a,b)=>b.v-a.v):[]}
 function dirShort(d){const m=dirParts(d);if(!m.length)return'';
  if(m[0].v>=95)return pick([`Every one went ${m[0].s}.`,`All of it went ${m[0].s}.`]);
@@ -215,20 +220,20 @@ function clause(r,p){
  if(d<=5)return pick(["it's a coin flip","it's dead even, run or pass","no real lean, run or pass"]);
  return pick([`slight lean to the ${side}`,`a little more ${side} than anything`])}
 function one(x,i){
- if(!x)return`${HP[i]}, nothing logged.`;
- let s=`${HP[i]}, ${clause(x.r,x.p)}.`;
+ if(!x)return`${hp(i)}, nothing logged.`;
+ let s=`${hp(i)}, ${clause(x.r,x.p)}.`;
  const dd=dirShort(x.d);if(dd)s+=' '+dd;
  if(x.c.length){const calls=x.c.slice(0,2).map(EX);s+=' '+pick(['Watch for','Look for','Expect','Be ready for'])+' '+J(calls)+'.'}
  if(x.n!=null&&x.n<=3)s+=` Only ${plays(x.n)} behind that, so don't lean on it.`;
  return s}
 function summarize(t,rows,hv,k){
  let s=cap(spk)+fl(t)+' against '+t.opp+'. ';
- s+=hv>=0?one(rows[hv],hv):[0,1,2].map(i=>one(rows[i],i)).join(' ');
+ s+=hv>=0?one(rows[hv],hv):S.hs===0?one(rows[0],-1):[0,1,2].map(i=>one(rows[i],i)).join(' ');
  return s+' More?'}
 function moreText(t,rows,hv,k){
- const idx=hv>=0?[hv]:[0,1,2];let s='';
- idx.forEach(i=>{const x=rows[i];if(!x){s+=`${HP[i]}, nothing logged. `;return}
-  s+=`${HP[i]}, ${Math.round(x.r)} percent run, ${Math.round(x.p)} percent pass. `;
+ const idx=hv>=0?[hv]:S.hs===0?[0]:[0,1,2];let s='';
+ idx.forEach(i=>{const x=rows[i],H=hp(S.hs===0?-1:i);if(!x){s+=`${H}, nothing logged. `;return}
+  s+=`${H}, ${Math.round(x.r)} percent run, ${Math.round(x.p)} percent pass. `;
   const dl=dirLong(x.d);if(dl)s+=dl+' ';
   if(x.c.length)s+='Calls on the sheet: '+J(x.c.map(EX))+'. ';else s+='No calls listed. ';
   if(x.f&&x.f.length)s+='Formations: '+J(x.f.slice(0,3).map(f=>EX(f).replace(/ ×(\d+)/,', $1 times')))+'. ';
@@ -271,11 +276,12 @@ function say(raw){
  if(!clrF&&/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';S.fm=S.mo='';S.rz=false;pending='';$('q').value='';upd();if(auto())speak('Cleared. Go ahead.');return}
  if(pending==='ds'){
   const n=nums(t),sh=/\bshort\b/.test(t)?2:/\bmedium\b/.test(t)?5:/\blong\b/.test(t)?(S.dn===3?10:8):null,d=sh??n[0],hw=hashOf(t);
-  if(d>=1){S.ds=Math.min(d,25);if(hw)S.hs=hw;return respond(S.hs>0||allWord(t))}}
+  if(d>=1){S.ds=Math.min(d,25);if(hw)S.hs=hw;if(SPL.test(t))S.hs=-1;return respond(S.hs!==0||allWord(t))}}
  if(pending==='hs'){
   const hw=hashOf(t);
+  if(SPL.test(t)){S.hs=-1;return respond(true)}
   if(hw||allWord(t)||/^(no|nope|nah)\W*$/.test(t)){S.hs=hw;return respond(true)}}
- let fchg=false;
+ let fchg=false;const spl=SPL.test(t);
  if(clrF){S.fm=S.mo='';S.rz=false;fchg=true}
  const fw=/\b(ugly|pro|doubles|trips|tight|wide)\b/.exec(t);if(fw){S.fm=cap(fw[1]);fchg=true}
  if(/\b(no|without) motion\b/.test(t)){S.mo='0';fchg=true}else if(/\bmotion\b/.test(t)){S.mo='1';fchg=true}
@@ -284,7 +290,7 @@ function say(raw){
  const hw=hashOf(t);
  const n=nums(t.replace(/two[- ]?point|\b2[- ]?(pt|point)/g,''),mode==='fp');let ok=false;
  if(mode==='fp'||mode==='tp'){S.mode=mode;S.hs=hw||n.filter(x=>x>=1&&x<=3).pop()||0;ok=true}
- else if(n.length===0&&(hw||fchg)){if(hw)S.hs=hw;if(fchg&&!S.dn&&S.mode==='play')S.mode='all';ok=true}
+ else if(n.length===0&&(hw||fchg||spl)){if(hw)S.hs=hw;if(fchg&&!S.dn&&S.mode==='play')S.mode='all';ok=true}
  else if(mode==='gl'&&!(n[0]>=1&&n[0]<=4)){S.mode='gl';S.hs=hw;ok=true}
  else if(n[0]===4&&mode==='play'){S.mode='play';S.dn=4;S.ds=n[1]||S.ds||1;ok=true}
  else if(n[0]>=1&&n[0]<=4){
@@ -295,7 +301,8 @@ function say(raw){
   else if(n.length===1){S.mode='play';S.dn=n[0];S.ds=null;ok=true}
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
  if(!ok){const m='Say that again?';$('heard').textContent+=' — I did not catch a down and distance. Try "third and five, middle."';if(auto())speak(m);return}
- respond(S.hs>0||allWord(t)||S.mode==='tp'||S.mode==='all'||(fchg&&n.length===0))}
+ if(spl)S.hs=-1;
+ respond(S.hs!==0||allWord(t)||S.mode==='tp'||S.mode==='all'||(fchg&&n.length===0))}
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(qt);say($('q').value);$('q').blur()}});
