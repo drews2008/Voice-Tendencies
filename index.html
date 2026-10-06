@@ -34,19 +34,20 @@ details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min
 .off{opacity:.4}
 .sit{font:700 40px/1.05 'Barlow Condensed',sans-serif;margin:18px 0 2px}
 .sub{color:var(--mute);margin-bottom:12px}
-.sum{background:linear-gradient(180deg,#fefefb 0%,#f3f5ee 100%);border:2px solid var(--ink);border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 3px 0 rgba(18,37,26,.06)}
+.sum{background:linear-gradient(180deg,#fefefb 0%,#f3f5ee 100%);border:2px solid var(--ink);border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 3px 0 rgba(18,37,26,.06);color:#12251a}
 .sum p{margin:0 0 12px;font-size:18px;line-height:1.55}
+.sum p[hidden]{display:none}
 .sumbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sumbar button{min-height:48px;padding:8px 18px;border:1.5px solid var(--ink);background:var(--acc);color:var(--accink);border-radius:8px;font-weight:700;font-size:16px}
-.sumbar label{font-size:14px;color:var(--mute)}
+.sumbar label{font-size:14px;color:#5d7568}
 select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:8px}
-.card{background:linear-gradient(180deg,#fff,#f9faf7);border:1.5px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 0 rgba(18,37,26,.04)}
-.card.on{border:2.5px solid var(--ink)}
+.card{background:linear-gradient(180deg,#fff,#f9faf7);border:1.5px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 0 rgba(18,37,26,.04);color:#12251a}
+.card.on{border:2.5px solid #12251a}
 .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.hd b{font:700 22px 'Barlow Condensed',sans-serif}.n{color:var(--mute);font-size:13px}
+.hd b{font:700 22px 'Barlow Condensed',sans-serif}.n{color:#5d7568;font-size:13px}
 .bar{display:flex;height:36px;border-radius:6px;overflow:hidden;font:700 18px/36px 'Barlow Condensed',sans-serif;color:var(--barink)}
 .bar span{padding-left:8px;white-space:nowrap;overflow:hidden}.bar .r{background:var(--run)}.bar .p{background:var(--pass)}
-.rw{margin-top:8px;font-size:15px}.rw i{font-style:normal;color:var(--mute)}
+.rw{margin-top:8px;font-size:15px}.rw i{font-style:normal;color:#5d7568}
 .warn{border-left:4px solid var(--acc);padding:6px 10px;margin:8px 0;font-size:14px;color:var(--mute)}
 .none{color:var(--mute);padding:8px 0;font-size:17px}
 .foot{color:var(--mute);font-size:12px;margin-top:18px}
@@ -60,7 +61,7 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 <button id="mic" aria-pressed="false" hidden>Tap to listen</button>
 <div id="heard" aria-live="polite">Tap the box, then tap the mic on your keyboard and say it.</div>
 <details><summary>How to say it</summary>
-<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and ten left" or "2 point try".</p></details>
+<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and ten left" or "2 point try". After any answer, say "tell me more" for the deeper breakdown.</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
@@ -72,7 +73,7 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 </main>
 <script>
 const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
-const V={name:'VCA vs Kings Christian',short:'VCA vs Kings Christian',data:{
+const V={name:'VCA vs Kings Christian',short:'VCA vs Kings Christian',opp:'Kings Christian',data:{
 fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(71.4,28.6,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive'])],
 d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing route','Slot motion L power','Double bubble','Power pass']),c(50,50,'50% R / 50% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass'])],
 a:[c(100,0,'',['Fake sweep toss left','FB dive']),c(0,100,'',['Fake crossbuck','Short crossing routes']),c(100,0,'',[])],
@@ -82,7 +83,7 @@ f:same(c(100,0,'',[])),g:same(c(0,100,'',['Out routes'])),h:same(c(0,100,'',['Fa
 i:[c(0,100,'',['Short crossing routes']),c(0,100,'',['RB screen']),null],
 pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
 notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}},
-A={name:'Alpaugh',short:'Alpaugh',data:{
+A={name:'Alpaugh',short:'Alpaugh',opp:'Alpaugh',data:{
 fp:[c(50,50,'33.3% R / 66.7% L',['TB power','Go routes w/ curl','QB sweep','QB sweep'],4),c(50,50,'50% R / 50% L',['Cross and w/ RB leak','QB sweep'],2),c(50,50,'25% R / 75% L',['QB power','Go routes','Jet sweep'],3)],
 d1:[c(50,50,'80% R / 20% L',['QB power','Jet sweep','Go routes w/ curl','QB sweep','QB sweep'],6),c(0,100,'100% R',['Cross and w/ RB leak'],1),c(50,50,'33.3% R / 66.7% L',['QB power','Go routes','Jet sweep'],3)],
 a:[null,c(100,0,'100% L',['QB power'],2),c(0,100,'',['Curls w/ post route'],1)],b:[null,null,null],
@@ -96,8 +97,8 @@ notes:{d1:'Only 1st and 10 is logged for first down.',pt:'Two plays total, and t
 const T={vca:V,alp:A},$=id=>document.getElementById(id);
 const S={team:'vca',dn:null,ds:null,hs:0,mode:'play'};
 const HN=['Left hash','Middle','Right hash'],HP=['On the left hash','In the middle','On the right hash'];
-const ORD=['','1st','2nd','3rd','4th'];
-let lastSum='',lastFollowUp='';
+const ORD=['','1st','2nd','3rd','4th'],ORDW=['','first','second','third','fourth'];
+let lastSum='',lastMore='',spk='';
 const bt=(a,v,txt,on)=>`<button data-a="${a}" data-v="${v}" aria-pressed="${on}">${txt}</button>`;
 
 /* ---------- controls ---------- */
@@ -121,91 +122,78 @@ function bucket(dn,ds){
  if(dn===1)return'd1';
  if(dn===2)return ds<=3?'a':ds<=7?'b':'e';
  return ds<=3?'f':ds<=6?'g':ds<=9?'h':'i'}
-const msg=(t,h)=>{lastSum='';lastFollowUp='';$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
+const msg=(t,h)=>{lastSum='';lastMore='';$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
 function upd(){
  ctl();const t=T[S.team];let key,lab;
- if(S.mode==='tp'){key='pt';lab='2-point try'}
- else if(S.mode==='fp'){key='fp';lab='First play of drive'}
+ if(S.mode==='tp'){key='pt';lab='2-point try';spk='the two point try'}
+ else if(S.mode==='fp'){key='fp';lab='First play of drive';spk='the first play of the drive'}
  else if(S.mode==='gl'){
   if(S.team!=='alp')return msg('The VCA sheet does not track goal-to-go. Switch to Regular to see its normal tendencies.','Goal to go');
   if(S.dn&&S.dn!==1)return msg('Only 1st and goal is logged on this sheet.','Goal to go');
-  key='g1';lab='1st & Goal'}
+  key='g1';lab='1st & Goal';spk='first and goal'}
  else{
   if(!S.dn||!S.ds)return msg('Pick a down and distance, or say it.');
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
-  key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds}
+  key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds;spk=ORDW[S.dn]+' and '+S.ds}
  const rows=t.data[key],hv=S.hs-1;
- let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div><div class="sum"><p id="sumtxt"></p><div class="sumbar"><button id="rd">Read aloud</button><button id="st">Stop</button><label><input id="auto" type="checkbox"> Auto-read</label></div></div>`;
+ let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button><label><input id="auto" type="checkbox"${autoOn?' checked':''}> Auto-read</label></div></div>`;
  [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
  $('res').innerHTML=o;
- lastSum=summarize(t,rows,hv,lab,key);$('sumtxt').textContent=lastSum;
- $('rd').onclick=speak;$('st').onclick=stopSpeak;$('auto').onchange=e=>autoOn=e.target.checked;fillVoices()}
+ lastSum=summarize(t,rows,hv,key);lastMore=moreText(t,rows,hv,key);
+ $('sumtxt').textContent=lastSum;
+ $('rd').onclick=()=>speak(lastSum);$('mr').onclick=doMore;$('st').onclick=stopSpeak;$('auto').onchange=e=>autoOn=e.target.checked;fillVoices()}
 function card(x,i,on){
  const h=`<div class="hd"><b>${HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
  return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}<div class="rw"><i>Calls</i> ${x.c.length?x.c.join(', '):'none listed'}</div></div>`}
 
-/* ---------- natural-sounding read aloud with conversational voice ---------- */
+/* ---------- spoken text ---------- */
 const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with ').replace(/\bL\b/g,'left').replace(/\bR\b/g,'right').replace(/\bM\b/g,'middle');
 const J=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
-const dirSpeak=d=>J(d.split(/\s*\/\s*/).map(x=>x.replace(/%\s*R/,' percent right').replace(/%\s*L/,' percent left').replace(/%\s*M/,' percent middle')));
-
-function getTendencyPhrase(r,p){
-  const diff = Math.abs(r - p);
-  if(r >= 95) return "they pretty much always run";
-  if(p >= 95) return "they pretty much always pass";
-  if(r >= 80) return "they're heavy on the run";
-  if(p >= 80) return "they're heavy on the pass";
-  if(r >= 65) return "they favor the run";
-  if(p >= 65) return "they favor the pass";
-  if(diff <= 5) return "they're pretty balanced between run and pass";
-  if(r > p) return "they lean more toward running";
-  return "they lean more toward passing";
-}
-
-function buildFollowUp(t, rows, hv, lab, k){
-  const x = hv >= 0 ? rows[hv] : null;
-  if(!x) return '';
-  if(x.d && Math.abs(x.r - x.p) > 25) return 'Want me to break down the direction split on that look?';
-  if(x.c && x.c.length > 2) return 'Want me to walk through the most common call from that side?';
-  if(x.n != null && x.n <= 3) return 'Want me to tell you how much weight to put on this sample size?';
-  if(rows.filter(Boolean).length > 1 && hv >= 0) return 'Want me to compare the hash splits next?';
-  if(t.notes[k]) return 'Want me to explain that note for you?';
-  return '';
-}
-
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const plays=n=>n+(n===1?' play':' plays');
+const SIDE={R:'right',L:'left',M:'middle'};
+function dirParts(d){return d?d.split(/\s*\/\s*/).map(s=>{const g=s.match(/([\d.]+)%\s*([RLM])/);return g?{v:+g[1],s:SIDE[g[2]]}:null}).filter(Boolean).sort((a,b)=>b.v-a.v):[]}
+function dirShort(d){const m=dirParts(d);if(!m.length)return'';
+ if(m[0].v>=95)return pick([`Every one went ${m[0].s}.`,`All of it went ${m[0].s}.`]);
+ if(m[0].v>=60)return pick([`Mostly to the ${m[0].s}.`,`They go ${m[0].s} most of the time.`,`It's ${m[0].s} more often than not.`]);
+ return'Direction is pretty spread out.'}
+function dirLong(d){const m=dirParts(d).filter(x=>x.v>0);if(!m.length)return'';
+ return 'By direction, '+J(m.map(x=>`${Math.round(x.v)} percent ${x.s}`))+'.'}
+function clause(r,p){
+ const hi=Math.max(r,p),side=r>p?'run':'pass',d=Math.abs(r-p);
+ if(hi>=95)return pick([`they ${side} it almost every time`,`it's ${side}, nearly every snap`]);
+ if(hi>=80)return pick([`they ${side} it a lot`,`it's mostly ${side}`,`they lean hard ${side}`]);
+ if(hi>=65)return pick([`they favor the ${side}`,`it's more ${side} than not`]);
+ if(d<=5)return pick(["it's a coin flip","it's dead even, run or pass","no real lean, run or pass"]);
+ return pick([`slight lean to the ${side}`,`a little more ${side} than anything`])}
 function one(x,i){
-  if(!x)return `${HP[i]}, there's nothing logged for this.`;
-  const tendency = getTendencyPhrase(x.r, x.p);
-  let s = `${HP[i]}, ${tendency}. So we're talking ${x.r} percent run versus ${x.p} percent pass. `;
-  if(x.d) s += `They like to go ${dirSpeak(x.d)}. `;
-  if(x.c.length) {
-    const calls = x.c.slice(0,3).map(EX);
-    s += `The plays we've seen? ${J(calls)}${x.c.length > 3 ? ' and some others' : ''}. `;
-  } else {
-    s += "We don't have specific play calls for this. ";
-  }
-  if(x.n == null) s += "Keep in mind the sheet doesn't track how many plays went into this.";
-  else if(x.n <= 3) s += `Fair warning though—we've only got ${x.n} ${x.n===1?'play':'plays'} here, so take it as a hint.`;
-  else s += `Based on ${x.n} plays, which isn't huge, but it's something.`;
-  return s;
-}
-
-function summarize(t,rows,hv,lab,k){
-  let intro = `Alright, looking at ${lab} against ${t.name}. `;
-  let body;
-  if(hv>=0) {
-    body = one(rows[hv],hv);
-  } else {
-    const summaries = [0,1,2].map(i=>one(rows[i],i));
-    body = summaries.join(' ');
-  }
-  let note = '';
-  if(t.notes[k]) note = ` By the way, ${t.notes[k]}`;
-  lastFollowUp = buildFollowUp(t, rows, hv, lab, k);
-  return intro + body + note + (lastFollowUp ? ` ${lastFollowUp}` : '');
-}
+ if(!x)return`${HP[i]}, nothing logged.`;
+ let s=`${HP[i]}, ${clause(x.r,x.p)}.`;
+ const dd=dirShort(x.d);if(dd)s+=' '+dd;
+ if(x.c.length){const calls=x.c.slice(0,2).map(EX);s+=' '+pick(['Watch for','Look for','Expect','Be ready for'])+' '+J(calls)+'.'}
+ if(x.n!=null&&x.n<=3)s+=` Only ${plays(x.n)} behind that, so don't lean on it.`;
+ return s}
+function summarize(t,rows,hv,k){
+ let s=cap(spk)+' against '+t.opp+'. ';
+ s+=hv>=0?one(rows[hv],hv):[0,1,2].map(i=>one(rows[i],i)).join(' ');
+ return s+' Say "tell me more" for the details.'}
+function moreText(t,rows,hv,k){
+ const idx=hv>=0?[hv]:[0,1,2];let s='';
+ idx.forEach(i=>{const x=rows[i];if(!x){s+=`${HP[i]}, nothing logged. `;return}
+  s+=`${HP[i]}, ${Math.round(x.r)} percent run, ${Math.round(x.p)} percent pass. `;
+  const dl=dirLong(x.d);if(dl)s+=dl+' ';
+  if(x.c.length)s+='Calls on the sheet: '+J(x.c.map(EX))+'. ';else s+='No calls listed. ';
+  s+=x.n==null?"The sheet doesn't say how many plays that covers. ":x.n<=3?`That's only ${plays(x.n)}, so treat it as a hint. `:`That's ${plays(x.n)}, a decent look but not a lot. `});
+ if(hv>=0){const o=[0,1,2].filter(j=>j!==hv&&rows[j]);
+  if(o.length)s+='Other hashes: '+o.map(j=>`${HN[j].toLowerCase()} is ${Math.round(rows[j].r)} run, ${Math.round(rows[j].p)} pass`).join('; ')+'. '}
+ if(t.notes[k])s+='Heads up: '+t.notes[k];
+ return s.trim()}
+function doMore(){
+ if(!lastMore){$('heard').textContent='Nothing to expand yet. Give me a situation first.';return}
+ const m=$('moretxt');m.hidden=false;m.textContent=lastMore;speak(lastMore)}
 
 /* ---------- parsing what you say or type ---------- */
 const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
@@ -217,6 +205,7 @@ function nums(t,skipFirst){const out=[];
 function say(raw){
  const t=raw.toLowerCase().trim();if(!t)return;
  $('heard').textContent='Heard: "'+raw.trim()+'"';
+ if(/tell me more|more detail|more on that|break it down|go deeper/.test(t)){$('q').value='';doMore();return}
  if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';$('q').value='';upd();return}
  const mode=/two[- ]?point|\b2[- ]?(pt|point)/.test(t)?'tp':/first play|drive/.test(t)?'fp':/goal/.test(t)?'gl':'play';
  const hw=/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
@@ -232,33 +221,30 @@ function say(raw){
   else if(ds>=1){S.mode='play';S.dn=n[0];S.ds=Math.min(ds,25);ok=true}
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
  if(!ok){$('heard').textContent+=' — I did not catch a down and distance. Try "third and five, middle."';return}
- upd();if(autoOn)setTimeout(speak,500)}
+ upd();if(autoOn)setTimeout(()=>speak(lastSum),500)}
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(qt);say($('q').value);$('q').blur()}});
 
-/* ---------- natural-sounding read aloud ---------- */
+/* ---------- read aloud ---------- */
 let autoOn=false,voices=[],vpick='';
 try{vpick=localStorage.getItem('voice')||''}catch(e){}
-const ok=()=>'speechSynthesis' in window;
+const sok=()=>'speechSynthesis' in window;
 function rank(v){return(/natural|neural|enhanced|premium/i.test(v.name)?4:0)+(/siri|samantha|ava|allison|evan|google us english|aaron|nicky/i.test(v.name)?2:0)+(/en[-_]US/i.test(v.lang)?1:0)+(v.localService?1:0)}
-function loadVoices(){if(!ok())return;voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>rank(b)-rank(a))}
+function loadVoices(){if(!sok())return;voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>rank(b)-rank(a))}
 function fillVoices(){const s=$('vsel');if(!s)return;
  if(!voices.length)loadVoices();
  s.innerHTML=voices.map(v=>`<option value="${v.name}"${v.name===(vpick||(voices[0]||{}).name)?' selected':''}>${v.name}</option>`).join('')||'<option>Default voice</option>';
  s.onchange=()=>{vpick=s.value;try{localStorage.setItem('voice',vpick)}catch(e){}}}
-if(ok())speechSynthesis.onvoiceschanged=()=>{loadVoices();fillVoices()};
-function stopSpeak(){if(ok())speechSynthesis.cancel()}
-function speak(){
- if(!lastSum)return;
- if(!ok()){$('heard').textContent='This browser cannot read aloud.';return}
+if(sok())speechSynthesis.onvoiceschanged=()=>{loadVoices();fillVoices()};
+function stopSpeak(){if(sok())speechSynthesis.cancel()}
+function speak(txt){
+ if(!txt)return;
+ if(!sok()){$('heard').textContent='This browser cannot read aloud.';return}
  speechSynthesis.cancel();if(!voices.length)loadVoices();
  const v=voices.find(x=>x.name===vpick)||voices[0];
- const parts=[];
- const summaryParts=lastSum.match(/[^.!?]+[.!?]*/g)||[lastSum];
- summaryParts.forEach(p=>{const s=p.trim();if(s)parts.push(s)});
- if(lastFollowUp)parts.push(lastFollowUp);
- setTimeout(()=>parts.forEach(p=>{const u=new SpeechSynthesisUtterance(p.trim());if(v)u.voice=v;u.rate=.98;u.pitch=1;speechSynthesis.speak(u)}),60)}
+ const parts=(txt.match(/[^.!?;]+[.!?;]*/g)||[txt]).map(s=>s.trim()).filter(Boolean);
+ setTimeout(()=>parts.forEach(p=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.rate=1.02;u.pitch=1;speechSynthesis.speak(u)}),60)}
 
 /* ---------- in-page mic (hidden when the host blocks it) ---------- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let micOK=!!SR,rec=null,on=false;
