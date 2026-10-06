@@ -16,15 +16,14 @@ h1{font:700 24px 'Barlow Condensed',sans-serif;margin:0 0 10px;letter-spacing:.0
 button{font-family:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--run);outline-offset:2px}
 .grp{display:flex;gap:6px;margin-bottom:12px}
-.grp button,.step button,.q button{flex:1;min-height:48px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 1px 0 rgba(18,37,26,.06)}
+.grp button,.step button{flex:1;min-height:48px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 1px 0 rgba(18,37,26,.06)}
 .grp button[aria-pressed=true]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 .lbl{display:block;font-weight:600;margin:14px 0 6px}
 #q{width:100%;font:600 22px Barlow,sans-serif;padding:12px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
-#mic{width:100%;margin-top:8px;min-height:48px;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:10px;font:700 18px Barlow,sans-serif}
+#mic{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:5;width:100%;margin:0 0 8px;min-height:56px;border:2px solid var(--ink);background:var(--acc);color:var(--accink);border-radius:10px;font:700 20px Barlow,sans-serif;box-shadow:0 3px 0 rgba(18,37,26,.15)}
 #mic[aria-pressed=true]{background:var(--run);border-color:var(--run);color:var(--barink)}
-#heard{min-height:22px;color:var(--mute);font-size:14px;margin:6px 0}
+#heard{min-height:22px;color:var(--mute);font-size:15px;margin:6px 0}
 details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min-height:32px}
-.row2{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .step{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .step button{flex:0 0 56px;font-size:24px}
 .step output{flex:1;text-align:center;font:700 40px 'Barlow Condensed',sans-serif}
@@ -39,8 +38,6 @@ details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min
 .sum p[hidden]{display:none}
 .sumbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sumbar button{min-height:48px;padding:8px 18px;border:1.5px solid var(--ink);background:var(--acc);color:var(--accink);border-radius:8px;font-weight:700;font-size:16px}
-.sumbar label{font-size:14px;color:#5d7568}
-select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:8px}
 .card{background:linear-gradient(180deg,#fff,#f9faf7);border:1.5px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px;box-shadow:0 1px 0 rgba(18,37,26,.04);color:#12251a}
 .card.on{border:2.5px solid #12251a}
 .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
@@ -54,14 +51,14 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body><main>
 <h1>Sideline Tendencies</h1>
+<button id="mic" aria-pressed="false" hidden>Start hands-free</button>
 <div class="grp" id="team" role="group" aria-label="Scouting sheet"></div>
 
 <label class="lbl" for="q">Say or type the situation</label>
 <input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="third and five, middle">
-<button id="mic" aria-pressed="false" hidden>Tap to listen</button>
-<div id="heard" aria-live="polite">Tap the box, then tap the mic on your keyboard and say it.</div>
-<details><summary>How to say it</summary>
-<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and ten left" or "2 point try". After any answer, say "tell me more" for the deeper breakdown.</p></details>
+<div id="heard" aria-live="polite">Tap Start hands-free once, then just talk. Or type here.</div>
+<details><summary>What you can say</summary>
+<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Also "first play of drive, right" or "2 point try". If you leave out the yards or the hash, I'll ask. Answer with just "five" or "left" ("all" works for hash). Then say "yes" for more detail or "no" to move on. Anytime: "what about left", "third and long", "repeat", "stop", "start over". Tap the big button while I'm talking to cut me off.</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
@@ -98,7 +95,7 @@ const T={vca:V,alp:A},$=id=>document.getElementById(id);
 const S={team:'vca',dn:null,ds:null,hs:0,mode:'play'};
 const HN=['Left hash','Middle','Right hash'],HP=['On the left hash','In the middle','On the right hash'];
 const ORD=['','1st','2nd','3rd','4th'],ORDW=['','first','second','third','fourth'];
-let lastSum='',lastMore='',spk='';
+let lastSum='',lastMore='',lastMsg='',spk='',pending='';
 const bt=(a,v,txt,on)=>`<button data-a="${a}" data-v="${v}" aria-pressed="${on}">${txt}</button>`;
 
 /* ---------- controls ---------- */
@@ -115,14 +112,14 @@ document.addEventListener('click',e=>{const el=e.target.closest('button[data-a]'
  if(a==='team')S.team=v;else if(a==='dn')S.dn=+v;else if(a==='ds')S.ds=+v;
  else if(a==='dsd')S.ds=Math.max(1,Math.min(25,(S.ds||5)+ +v));
  else if(a==='hs')S.hs=+v;else if(a==='mode')S.mode=v;
- stopSpeak();upd()});
+ pending='';stopSpeak();upd()});
 
 /* ---------- lookup ---------- */
 function bucket(dn,ds){
  if(dn===1)return'd1';
  if(dn===2)return ds<=3?'a':ds<=7?'b':'e';
  return ds<=3?'f':ds<=6?'g':ds<=9?'h':'i'}
-const msg=(t,h)=>{lastSum='';lastMore='';$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
+const msg=(t,h)=>{lastSum='';lastMore='';lastMsg=t;$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
 function upd(){
  ctl();const t=T[S.team];let key,lab;
  if(S.mode==='tp'){key='pt';lab='2-point try';spk='the two point try'}
@@ -132,17 +129,17 @@ function upd(){
   if(S.dn&&S.dn!==1)return msg('Only 1st and goal is logged on this sheet.','Goal to go');
   key='g1';lab='1st & Goal';spk='first and goal'}
  else{
-  if(!S.dn||!S.ds)return msg('Pick a down and distance, or say it.');
+  if(!S.dn||!S.ds)return msg(S.dn?'How many yards?':'Pick a down and distance, or say it.');
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
   key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds;spk=ORDW[S.dn]+' and '+S.ds}
  const rows=t.data[key],hv=S.hs-1;
- let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button><label><input id="auto" type="checkbox"${autoOn?' checked':''}> Auto-read</label></div></div>`;
+ let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button></div></div>`;
  [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
  $('res').innerHTML=o;
  lastSum=summarize(t,rows,hv,key);lastMore=moreText(t,rows,hv,key);
  $('sumtxt').textContent=lastSum;
- $('rd').onclick=()=>speak(lastSum);$('mr').onclick=doMore;$('st').onclick=stopSpeak;$('auto').onchange=e=>autoOn=e.target.checked;fillVoices()}
+ $('rd').onclick=()=>speak(lastSum);$('mr').onclick=doMore;$('st').onclick=stopSpeak}
 function card(x,i,on){
  const h=`<div class="hd"><b>${HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
@@ -179,7 +176,7 @@ function one(x,i){
 function summarize(t,rows,hv,k){
  let s=cap(spk)+' against '+t.opp+'. ';
  s+=hv>=0?one(rows[hv],hv):[0,1,2].map(i=>one(rows[i],i)).join(' ');
- return s+' Say "tell me more" for the details.'}
+ return s+' More?'}
 function moreText(t,rows,hv,k){
  const idx=hv>=0?[hv]:[0,1,2];let s='';
  idx.forEach(i=>{const x=rows[i];if(!x){s+=`${HP[i]}, nothing logged. `;return}
@@ -192,23 +189,42 @@ function moreText(t,rows,hv,k){
  if(t.notes[k])s+='Heads up: '+t.notes[k];
  return s.trim()}
 function doMore(){
- if(!lastMore){$('heard').textContent='Nothing to expand yet. Give me a situation first.';return}
- const m=$('moretxt');m.hidden=false;m.textContent=lastMore;speak(lastMore)}
+ if(!lastMore){const m='Give me a situation first.';$('heard').textContent=m;if(auto())speak(m);return}
+ pending='';const m=$('moretxt');m.hidden=false;m.textContent=lastMore;speak(lastMore)}
 
-/* ---------- parsing what you say or type ---------- */
+/* ---------- conversation ---------- */
 const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
 function nums(t,skipFirst){const out=[];
  t.split(/[^a-z0-9]+/).forEach(w=>{
   if(/^\d+$/.test(w)){if(w.length===3)out.push(+w[0],+w[1],+w[2]);else if(w.length===4)out.push(+w[0],+w.slice(1,3),+w[3]);else out.push(+w)}
   else if(w in NUM&&!(skipFirst&&w==='first')){const n=NUM[w],l=out[out.length-1];if(n>0&&n<10&&l>=20&&l%10===0)out[out.length-1]=l+n;else out.push(n)}});
  return out}
+const YES=/^(yes|yeah|yep|yup|sure|okay|ok|please|go ahead|go on|more|do it)\b/,NO=/^(no|nope|nah|next|that'?s it|i'?m good|done|all good)\b/;
+const hashOf=t=>/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
+const allWord=t=>/\b(all|any|every|don'?t know|not sure)\b/.test(t);
+const auto=()=>listening;
+function ask(q,p){pending=p;$('heard').textContent=q;if(auto())speak(q)}
+function respond(noAsk){
+ pending='';upd();
+ if(S.mode==='play'&&S.dn&&!S.ds)return ask('How many yards?','ds');
+ if(lastSum&&!noAsk&&S.hs===0&&S.mode!=='tp')return ask('Which hash?','hs');
+ if(auto()){pending=lastSum?'more':'';speak(lastSum||lastMsg)}}
 function say(raw){
  const t=raw.toLowerCase().trim();if(!t)return;
  $('heard').textContent='Heard: "'+raw.trim()+'"';
- if(/tell me more|more detail|more on that|break it down|go deeper/.test(t)){$('q').value='';doMore();return}
- if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';$('q').value='';upd();return}
+ if(/tell me more|more detail|break it down|go deeper/.test(t)||(pending==='more'&&YES.test(t))){$('q').value='';doMore();return}
+ if(pending==='more'&&NO.test(t)){pending='';$('q').value='';$('heard').textContent+=' — okay, next one.';return}
+ if(/^(repeat|say that again|say again|again)\b/.test(t)){speak(lastSpoken);return}
+ if(/^(stop|quiet|cancel|shut up)\b/.test(t)){pending='';stopSpeak();return}
+ if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';pending='';$('q').value='';upd();if(auto())speak('Cleared. Go ahead.');return}
+ if(pending==='ds'){
+  const n=nums(t),sh=/\bshort\b/.test(t)?2:/\bmedium\b/.test(t)?5:/\blong\b/.test(t)?(S.dn===3?10:8):null,d=sh??n[0],hw=hashOf(t);
+  if(d>=1){S.ds=Math.min(d,25);if(hw)S.hs=hw;return respond(S.hs>0||allWord(t))}}
+ if(pending==='hs'){
+  const hw=hashOf(t);
+  if(hw||allWord(t)){S.hs=hw;return respond(true)}}
  const mode=/two[- ]?point|\b2[- ]?(pt|point)/.test(t)?'tp':/first play|drive/.test(t)?'fp':/goal/.test(t)?'gl':'play';
- const hw=/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
+ const hw=hashOf(t);
  const n=nums(t.replace(/two[- ]?point|\b2[- ]?(pt|point)/g,''),mode==='fp');let ok=false;
  if(mode==='fp'||mode==='tp'){S.mode=mode;S.hs=hw||n.filter(x=>x>=1&&x<=3).pop()||0;ok=true}
  else if(n.length===0&&hw){S.hs=hw;ok=true}
@@ -219,44 +235,52 @@ function say(raw){
   const ds=sh??n[1];
   if(mode==='gl'){S.mode='gl';S.dn=n[0];ok=true}
   else if(ds>=1){S.mode='play';S.dn=n[0];S.ds=Math.min(ds,25);ok=true}
+  else if(n.length===1){S.mode='play';S.dn=n[0];S.ds=null;ok=true}
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
- if(!ok){$('heard').textContent+=' — I did not catch a down and distance. Try "third and five, middle."';return}
- upd();if(autoOn)setTimeout(()=>speak(lastSum),500)}
+ if(!ok){const m='Say that again?';$('heard').textContent+=' — I did not catch a down and distance. Try "third and five, middle."';if(auto())speak(m);return}
+ respond(S.hs>0||allWord(t)||S.mode==='tp')}
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(qt);say($('q').value);$('q').blur()}});
 
-/* ---------- read aloud ---------- */
-let autoOn=false,voices=[],vpick='';
-try{vpick=localStorage.getItem('voice')||''}catch(e){}
-const sok=()=>'speechSynthesis' in window;
-function rank(v){return(/natural|neural|enhanced|premium/i.test(v.name)?4:0)+(/siri|samantha|ava|allison|evan|google us english|aaron|nicky/i.test(v.name)?2:0)+(/en[-_]US/i.test(v.lang)?1:0)+(v.localService?1:0)}
-function loadVoices(){if(!sok())return;voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>rank(b)-rank(a))}
-function fillVoices(){const s=$('vsel');if(!s)return;
- if(!voices.length)loadVoices();
- s.innerHTML=voices.map(v=>`<option value="${v.name}"${v.name===(vpick||(voices[0]||{}).name)?' selected':''}>${v.name}</option>`).join('')||'<option>Default voice</option>';
- s.onchange=()=>{vpick=s.value;try{localStorage.setItem('voice',vpick)}catch(e){}}}
-if(sok())speechSynthesis.onvoiceschanged=()=>{loadVoices();fillVoices()};
-function stopSpeak(){if(sok())speechSynthesis.cancel()}
-function speak(txt){
- if(!txt)return;
- if(!sok()){$('heard').textContent='This browser cannot read aloud.';return}
- speechSynthesis.cancel();if(!voices.length)loadVoices();
- const v=voices.find(x=>x.name===vpick)||voices[0];
- const parts=(txt.match(/[^.!?;]+[.!?;]*/g)||[txt]).map(s=>s.trim()).filter(Boolean);
- setTimeout(()=>parts.forEach(p=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.rate=1.02;u.pitch=1;speechSynthesis.speak(u)}),60)}
-
-/* ---------- in-page mic (hidden when the host blocks it) ---------- */
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let micOK=!!SR,rec=null,on=false;
+/* ---------- voice loop: speak, then listen again on its own ---------- */
+let listening=false,speaking=false,recActive=false,rec=null,lastSpoken='',sid=0,spokeAt=0,voices=[];
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition,sok=()=>'speechSynthesis' in window;
+let micOK=!!SR;
 try{if(document.featurePolicy&&!document.featurePolicy.allowsFeature('microphone'))micOK=false}catch(e){}
 if(micOK)$('mic').hidden=false;
+function setMic(){const b=$('mic');b.setAttribute('aria-pressed',listening);
+ b.textContent=!listening?'Start hands-free':speaking?'Talking… tap to cut me off':'Listening. Just talk. Tap to stop'}
+function rank(v){return(/natural|neural|enhanced|premium/i.test(v.name)?4:0)+(/siri|samantha|ava|allison|evan|google us english|aaron|nicky/i.test(v.name)?2:0)+(/en[-_]US/i.test(v.lang)?1:0)+(v.localService?1:0)}
+function loadVoices(){if(!sok())return;voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>rank(b)-rank(a))}
+if(sok())speechSynthesis.onvoiceschanged=loadVoices;
+function initRec(){
+ rec=new SR();rec.continuous=false;rec.interimResults=false;rec.lang='en-US';rec.maxAlternatives=1;
+ rec.onstart=()=>{recActive=true};
+ rec.onresult=e=>{const r=e.results[e.results.length-1][0].transcript.trim();if(r){$('q').value=r;say(r)}};
+ rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error)){listening=false;micOK=false;$('mic').hidden=true;$('heard').textContent='Mic is blocked on this page. Open the page in its own browser tab, or use your keyboard mic.'}};
+ rec.onend=()=>{recActive=false;setTimeout(startRec,250)}}
+function startRec(){if(!listening||speaking||recActive||!rec)return;try{rec.start();recActive=true}catch(_){}}
+function stopSpeak(){sid++;if(sok())speechSynthesis.cancel();speaking=false;setMic();startRec()}
+function speak(txt){
+ if(!txt)return;lastSpoken=txt;
+ if(!sok()){$('heard').textContent='This browser cannot read aloud.';return}
+ const id=++sid;speechSynthesis.cancel();speaking=true;spokeAt=Date.now();
+ if(recActive){try{rec.abort()}catch(_){}}
+ setMic();if(!voices.length)loadVoices();
+ const v=voices[0],parts=(txt.match(/[^.!?;]+[.!?;]*/g)||[txt]).map(s=>s.trim()).filter(Boolean);
+ const done=()=>{if(id!==sid)return;speaking=false;setMic();startRec()};
+ setTimeout(()=>{if(id!==sid)return;parts.forEach((p,i)=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.rate=1.02;u.pitch=1;if(i===parts.length-1){u.onend=done;u.onerror=done}speechSynthesis.speak(u)})},60)}
 $('mic').onclick=()=>{
- if(on){on=false;rec.stop();$('mic').setAttribute('aria-pressed',false);$('mic').textContent='Tap to listen';return}
- rec=new SR();rec.continuous=true;rec.interimResults=false;rec.lang='en-US';
- rec.onresult=e=>{const r=e.results[e.results.length-1][0].transcript.trim();$('q').value=r;say(r)};
- rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error)){on=false;$('mic').hidden=true;$('heard').textContent='Mic is blocked on this page. Tap the box and use your keyboard mic instead.';return} $('heard').textContent='I did not catch that. Try again.';};
- rec.onend=()=>{if(on)try{rec.start()}catch(_){} };
- on=true;$('mic').setAttribute('aria-pressed',true);$('mic').textContent='Listening. Tap to stop';rec.start()};
+ if(speaking){stopSpeak();return}
+ if(listening){listening=false;try{rec.abort()}catch(_){}pending='';setMic();$('heard').textContent='Hands-free is off.';return}
+ if(!rec)initRec();
+ listening=true;setMic();$('heard').textContent='Listening. Say a situation, like "third and five".';
+ if(sok()){const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}
+ startRec()};
+setInterval(()=>{
+ if(speaking&&sok()&&!speechSynthesis.speaking&&!speechSynthesis.pending&&Date.now()-spokeAt>1500){speaking=false;setMic()}
+ if(listening&&!speaking&&!recActive)startRec()},1200);
 
 loadVoices();upd();
 </script></body></html>
