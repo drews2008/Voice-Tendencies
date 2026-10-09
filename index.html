@@ -50,6 +50,14 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 .rw{margin-top:8px;font-size:15px}.rw i{font-style:normal;color:var(--mute)}
 .warn{border-left:4px solid var(--acc);padding:6px 10px;margin:8px 0;font-size:14px;color:var(--mute)}
 .none{color:var(--mute);padding:8px 0;font-size:17px}
+.followup{margin:12px 0 8px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card)}
+.followup h3{margin:0 0 10px;font:700 20px 'Barlow Condensed',sans-serif;letter-spacing:.02em}
+.followup .small{margin:0 0 8px;color:var(--mute);font-size:14px}
+.filter-row{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.filter-row input{width:100%;min-height:40px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:600 15px Barlow,sans-serif}
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px}
+.filter-chip{border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:7px 10px;border-radius:8px;font-weight:600;min-height:36px}
+.filter-chip.active{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 .foot{color:var(--mute);font-size:12px;margin-top:18px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body><main>
@@ -61,31 +69,32 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 <button id="mic" aria-pressed="false" hidden>Tap to listen</button>
 <div id="heard" aria-live="polite">Tap the box, then tap the mic on your keyboard and say it.</div>
 <details><summary>How to say it</summary>
-<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and goal, left", "two point". Say "new play" to clear. Say just "right hash" to change only the hash.</p></details>
+<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and goal”, or “2 point try.” You can also add a formation like “shotgun split back.”</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
 <span class="lbl">Hash</span><div class="grp" id="hs" role="group"></div>
 <span class="lbl">Situation</span><div class="chips" id="mode" role="group"></div>
 
+<div id="followup" aria-live="polite"></div>
 <div id="res" aria-live="polite"></div>
-<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a call. Small samples are hints, not tendencies.</div>
+<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a call. This page will also accept a formation follow-up, such as “shotgun split back,” to narrow the result.</div>
 </main>
 <script>
 const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
 const V={name:'VCA vs Kings Christian',short:'VCA vs Kings Christian',data:{
-fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(71.4,28.6,'57.1% R / 14.3% L / 28.6% M',['Fake TB power QB keeper','TB power','Reverse','FB dive','Short crossing routes','Out routes','QB keeper'])],
-d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing routes','TB sweep toss left','Out routes','Corner routes']),c(56,44,'40% R / 10% L / 50% M',['Fake TB power QB keeper','TB power','Reverse','FB dive','QB keeper'])],
+fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(71.4,28.6,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep']),c(71.4,28.6,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep'])],
+d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(50,50,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep']),c(50,50,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep'])],
 a:[c(100,0,'',['Fake sweep toss left','FB dive']),c(0,100,'',['Fake crossbuck','Short crossing routes']),c(100,0,'',[])],
 b:[c(100,0,'0% R / 100% L',['Fake sweep toss left','FB dive']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route'])],
 e:same(c(25,75,'33.3% R / 66.7% L',['Out routes','Power pass','TB sweep toss right','Slot motion L return drag L'])),
 f:same(c(100,0,'',[])),g:same(c(0,100,'',['Out routes'])),h:same(c(0,100,'',['Fake crossbuck TE post','Power pass'])),
 i:[c(0,100,'',['Short crossing routes']),c(0,100,'',['RB screen']),null],
 pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
-notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.',d1:'Call lists are the most scrambled part of this sheet.',a:'Call placement by hash is a best read.',b:'Call placement by hash is a best read.'}};
+notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}};
 const A={name:'Alpaugh',short:'Alpaugh',data:{
-fp:[c(50,50,'33.3% R / 66.7% L',['TB power','Go routes w/ curl','QB sweep','QB sweep'],4),c(50,50,'50% R / 50% L',['Cross and w/ RB leak','QB sweep'],2),c(50,50,'25% R / 75% L',['QB power','Go routes','Pro go route TE drag RB swing'],4)],
-d1:[c(50,50,'80% R / 20% L',['QB power','Jet sweep','Go routes w/ curl','QB sweep','QB sweep'],6),c(0,100,'100% R',['Cross and w/ RB leak'],1),c(50,50,'33.3% R / 66.7% L',['QB power','Go routes','TE leak','Pro go route TE drag RB swing'],6)],
+fp:[c(50,50,'33.3% R / 66.7% L',['TB power','Go routes w/ curl','QB sweep','QB sweep'],4),c(50,50,'50% R / 50% L',['Cross and w/ RB leak','QB sweep'],2),c(50,50,'25% R / 75% L',['QB power','Go routes','TE slant','QB keeper'],3)],
+d1:[c(50,50,'80% R / 20% L',['QB power','Jet sweep','Go routes w/ curl','QB sweep','QB sweep'],6),c(0,100,'100% R',['Cross and w/ RB leak'],1),c(50,50,'33.3% R / 66.7% L',['QB power','Go routes','TE slant','QB keeper'],3)],
 a:[null,c(100,0,'100% L',['QB power'],2),c(0,100,'',['Curls w/ post route'],1)],b:[null,null,null],
 e:[c(100,0,'50% R / 50% L',['QB power','QB keeper'],2),null,c(0,100,'50% R / 50% L',['Flood','Motion L pro out route RB go route'],2)],
 f:[null,null,c(100,0,'100% L',['QB power'],1)],g:[null,null,null],
@@ -105,14 +114,79 @@ g:[c(0,100,'100% R / 0% L',['TE corner route RB leak']),null,c(100,0,'0% R / 0% 
 h:[null,null,null],
 i:[c(100,0,'0% R / 100% L',['QB power']),null,null],
 pt:[null,null,null]},
-notes:{fp:'5 plays total across all hashes.',d1:'7 plays total across all hashes.',a:'2 plays total across all hashes.',b:'2 plays total. The right hash had no data; the sheet repeated middle numbers there, so I left it empty.',e:'2 plays total. Left and right hash had no data; the sheet repeated middle numbers there, so I left them empty.',f:'1 play total.',g:'2 plays total across all hashes.',h:'No plays logged in this range.',i:'1 play total.',pt:'No 2-point plays logged.'}};
+notes:{fp:'5 plays total across all hashes.',d1:'7 plays total across all hashes.',a:'2 plays total across all hashes.',b:'2 plays total. The right hash had no data; the sheet repeated middle numbers.',e:'2 total plays across all hashes.'}};
 const T={vca:V,alp:A,mar:M},$=id=>document.getElementById(id);
-const S={team:'vca',dn:null,ds:null,hs:0,mode:'play'};
+const S={team:'vca',dn:null,ds:null,hs:0,mode:'play',formation:'',personnel:'',motion:'',playType:''};
 const HN=['Left hash','Middle','Right hash'],HP=['On the left hash','In the middle','On the right hash'];
 const ORD=['','1st','2nd','3rd','4th'];
-const RNG={d1:'all 1st downs, which the sheet logs as 1st and 10',a:'the 1 to 3 yard range',b:'the 4 to 7 yard range',e:'the 8 or more yard range',f:'the 1 to 3 yard range',g:'the 4 to 6 yard range',h:'the 7 to 9 yard range',i:'the 10 or more yard range'};
+const RNG={d1:'all 1st downs, which the sheet logs as 1st and 10',a:'the 1 to 3 yard range',b:'the 4 to 7 yard range',e:'the 8 or more yard range',f:'the 1 to 3 yard range',g:'the 4 to 6 yard range',h:'the 7 to 9 yard range',i:'the 10+ yard range',fp:'the first play of the drive',g1:'the goal-to-go situation',pt:'2-point tries'};
 let lastSum='';
 const bt=(a,v,txt,on)=>`<button data-a="${a}" data-v="${v}" aria-pressed="${on}">${txt}</button>`;
+
+const FORMATION_CHOICES=['Shotgun Split Back','Shotgun','Pistol','Pro','Wide','Under Center','Slot','Single Back','Empty'];
+
+function normaliseText(v){
+ return String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function detectFormation(raw){
+ const t=normaliseText(raw);
+ if(!t) return '';
+ if((/shotgun/.test(t)||/gun/.test(t))&&/split/.test(t)&&/back/.test(t)) return 'Shotgun Split Back';
+ if(/shotgun/.test(t)||/gun/.test(t)) return 'Shotgun';
+ if(/pistol/.test(t)) return 'Pistol';
+ if(/under center|under-center|u c|uc/.test(t)) return 'Under Center';
+ if(/pro/.test(t)&&/wide/.test(t)) return 'Pro Wide';
+ if(/pro/.test(t)) return 'Pro';
+ if(/wide/.test(t)) return 'Wide';
+ if(/slot/.test(t)) return 'Slot';
+ if(/single back/.test(t)) return 'Single Back';
+ if(/empty/.test(t)) return 'Empty';
+ return '';
+}
+
+function extractFollowUp(raw){
+ const out={};
+ const t=String(raw||'').toLowerCase();
+ const formation=detectFormation(t);
+ if(formation) out.formation=formation;
+ const pos=/\b(11|12|21|22|23)\b/.exec(t);
+ if(pos) out.personnel=pos[1];
+ if(/motion/.test(t)) out.motion='Yes';
+ if(/no motion|no motion/.test(t)) out.motion='No';
+ if(/run/.test(t)&&!/pass/.test(t)) out.playType='Run';
+ if(/pass/.test(t)&&!/run/.test(t)) out.playType='Pass';
+ return out;
+}
+
+function filterRows(rows){
+ const formationKey=normaliseText(S.formation);
+ if(!formationKey) return rows;
+ const hasFormationMeta=rows.some(r=>{
+  const sample=[r&&r.formation,r&&r.Formation,r&&r.form,r&&r.Formation,r&&r.calls,Array.isArray(r&&r.c)?r.c.join(' '):''].filter(Boolean).join(' ');
+  return !!sample && normaliseText(sample).length;
+ });
+ if(!hasFormationMeta) return rows;
+ return rows.filter(r=>{
+  const sample=[r&&r.formation,r&&r.Formation,r&&r.form,r&&r.calls,Array.isArray(r&&r.c)?r.c.join(' '):''].filter(Boolean).join(' ');
+  if(!sample) return true;
+  const norm=normaliseText(sample);
+  return norm.includes(formationKey) || formationKey.includes(norm);
+ });
+}
+
+function renderFollowUp(){
+ const hasSituation=(S.mode==='tp' || S.mode==='fp' || S.mode==='gl' || (S.dn && S.ds));
+ if(!hasSituation){ $('followup').innerHTML=''; return; }
+ const choiceButtons=FORMATION_CHOICES.map(name=>`<button class="filter-chip ${S.formation===name?'active':''}" data-a="setFilter" data-v="${name}">${name}</button>`).join('');
+ const summary = S.formation ? `Narrowed by formation: ${S.formation}` : 'Optional follow-up: formation';
+ $('followup').innerHTML=`<div class="followup"><h3>Follow-up</h3><p class="small">${summary}</p><div class="filter-row"><input id="followFormation" value="${(S.formation||'').replace(/"/g,'&quot;')}" placeholder="Say or type a formation, like shotgun split back" aria-label="Formation"></div><div class="filter-row"><div class="filter-chips">${choiceButtons}<button class="filter-chip" data-a="clearFilter">Clear</button></div></div></div>`;
+ const input=$('followFormation');
+ if(input){
+  input.oninput=(e)=>{const val=e.target.value.trim(); const detected=detectFormation(val); if(detected) S.formation=detected; else S.formation=val; upd();};
+  input.onkeydown=(e)=>{if(e.key==='Enter'){const val=e.target.value.trim(); const detected=detectFormation(val); S.formation=detected||val; upd();}};
+ }
+}
 
 /* ---------- controls ---------- */
 function ctl(){
@@ -121,13 +195,15 @@ function ctl(){
  $('dn').className='grp'+(play||gl?'':' off');
  $('dn').innerHTML=[1,2,3].map(n=>bt('dn',n,ORD[n],S.dn===n)).join('');
  $('ds').className=play?'':'off';
- $('ds').innerHTML=`<div class="step"><button data-a="dsd" data-v="-1" aria-label="Fewer yards">−</button><output>${S.ds??'–'}</output><button data-a="dsd" data-v="1" aria-label="More yards">+</button></div><div class="chips">`+[1,2,3,5,7,10,15].map(n=>bt('ds',n,n===15?'15+':n,S.ds===n)).join('')+'</div>';
+ $('ds').innerHTML=`<div class="step"><button data-a="dsd" data-v="-1" aria-label="Fewer yards">−</button><output>${S.ds??'–'}</output><button data-a="dsd" data-v="1" aria-label="More yards">+</button></div>`;
  $('hs').innerHTML=[['Left',1],['Middle',2],['Right',3],['All',0]].map(([t,v])=>bt('hs',v,t,S.hs===v)).join('');
  $('mode').innerHTML=[['play','Regular'],['fp','First play of drive'],['gl','Goal to go'],['tp','2-point try']].map(([v,t])=>bt('mode',v,t,S.mode===v)).join('')}
 document.addEventListener('click',e=>{const el=e.target.closest('button[data-a]');if(!el)return;const a=el.dataset.a,v=el.dataset.v;
  if(a==='team')S.team=v;else if(a==='dn')S.dn=+v;else if(a==='ds')S.ds=+v;
  else if(a==='dsd')S.ds=Math.max(1,Math.min(25,(S.ds||5)+ +v));
  else if(a==='hs')S.hs=+v;else if(a==='mode')S.mode=v;
+ else if(a==='setFilter'){S.formation=v;renderFollowUp();upd();}
+ else if(a==='clearFilter'){S.formation='';renderFollowUp();upd();}
  stopSpeak();upd()});
 
 /* ---------- lookup ---------- */
@@ -137,7 +213,7 @@ function bucket(dn,ds){
  return ds<=3?'f':ds<=6?'g':ds<=9?'h':'i'}
 const msg=(t,h)=>{lastSum='';$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
 function upd(){
- ctl();const t=T[S.team];let key,lab;
+ ctl();renderFollowUp();const t=T[S.team];let key,lab;
  if(S.mode==='tp'){key='pt';lab='2-point try'}
  else if(S.mode==='fp'){key='fp';lab='First play of drive'}
  else if(S.mode==='gl'){
@@ -149,36 +225,41 @@ function upd(){
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
   key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds}
  const rows=t.data[key],hv=S.hs-1;
- let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div>${RNG[key]?`<div class="sub">Uses ${RNG[key]}</div>`:''}<div class="sum"><p id="sumtxt"></p><div class="sumbar"><button id="rd">Read aloud</button><button id="st">Stop</button><label><input type="checkbox" id="auto"${autoOn?' checked':''}> Read after I speak</label></div><details><summary>Voice</summary><select id="vsel" aria-label="Voice"></select></details></div>`;
- [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
+ const filteredRows=filterRows(rows||[]);
+ const rowSet=(filteredRows.length?filteredRows:rows);
+ let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div>${RNG[key]?`<div class="sub">Uses ${RNG[key]}</div>`:''}${S.formation?`<div class="sub">Follow-up: ${S.formation}</div>`:''}<div class="sum"><p id="sumtxt"></p><div class="sumbar"><button id="rd" type="button">Read it</button><button id="st" type="button">Stop</button><label><input id="auto" type="checkbox"> Auto read</label></div></div>`;
+ if(hv>=0){
+  [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{if(rowSet[j]) o+=card(rowSet[j],j,j===hv); else o+=card(null,j,j===hv)});
+ } else {
+  [0,1,2].forEach(j=>{if(rowSet[j]) o+=card(rowSet[j],j,j===hv); else o+=card(null,j,j===hv)});
+ }
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
  $('res').innerHTML=o;
- lastSum=summarize(t,rows,hv,lab,key);$('sumtxt').textContent=lastSum;
+ lastSum=summarize(t,rowSet,hv,lab,key);$('sumtxt').textContent=lastSum;
  $('rd').onclick=speak;$('st').onclick=stopSpeak;$('auto').onchange=e=>autoOn=e.target.checked;fillVoices()}
 function card(x,i,on){
  const h=`<div class="hd"><b>${HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
- return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>`
- +(x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:'')+`<div class="rw"><i>Calls</i> ${x.c.length?x.c.join(', '):'none listed'}</div></div>`}
+ return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}${`<div class="rw"><i>Calls</i> ${x.c.length?x.c.join(', '):'none listed'}</div>`}</div>`}
 
 /* ---------- summary text (templated from the sheet; no AI) ---------- */
-const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with').replace(/\bL\b/g,'left');
+const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with').replace(/\bRTE\b/g,'right tight end').replace(/\bLTE\b/g,'left tight end').replace(/\bWR\b/g,'wide receiver').replace(/\bGo\b/g,'go');
 const J=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
-const dirSpeak=d=>{const a=d.split(/\s*\/\s*/),b=a.filter(x=>!/^0%/.test(x));return J((b.length?b:a).map(x=>x.replace(/%\s*R/,' percent right').replace(/%\s*L/,' percent left').replace(/%\s*M/,' percent middle')))};
+const dirSpeak=d=>{const a=d.split(/\s*\/\s*/),b=a.filter(x=>!/^0%/.test(x));return J((b.length?b:a).map(x=>x.replace(/%\s*R/,' percent right').replace(/%\s*L/,' percent left').replace(/%\s*M/,' percent middle').replace(/\s+/g,' ')));};
 function one(x,i){
  if(!x)return HP[i]+', nothing is logged.';
- const ph=x.r>=95?'they run every time':x.p>=95?'they pass every time':x.r>=75?'they run most of the time':x.p>=75?'they pass most of the time':x.r>=60?'they lean toward the run':x.p>=60?'they lean toward the pass':'it is split close to even';
+ const ph=x.r>=95?'they run every time':x.p>=95?'they pass every time':x.r>=75?'they run most of the time':x.p>=75?'they pass most of the time':x.r>=60?'they lean toward the run':x.p>=60?'they lean to the pass':'it is close to balanced';
  let s=`${HP[i]}, ${ph}. That is ${x.r} percent run and ${x.p} percent pass.`;
  if(x.d)s+=' Direction: '+dirSpeak(x.d)+'.';
  s+=x.c.length?' Calls logged: '+J(x.c.slice(0,4).map(EX))+(x.c.length>4?', and others':'')+'.':' No specific calls are listed.';
  s+=x.n==null?" The sample size for this hash is not listed.":x.n<=3?` Only ${x.n} ${x.n===1?'play':'plays'} behind it, so treat it as a hint.`:` That comes from ${x.n} plays, which is a small sample.`;
  return s}
 function summarize(t,rows,hv,lab,k){
- const body=hv>=0?one(rows[hv],hv):[0,1,2].map(i=>one(rows[i],i)).join(' ');
- return lab.replace('&','and')+', '+t.name+'. '+(RNG[k]?'This uses '+RNG[k]+'. ':'')+body+(t.notes[k]?' Note: '+t.notes[k]:'')}
+ const body=hv>=0?one(rows[hv]||{r:0,p:0,d:'',c:[],n:null},hv):[0,1,2].map(i=>one(rows[i]||{r:0,p:0,d:'',c:[],n:null},i)).join(' ');
+ return lab.replace('&','and')+', '+t.name+'. '+(RNG[k]?'This uses '+RNG[k]+'. ':'')+body+(t.notes[k]?' Note: '+t.notes[k]:'')+(S.formation?` Narrowed to ${S.formation}.`:'')}
 
 /* ---------- parsing what you say or type ---------- */
-const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30};
+const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,twentyone:21,twenty-two:22,twentytwo:22,twentyone:21,twentytwo:22};
 function nums(t,skipFirst){const out=[];
  t.split(/[^a-z0-9]+/).forEach(w=>{
   if(/^\d+$/.test(w)){if(w.length===3)out.push(+w[0],+w[1],+w[2]);else if(w.length===4)out.push(+w[0],+w.slice(1,3),+w[3]);else out.push(+w)}
@@ -187,10 +268,15 @@ function nums(t,skipFirst){const out=[];
 function say(raw){
  const t=raw.toLowerCase().trim();if(!t)return;
  $('heard').textContent='Heard: “'+raw.trim()+'”';
- if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';$('q').value='';upd();return}
- const mode=/two[- ]?point|\b2[- ]?(pt|point)/.test(t)?'tp':/first play|drive/.test(t)?'fp':/goal/.test(t)?'gl':'play';
+ if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';S.formation='';S.personnel='';S.motion='';S.playType='';$('q').value='';upd();return}
+ const mode=/two[- ]?point|\b2[- ]?(pt|point)\b/.test(t)?'tp':/first play|drive/.test(t)?'fp':/goal/.test(t)?'gl':'play';
  const hw=/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
- const n=nums(t.replace(/two[- ]?point|\b2[- ]?(pt|point)/g,''),mode==='fp');let ok=false;
+ const n=nums(t.replace(/two[- ]?point|\b2[- ]?(pt|point)\b/g,''),mode==='fp');let ok=false;
+ const follow=extractFollowUp(raw);
+ if(follow.formation) S.formation=follow.formation;
+ if(follow.personnel) S.personnel=follow.personnel;
+ if(follow.motion) S.motion=follow.motion;
+ if(follow.playType) S.playType=follow.playType;
  if(mode==='fp'||mode==='tp'){S.mode=mode;S.hs=hw||n.filter(x=>x>=1&&x<=3).pop()||0;ok=true}
  else if(n.length===0&&hw){S.hs=hw;ok=true}
  else if(mode==='gl'&&!(n[0]>=1&&n[0]<=4)){S.mode='gl';S.hs=hw;ok=true}
@@ -211,7 +297,7 @@ $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(qt);say($
 let autoOn=false,voices=[],vpick='';
 try{vpick=localStorage.getItem('voice')||''}catch(e){}
 const ok=()=>'speechSynthesis' in window;
-function rank(v){return(/natural|neural|enhanced|premium/i.test(v.name)?4:0)+(/siri|samantha|ava|allison|evan|google us english|aaron|nicky/i.test(v.name)?2:0)+(/en[-_]US/i.test(v.lang)?1:0)+(v.localService?.5:0)}
+function rank(v){return(/natural|neural|enhanced|premium/i.test(v.name)?4:0)+(/siri|samantha|ava|allison|evan|google us english|aaron|nicky/i.test(v.name)?2:0)+(/en[-_]US/i.test(v.lang)?1:0)+(v.localService?1:0)+(v.default?1:0)}
 function loadVoices(){if(!ok())return;voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)).sort((a,b)=>rank(b)-rank(a))}
 function fillVoices(){const s=$('vsel');if(!s)return;
  if(!voices.length)loadVoices();
@@ -235,8 +321,8 @@ $('mic').onclick=()=>{
  if(on){on=false;rec.stop();$('mic').setAttribute('aria-pressed',false);$('mic').textContent='Tap to listen';return}
  rec=new SR();rec.continuous=true;rec.interimResults=false;rec.lang='en-US';
  rec.onresult=e=>{const r=e.results[e.results.length-1][0].transcript.trim();$('q').value=r;say(r)};
- rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error)){on=false;$('mic').hidden=true;$('heard').textContent='Mic is blocked on this page. Tap the box and use your keyboard mic instead.'}};
- rec.onend=()=>{if(on)try{rec.start()}catch(_){}};
+ rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error)){on=false;$('mic').hidden=true;$('heard').textContent='Mic is blocked on this page. Tap the box and use your keyboard mic instead.'}}
+ rec.onend=()=>{if(on)try{rec.start()}catch(_){} };
  on=true;$('mic').setAttribute('aria-pressed',true);$('mic').textContent='Listening. Tap to stop';rec.start()};
 
 loadVoices();upd();
