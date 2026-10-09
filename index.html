@@ -69,7 +69,7 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 <button id="mic" aria-pressed="false" hidden>Tap to listen</button>
 <div id="heard" aria-live="polite">Tap the box, then tap the mic on your keyboard and say it.</div>
 <details><summary>How to say it</summary>
-<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and goal”, or “2 point try.” You can also add a formation like “shotgun split back.”</p></details>
+<p>Down, distance, hash: "third and five, middle" or "3 5 2". Hash is left, middle or right (1, 2, 3). Short means 1 to 3 yards, medium 5, long 8 or more. Also: "first play of drive, right", "first and goal", or "2 point try." You can also add a formation like "shotgun split back."</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
@@ -78,20 +78,24 @@ select{max-width:100%;min-height:40px;font-size:15px;background:var(--card);colo
 
 <div id="followup" aria-live="polite"></div>
 <div id="res" aria-live="polite"></div>
-<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a call. This page will also accept a formation follow-up, such as “shotgun split back,” to narrow the result.</div>
+<div class="foot">Call names were read from PDF text, so which hash a call sits under may be wrong. Run/pass and direction numbers are more reliable. Check against the sheet before betting on a call. This page will also accept a formation follow-up, such as "shotgun split back," to narrow the result.</div>
 </main>
 <script>
-const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
+const c=(r,p,d,calls,n,f,m)=>({r,p,d,c:calls,n,f,m}),same=x=>[x,x,x];
+
+/* VCA DATA */
 const V={name:'VCA vs Kings Christian',short:'VCA vs Kings Christian',data:{
-fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(71.4,28.6,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep']),c(71.4,28.6,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep'])],
-d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(50,50,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep']),c(50,50,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep'])],
-a:[c(100,0,'',['Fake sweep toss left','FB dive']),c(0,100,'',['Fake crossbuck','Short crossing routes']),c(100,0,'',[])],
+fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(71.4,28.6,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep'])],
+d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(50,50,'33.3% R / 66.7% L',['TB power','Belly','Power pass','Quarterback sweep'])],
+a:[c(100,0,'',['Fake sweep toss left','FB dive']),c(0,100,'',['Fake crossbuck','Short crossing routes']),c(100,0,'',['Fake sweep toss left'])],
 b:[c(100,0,'0% R / 100% L',['Fake sweep toss left','FB dive']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route'])],
 e:same(c(25,75,'33.3% R / 66.7% L',['Out routes','Power pass','TB sweep toss right','Slot motion L return drag L'])),
 f:same(c(100,0,'',[])),g:same(c(0,100,'',['Out routes'])),h:same(c(0,100,'',['Fake crossbuck TE post','Power pass'])),
 i:[c(0,100,'',['Short crossing routes']),c(0,100,'',['RB screen']),null],
 pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
 notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}};
+
+/* ALPAUGH DATA */
 const A={name:'Alpaugh',short:'Alpaugh',data:{
 fp:[c(50,50,'33.3% R / 66.7% L',['TB power','Go routes w/ curl','QB sweep','QB sweep'],4),c(50,50,'50% R / 50% L',['Cross and w/ RB leak','QB sweep'],2),c(50,50,'25% R / 75% L',['QB power','Go routes','TE slant','QB keeper'],3)],
 d1:[c(50,50,'80% R / 20% L',['QB power','Jet sweep','Go routes w/ curl','QB sweep','QB sweep'],6),c(0,100,'100% R',['Cross and w/ RB leak'],1),c(50,50,'33.3% R / 66.7% L',['QB power','Go routes','TE slant','QB keeper'],3)],
@@ -103,20 +107,63 @@ i:[null,null,null],
 g1:[c(100,0,'100% L',['TB power'],1),c(100,0,'100% L',['QB sweep'],1),c(100,0,'100% L',['TE sweep'],1)],
 pt:same(c(100,0,'100% R',['QB power'],2))},
 notes:{d1:'Only 1st and 10 is logged for first down.',pt:'Two plays total, and the hash was not logged.'}};
+
+/* MARICOPA DATA - COMPLETE FROM SHEET */
 const M={name:'Maricopa',short:'Maricopa',data:{
-fp:[c(100,0,'66.7% R / 0% L / 33.3% M',['TB power','TB dive']),c(100,0,'0% R / 0% L / 100% M',['QB power']),c(100,0,'0% R / 100% L',['TB power'])],
-d1:[c(100,0,'66.7% R / 0% L / 33.3% M',['TB power','TB dive']),c(100,0,'0% R / 0% L / 100% M',['QB power','TB power']),c(100,0,'0% R / 100% L',['TB power'])],
-a:[c(100,0,'0% R / 0% L / 100% M',['QB power']),null,c(100,0,'0% R / 100% L',['TB power'])],
-b:[c(100,0,'0% R / 0% L / 100% M',['TB dive']),c(100,0,'0% R / 0% L / 100% M',['QB power']),null],
-e:[null,c(100,0,'50% R / 50% L',['TB sweep','QB power']),null],
-f:[c(100,0,'0% R / 0% L / 100% M',['QB power']),null,null],
-g:[c(0,100,'100% R / 0% L',['TE corner route RB leak']),null,c(100,0,'0% R / 0% L / 100% M',['QB power'])],
-h:[null,null,null],
-i:[c(100,0,'0% R / 100% L',['QB power']),null,null],
-pt:[null,null,null]},
-notes:{fp:'5 plays total across all hashes.',d1:'7 plays total across all hashes.',a:'2 plays total across all hashes.',b:'2 plays total. The right hash had no data; the sheet repeated middle numbers.',e:'2 total plays across all hashes.'}};
+fp:[
+  c(85.7,14.3,'50% R / 16.7% L / 33.3% M',['QB power','TB power','TB dive','TE drag WR post RB leak','RB dive'],7,'Shotgun Split Back, Pro R'),
+  c(100,0,'20% R / 0% L / 80% M',['QB power','TB sweep toss'],2,'Shotgun Split Back, Pro R'),
+  c(75,25,'25% R / 50% L / 25% M',['TB power','TE slant WR go rte','TB dive'],4,'Shotgun Split Back, Pistol L')
+],
+d1:[
+  c(75,25,'57.1% R / 14.3% L / 28.6% M',['QB power','TB power','TB dive','TE drag WR post RB leak','RB dive','Pro drag'],7,'Shotgun Split Back'),
+  c(100,0,'16.7% R / 16.7% L / 66.7% M',['QB power','TB power','TB sweep toss'],3,'Shotgun Split Back'),
+  c(83.3,16.7,'16.7% R / 50% L / 33.3% M',['TB power','QB power','TE slant WR go rte','TB dive'],6,'Shotgun Split Back, Pistol L')
+],
+a:[
+  c(100,0,'0% R / 0% L / 100% M',['QB power'],1,'Shotgun Split Back'),
+  null,
+  c(100,0,'0% R / 100% L',['TB power'],1,'Shotgun Split Back')
+],
+b:[
+  c(100,0,'50% R / 0% L / 50% M',['TB dive','Option toss'],2,'Shotgun Split Back, Pistol L'),
+  c(100,0,'0% R / 0% L / 100% M',['QB power'],1,'Shotgun Split Back'),
+  c(100,0,'100% R / 0% L',['QB power'],1,'Shotgun Split Back')
+],
+e:[
+  c(100,0,'0% R / 0% L / 100% M',['QB keeper'],1,'Shotgun Split Back'),
+  c(100,0,'33.3% R / 50% L / 16.7% M',['QB power','TB sweep','TB sweep toss','Fake RB power QB keeper'],4,'Shotgun Split Back, Pistol R'),
+  c(75,25,'0% R / 100% L',['TB power'],1,'Shotgun Split Back')
+],
+f:[
+  null,
+  null,
+  null
+],
+g:[
+  null,
+  null,
+  c(100,0,'0% R / 0% L / 100% M',['QB power'],1,'Shotgun Split Back')
+],
+h:[
+  c(100,0,'0% R / 0% L / 100% M',['QB power'],1,'Shotgun Split Back'),
+  c(100,0,'0% R / 50% L / 50% M',['QB power','TB power'],2,'Shotgun Split Back'),
+  c(100,0,'100% R / 0% L',['Option toss'],1,'Pistol R')
+],
+i:[
+  c(100,0,'0% R / 100% L',['QB power'],1,'Shotgun Split Back'),
+  c(50,50,'50% R / 0% L / 50% M',['QB power','Flood'],2,'Shotgun Split Back'),
+  c(50,50,'50% R / 0% L / 50% M',['QB power','Flood'],2,'Shotgun Split Back')
+],
+g1:[null,null,null],
+pt:[
+  c(33.3,66.7,'60% R / 20% L / 20% M',['QB keeper','Slot out rte Wide go rte','Center leak','Fake TB power QB keeper','Crossing rtes with Pro to flat','TE leak Pro out rte'],6,'Under center Split Back, Slot R, Wide R, Ugly R Wide R')
+]
+},
+notes:{fp:'16 plays. Strong run tendency early.',d1:'20 plays. 85% run / 15% pass overall.',a:'2 plays. 100% run in short yardage.',e:'11 plays. 90.9% run / 9.1% pass in 2nd & 8+.',g:'Limited 3rd & 4-6 data.',h:'3 plays in 3rd & 7-9.',i:'3 plays in 3rd & 10+.',pt:'6 plays. 33.3% run / 66.7% pass in 2-point tries.'}};
+
 const T={vca:V,alp:A,mar:M},$=id=>document.getElementById(id);
-const S={team:'vca',dn:null,ds:null,hs:0,mode:'play',formation:'',personnel:'',motion:'',playType:''};
+const S={team:'vca',dn:null,ds:null,hs:0,mode:'play',formation:''};
 const HN=['Left hash','Middle','Right hash'],HP=['On the left hash','In the middle','On the right hash'];
 const ORD=['','1st','2nd','3rd','4th'];
 const RNG={d1:'all 1st downs, which the sheet logs as 1st and 10',a:'the 1 to 3 yard range',b:'the 4 to 7 yard range',e:'the 8 or more yard range',f:'the 1 to 3 yard range',g:'the 4 to 6 yard range',h:'the 7 to 9 yard range',i:'the 10+ yard range',fp:'the first play of the drive',g1:'the goal-to-go situation',pt:'2-point tries'};
@@ -132,10 +179,10 @@ function normaliseText(v){
 function detectFormation(raw){
  const t=normaliseText(raw);
  if(!t) return '';
- if((/shotgun/.test(t)||/gun/.test(t))&&/split/.test(t)&&/back/.test(t)) return 'Shotgun Split Back';
+ if(/shotgun/.test(t)&&/split/.test(t)&&/back/.test(t)) return 'Shotgun Split Back';
  if(/shotgun/.test(t)||/gun/.test(t)) return 'Shotgun';
  if(/pistol/.test(t)) return 'Pistol';
- if(/under center|under-center|u c|uc/.test(t)) return 'Under Center';
+ if(/under center|under-center|uc/.test(t)) return 'Under Center';
  if(/pro/.test(t)&&/wide/.test(t)) return 'Pro Wide';
  if(/pro/.test(t)) return 'Pro';
  if(/wide/.test(t)) return 'Wide';
@@ -145,41 +192,22 @@ function detectFormation(raw){
  return '';
 }
 
-function extractFollowUp(raw){
- const out={};
- const t=String(raw||'').toLowerCase();
- const formation=detectFormation(t);
- if(formation) out.formation=formation;
- const pos=/\b(11|12|21|22|23)\b/.exec(t);
- if(pos) out.personnel=pos[1];
- if(/motion/.test(t)) out.motion='Yes';
- if(/no motion|no motion/.test(t)) out.motion='No';
- if(/run/.test(t)&&!/pass/.test(t)) out.playType='Run';
- if(/pass/.test(t)&&!/run/.test(t)) out.playType='Pass';
- return out;
-}
-
-function filterRows(rows){
- const formationKey=normaliseText(S.formation);
- if(!formationKey) return rows;
- const hasFormationMeta=rows.some(r=>{
-  const sample=[r&&r.formation,r&&r.Formation,r&&r.form,r&&r.Formation,r&&r.calls,Array.isArray(r&&r.c)?r.c.join(' '):''].filter(Boolean).join(' ');
-  return !!sample && normaliseText(sample).length;
- });
- if(!hasFormationMeta) return rows;
- return rows.filter(r=>{
-  const sample=[r&&r.formation,r&&r.Formation,r&&r.form,r&&r.calls,Array.isArray(r&&r.c)?r.c.join(' '):''].filter(Boolean).join(' ');
-  if(!sample) return true;
-  const norm=normaliseText(sample);
-  return norm.includes(formationKey) || formationKey.includes(norm);
- });
+function filterByFormation(rows,formation){
+ if(!formation) return rows;
+ const norm=normaliseText(formation);
+ return rows.map(r=>{
+  if(!r||!r.f) return r;
+  const rFormNorm=normaliseText(r.f);
+  if(rFormNorm.includes(norm)||norm.includes(rFormNorm)) return r;
+  return null;
+ }).filter(r=>r!==null);
 }
 
 function renderFollowUp(){
- const hasSituation=(S.mode==='tp' || S.mode==='fp' || S.mode==='gl' || (S.dn && S.ds));
+ const hasSituation=(S.mode==='tp'||S.mode==='fp'||S.mode==='gl'||(S.dn&&S.ds));
  if(!hasSituation){ $('followup').innerHTML=''; return; }
  const choiceButtons=FORMATION_CHOICES.map(name=>`<button class="filter-chip ${S.formation===name?'active':''}" data-a="setFilter" data-v="${name}">${name}</button>`).join('');
- const summary = S.formation ? `Narrowed by formation: ${S.formation}` : 'Optional follow-up: formation';
+ const summary=S.formation?`Narrowed by formation: ${S.formation}`:'Optional follow-up: formation';
  $('followup').innerHTML=`<div class="followup"><h3>Follow-up</h3><p class="small">${summary}</p><div class="filter-row"><input id="followFormation" value="${(S.formation||'').replace(/"/g,'&quot;')}" placeholder="Say or type a formation, like shotgun split back" aria-label="Formation"></div><div class="filter-row"><div class="filter-chips">${choiceButtons}<button class="filter-chip" data-a="clearFilter">Clear</button></div></div></div>`;
  const input=$('followFormation');
  if(input){
@@ -224,25 +252,26 @@ function upd(){
   if(!S.dn||!S.ds)return msg('Pick a down and distance, or say it.');
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
   key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds}
- const rows=t.data[key],hv=S.hs-1;
- const filteredRows=filterRows(rows||[]);
- const rowSet=(filteredRows.length?filteredRows:rows);
+ let rows=t.data[key];
+ if(S.formation&&rows){rows=filterByFormation(rows,S.formation);}
+ if(!rows||rows.length===0) rows=[null,null,null];
+ const hv=S.hs-1;
  let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:'All hashes'} · ${t.name}</div>${RNG[key]?`<div class="sub">Uses ${RNG[key]}</div>`:''}${S.formation?`<div class="sub">Follow-up: ${S.formation}</div>`:''}<div class="sum"><p id="sumtxt"></p><div class="sumbar"><button id="rd" type="button">Read it</button><button id="st" type="button">Stop</button><label><input id="auto" type="checkbox"> Auto read</label></div></div>`;
  if(hv>=0){
-  [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{if(rowSet[j]) o+=card(rowSet[j],j,j===hv); else o+=card(null,j,j===hv)});
+  [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{if(rows[j]) o+=card(rows[j],j,j===hv); else o+=card(null,j,j===hv)});
  } else {
-  [0,1,2].forEach(j=>{if(rowSet[j]) o+=card(rowSet[j],j,j===hv); else o+=card(null,j,j===hv)});
+  [0,1,2].forEach(j=>{if(rows[j]) o+=card(rows[j],j,false)});
  }
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
  $('res').innerHTML=o;
- lastSum=summarize(t,rowSet,hv,lab,key);$('sumtxt').textContent=lastSum;
+ lastSum=summarize(t,rows,hv,lab,key);$('sumtxt').textContent=lastSum;
  $('rd').onclick=speak;$('st').onclick=stopSpeak;$('auto').onchange=e=>autoOn=e.target.checked;fillVoices()}
 function card(x,i,on){
  const h=`<div class="hd"><b>${HN[i]}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
- return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}${`<div class="rw"><i>Calls</i> ${x.c.length?x.c.join(', '):'none listed'}</div>`}</div>`}
+ return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}${`<div class="rw"><i>Calls</i> ${x.c.length?x.c.join(', '):'none listed'}</div>`}${x.f?`<div class="rw"><i>Formation</i> ${x.f}</div>`:''}</div>`}
 
-/* ---------- summary text (templated from the sheet; no AI) ---------- */
+/* ---------- summary text ---------- */
 const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with').replace(/\bRTE\b/g,'right tight end').replace(/\bLTE\b/g,'left tight end').replace(/\bWR\b/g,'wide receiver').replace(/\bGo\b/g,'go');
 const J=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
 const dirSpeak=d=>{const a=d.split(/\s*\/\s*/),b=a.filter(x=>!/^0%/.test(x));return J((b.length?b:a).map(x=>x.replace(/%\s*R/,' percent right').replace(/%\s*L/,' percent left').replace(/%\s*M/,' percent middle').replace(/\s+/g,' ')));};
@@ -252,14 +281,14 @@ function one(x,i){
  let s=`${HP[i]}, ${ph}. That is ${x.r} percent run and ${x.p} percent pass.`;
  if(x.d)s+=' Direction: '+dirSpeak(x.d)+'.';
  s+=x.c.length?' Calls logged: '+J(x.c.slice(0,4).map(EX))+(x.c.length>4?', and others':'')+'.':' No specific calls are listed.';
- s+=x.n==null?" The sample size for this hash is not listed.":x.n<=3?` Only ${x.n} ${x.n===1?'play':'plays'} behind it, so treat it as a hint.`:` That comes from ${x.n} plays, which is a small sample.`;
+ s+=x.n==null?" The sample size for this hash is not listed.":x.n<=3?` Only ${x.n} ${x.n===1?'play':'plays'} behind it, so treat it as a hint.`:` That comes from ${x.n} plays.`;
  return s}
 function summarize(t,rows,hv,lab,k){
  const body=hv>=0?one(rows[hv]||{r:0,p:0,d:'',c:[],n:null},hv):[0,1,2].map(i=>one(rows[i]||{r:0,p:0,d:'',c:[],n:null},i)).join(' ');
  return lab.replace('&','and')+', '+t.name+'. '+(RNG[k]?'This uses '+RNG[k]+'. ':'')+body+(t.notes[k]?' Note: '+t.notes[k]:'')+(S.formation?` Narrowed to ${S.formation}.`:'')}
 
 /* ---------- parsing what you say or type ---------- */
-const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,twentyone:21,twenty-two:22,twentytwo:22,twentyone:21,twentytwo:22};
+const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20};
 function nums(t,skipFirst){const out=[];
  t.split(/[^a-z0-9]+/).forEach(w=>{
   if(/^\d+$/.test(w)){if(w.length===3)out.push(+w[0],+w[1],+w[2]);else if(w.length===4)out.push(+w[0],+w.slice(1,3),+w[3]);else out.push(+w)}
@@ -267,16 +296,13 @@ function nums(t,skipFirst){const out=[];
  return out}
 function say(raw){
  const t=raw.toLowerCase().trim();if(!t)return;
- $('heard').textContent='Heard: “'+raw.trim()+'”';
- if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';S.formation='';S.personnel='';S.motion='';S.playType='';$('q').value='';upd();return}
+ $('heard').textContent='Heard: "'+raw.trim()+'"';
+ if(/new play|clear|reset|start over/.test(t)){S.dn=S.ds=null;S.hs=0;S.mode='play';S.formation='';$('q').value='';upd();return}
  const mode=/two[- ]?point|\b2[- ]?(pt|point)\b/.test(t)?'tp':/first play|drive/.test(t)?'fp':/goal/.test(t)?'gl':'play';
  const hw=/\bleft\b/.test(t)?1:/middle|center/.test(t)?2:/\bright\b|white|\bwrite\b|bright/.test(t)?3:0;
  const n=nums(t.replace(/two[- ]?point|\b2[- ]?(pt|point)\b/g,''),mode==='fp');let ok=false;
- const follow=extractFollowUp(raw);
- if(follow.formation) S.formation=follow.formation;
- if(follow.personnel) S.personnel=follow.personnel;
- if(follow.motion) S.motion=follow.motion;
- if(follow.playType) S.playType=follow.playType;
+ const formation=detectFormation(raw);
+ if(formation) S.formation=formation;
  if(mode==='fp'||mode==='tp'){S.mode=mode;S.hs=hw||n.filter(x=>x>=1&&x<=3).pop()||0;ok=true}
  else if(n.length===0&&hw){S.hs=hw;ok=true}
  else if(mode==='gl'&&!(n[0]>=1&&n[0]<=4)){S.mode='gl';S.hs=hw;ok=true}
@@ -287,7 +313,7 @@ function say(raw){
   if(mode==='gl'){S.mode='gl';S.dn=n[0];ok=true}
   else if(ds>=1){S.mode='play';S.dn=n[0];S.ds=Math.min(ds,25);ok=true}
   if(ok)S.hs=hw||(n.length>=3&&n[2]>=1&&n[2]<=3?n[2]:0)}
- if(!ok){$('heard').textContent+=' — I did not catch a down and distance. Try “third and five, middle.”';return}
+ if(!ok){$('heard').textContent+=' — I did not catch a down and distance. Try "third and five, middle."';return}
  upd();if(autoOn)setTimeout(speak,500)}
 let qt;
 $('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>say($('q').value),700)});
