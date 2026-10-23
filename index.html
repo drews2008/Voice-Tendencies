@@ -72,7 +72,7 @@ const HW={L:'Left',M:'Middle',R:'Right'},HN={1:'L',2:'M',3:'R'},ORD=['','1st','2
 const NW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,first:1,second:2,third:3,fourth:4};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const blank=()=>({down:null,dist:null,hash:null,form:null,fp:false,goal:false,pt:false,mo:null,zone:null,sc:null});
+const blank=()=>({down:null,dist:null,hash:null,form:null,fp:false,goal:false,pt:false,mo:null,zone:null,sc:null,qb:false});
 let S=blank(),lastSay='',lastIncomplete=false;
 
 /* ---------- parsing (voice or typed) ---------- */
@@ -82,11 +82,13 @@ function parse(raw){
   const o=blank();
   o.pt=!!eat(/ (two point|2 point|2 ?pt|conversion) /);
   o.fp=!!eat(/ (first play|drive start\w*|opening drive|starter) /);
+  o.qb=!!eat(/ (qb runs?|q b runs?|quarterback runs?|qb indicators?|indicators) /);
   o.goal=!!eat(/ goal( to go)? /);
   if(eat(/ (no motion|without motion) /))o.mo=false;else if(eat(/ motion /))o.mo=true;
   if(eat(/ (red zone|redzone) /))o.zone='Opp 1-20';
   if(eat(/ (close game|close) /))o.sc='close';else if(eat(/ (blowout|blow out|big lead) /))o.sc='lead';
   for(let i=0;i<2;i++)s=s.replace(/ (wide|trips|slot) (left|right) /g,(m,a,b)=>' '+a+' '+b[0]+' ');
+  s=s.replace(/ (i formation|i form|eye formation|eye tight) /,' i tight ');
   const fm=s.match(/ formation (\d+) /);
   if(fm){o.form=FT[+fm[1]-1]||null;s=s.replace(fm[0],' ')}
   else{const f=[...FT].sort((a,b)=>b.name.length-a.name.length).find(f=>s.includes(' '+f.name.toLowerCase()+' '));if(f){o.form=f;s=s.replace(' '+f.name.toLowerCase()+' ',' ')}}
@@ -118,6 +120,7 @@ function human(o){
   if(o.hash)p.push(HW[o.hash]+' hash');if(o.form)p.push(o.form.name);
   if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone)p.push(o.zone);
   if(o.sc)p.push(o.sc==='close'?'close game':'blowout');
+  if(o.qb)p.push('QB run indicators');
   return p.join(' · ');
 }
 function speakText(o){
@@ -128,6 +131,7 @@ function speakText(o){
   if(o.hash)p.push(HW[o.hash].toLowerCase()+' hash');if(o.form)p.push(o.form.name.toLowerCase());
   if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone==='Opp 1-20')p.push('red zone');
   if(o.sc)p.push(o.sc==='close'?'close game':'blowout');
+  if(o.qb)p.push('qb run');
   return p.join(' ');
 }
 const needsDist=o=>o.down>=2&&!o.goal&&!o.fp&&!o.pt&&o.dist==null;
@@ -166,6 +170,61 @@ function stats(rows){
     calls:Object.entries(calls).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])),med,exp:ys.filter(y=>y>=15).length};
 }
 
+/* ---------- coach keys (edit these lines to change your notes) ---------- */
+const COACH_NOTES=[
+  {label:'Trips L',forms:['Trips L Wide R','Trips L'],watch:'QB KEEPER'},
+  {label:'Trips R',forms:['Trips R','Wide L Trips R'],watch:'WR SCREEN'},
+  {label:'I formation',forms:['I Tight'],watch:'TB POWER'},
+  {label:'Spread',forms:['Spread'],mixed:true}
+];
+const QBC=['QB KEEPER','QB SNEAK','QB DRAW','QB SWEEP'];
+const isQB=x=>QBC.includes(x.cc);
+function noteFor(f){return f?COACH_NOTES.find(n=>n.forms.some(x=>x.toLowerCase()===f.name.toLowerCase())):null}
+function noteData(f){
+  const n=noteFor(f);if(!n||!n.watch)return null;
+  const rows=LOG.filter(x=>x.pt&&x.form.toLowerCase()===f.name.toLowerCase()),hit=rows.filter(x=>x.cc===n.watch).length;
+  const calls=stats(rows).calls,max=calls.length?calls[0][1]:0,pct=rows.length?Math.round(100*hit/rows.length):0;
+  const extra=hit<max?`<div class="rw"><i>Charted top call here is ${esc(calls[0][0])} (${calls[0][1]}).</i></div>`:'';
+  const small=rows.length<5?warn('Only '+rows.length+' snap'+(rows.length==1?'':'s')+' charted in '+esc(f.name)+'. Your key stands; the data cannot confirm it yet.'):'';
+  return{line:n.label+': watch for '+n.watch,
+    say:n.label+': watch for '+n.watch+'. '+hit+' of '+rows.length+' charted snaps.',
+    html:`<section class="card"><div class="hd"><b>Your key</b><span class="n">${esc(n.label)} · charted as ${esc(f.name)}</span></div><div class="rw"><b>Watch for ${esc(n.watch)}</b></div><div class="rw"><i>Data:</i> ${esc(n.watch)} on ${hit} of ${rows.length} snaps in ${esc(f.name)} (${pct}%).</div>${extra}${small}</section>`};
+}
+function spreadRead(o){
+  const rows=LOG.filter(x=>x.form==='Spread'&&(x.pt==='Run'||x.pt==='Pass'));
+  const G=[['1st down',x=>x.dn===1],['2nd down',x=>x.dn===2],['3rd and 4th down',x=>x.dn===3||x.dn===4]];
+  const cur=o.down?(o.down===1?0:o.down===2?1:2):-1;
+  const gs=G.map(([lab,f],i)=>{const r=rows.filter(f),run=r.filter(x=>x.pt==='Run').length;return{lab,r,run,ps:r.length-run,i}});
+  const list=g=>g.r.map(x=>ORD[x.dn]+' & '+(x.gl?'goal':x.di)+' '+esc(x.cc||'(not labeled)')+' ('+x.pt.toLowerCase()+')').join(' · ');
+  const tr=rows.filter(x=>x.pt==='Run').length;
+  const html=`<section class="card"><div class="hd"><b>Spread: mixed, read the situation</b><span class="n">${rows.length} snaps · ${tr} run, ${rows.length-tr} pass</span></div>`+
+    gs.map(g=>`<div class="rw"${g.i===cur?' style="font-weight:700"':''}><i>${g.lab}:</i> ${g.run} run, ${g.ps} pass${g.r.length?' — '+list(g):''}</div>`).join('')+
+    warn('Only '+rows.length+' Spread snaps. Read the down as a lean, not a rule.')+'</section>';
+  const g=cur>=0?gs[cur]:null;
+  const say=g?(g.r.length?'Spread is mixed. On '+g.lab+': '+g.run+' run, '+g.ps+' pass in '+g.r.length+' snaps.':'Spread is mixed. No Spread snaps on that down.'):'Spread is mixed, '+tr+' run and '+(rows.length-tr)+' pass. Give me the down and distance.';
+  return{html,line:'Spread: mixed, read the situation',say};
+}
+function qbData(){
+  const pl=LOG.filter(x=>x.pt),q=pl.filter(isQB),base=Math.round(1000*q.length/pl.length)/10;
+  const sit=x=>{if(x.dn==='2PT')return null;if(x.gl)return'Goal-to-go';
+    if(x.dn===2)return x.di>=10?'2nd & 10+':x.di>=4?'2nd & 4-9':'2nd & 1-3';
+    if(x.dn===3)return x.di>=10?'3rd & 10+':x.di>=4?'3rd & 4-9':'3rd & 1-3';return null};
+  const G=[x=>x.form,x=>x.pers?'Personnel '+x.pers:null,x=>x.dn==='2PT'?null:ORD[x.dn]+' down',x=>x.dn==='2PT'?null:(x.mo?'With motion':'No motion'),sit];
+  const rows=[];
+  G.forEach(f=>{const m={};pl.forEach(x=>{const k=f(x);if(k)(m[k]=m[k]||[]).push(x)});
+    Object.entries(m).forEach(([k,r])=>{if(r.length>=3){const c=r.filter(isQB).length;rows.push({k,n:r.length,c,rate:Math.round(1000*c/r.length)/10})}})});
+  const up=rows.filter(r=>r.rate>=base*1.3).sort((a,b)=>b.rate-a.rate||b.n-a.n),dn=rows.filter(r=>r.rate<=base*0.5).sort((a,b)=>a.rate-b.rate||b.n-a.n);
+  const li=a=>a.length?'<ul class="t">'+a.map(r=>`<li><b>${esc(r.k)}</b>: ${r.c} of ${r.n} (${r.rate}%)</li>`).join('')+'</ul>':'<div class="rw">None.</div>';
+  const dirs=QBC.map(c=>{const s=stats(pl.filter(x=>x.cc===c));return s.n>=2?esc(c)+' ('+s.n+'): '+dirStr(s.dir,true):null}).filter(Boolean);
+  const html=`<section class="card"><div class="hd"><b>QB run indicators</b><span class="n">${q.length} of ${pl.length} snaps · ${base}%</span></div>
+<div class="rw"><i>Raises the odds (1.3x or more, 3+ snaps):</i></div>${li(up)}
+<div class="rw"><i>Lowers the odds (half the base or less):</i></div>${li(dn)}
+<div class="rw"><i>Where they go:</i> ${dirs.join(' · ')}</div>
+${warn('QB runs here are keeper, sneak, draw and sweep. Every cell is small. One run with no charted call (68 yards, Trips L Wide R) is not counted, and it was probably a keeper.')}</section>`;
+  const say='QB runs are '+base+'% of snaps. More likely: '+up.slice(0,5).map(r=>r.k).join(', ').replace(/ & /g,' and ')+'. Less likely: '+dn.slice(0,4).map(r=>r.k).join(', ').replace(/ & /g,' and ')+'.';
+  return{html,say};
+}
+
 /* ---------- rendering ---------- */
 function dirStr(d,cnt){
   const t=cnt?d.R+d.L+d.M:1;if(cnt&&!t)return'none logged';
@@ -173,8 +232,8 @@ function dirStr(d,cnt){
   return o.length?o.join(' · '):'none logged';
 }
 const fromSheet=r=>({n:r.n,run:r.r,pass:r.p,dir:dirStr(r.d,false),calls:r.calls});
-const fromStats=s=>({n:s.n,run:s.run,pass:s.pass,dir:dirStr(s.dir,true),calls:s.calls,
-  extra:s.med==null?'':'Median '+s.med+' yds · '+s.exp+' play'+(s.exp==1?'':'s')+' of 15+ yds'});
+const fromStats=s=>{const q=s.rows.filter(isQB).length;return{n:s.n,run:s.run,pass:s.pass,dir:dirStr(s.dir,true),calls:s.calls,
+  extra:(s.n?'QB runs: '+q+' of '+s.n+' ('+Math.round(100*q/s.n)+'%). ':'')+(s.med==null?'':'Median '+s.med+' yds · '+s.exp+' play'+(s.exp==1?'':'s')+' of 15+ yds')}};
 const warn=t=>`<div class="warn">${t}</div>`;
 function card(title,sub,r,note){
   const top=r.calls.slice(0,7).map(c=>esc(c[0])+' ('+c[1]+')').join(', ')||'none';
@@ -214,15 +273,23 @@ ${warn('Laton led big in both games, so most of this log is a team protecting a 
   const t=tells();
   h+=`<section class="card"><div class="hd"><b>Tells</b><span class="n">8+ plays and 80%+ one way</span></div>`+
     (t.length?'<ul class="t">'+t.map(x=>`<li><b>${esc(x.k)}</b> (${esc(x.g)}): ${Math.max(x.s.run,x.s.pass)}% ${x.s.run>=x.s.pass?'run':'pass'}, ${x.s.n} plays · top ${esc(x.s.calls[0][0])}</li>`).join('')+'</ul>':'<div class="rw">None clear the bar.</div>')+'</section>';
-  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add "i tight", "formation 3", "motion", "red zone", "close game". Say "clear" to start over.</div></section>`;
+  h=`<section class="card"><div class="hd"><b>Your keys</b><span class="n">edit COACH_NOTES in the file</span></div><ul class="t">`+COACH_NOTES.map(n=>`<li><b>${esc(n.label)}</b>: ${n.watch?'watch for '+esc(n.watch):'mixed, read the situation'}</li>`).join('')+`</ul></section>`+h;
+  h+=qbData().html;
+  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add "i tight", "spread", "trips left wide right", "motion", "red zone", "close game". Say "qb run" for the QB indicators. Say "clear" to start over.</div></section>`;
   return h;
 }
 function render(){
   const o=S,res=$('res'),sum=$('sum');
-  const any=o.pt||o.fp||o.goal||o.down||o.hash||o.form||o.mo!=null||o.zone||o.sc;
+  const sit=o.pt||o.fp||o.goal||o.down||o.hash||o.form||o.mo!=null||o.zone||o.sc;
+  const any=sit||o.qb;
   $('heard').textContent=any?'Reading: '+human(o):'Pick a situation or just talk.';
   if(!any){sum.innerHTML='<p>Laton. Pick a situation or say it.</p>';res.innerHTML=overview();lastSay='';return}
-  let h='',sheetR=null;
+  if(o.qb&&!sit){const q=qbData();res.innerHTML=q.html;sum.innerHTML='<p>'+esc(q.say)+'</p>';lastSay=q.say;return}
+  let h='',sheetR=null,noteLine='',noteSay='';
+  const nd=noteData(o.form);
+  if(nd){h+=nd.html;noteLine=nd.line;noteSay=nd.say}
+  if(o.form&&o.form.name==='Spread'){const sp=spreadRead(o);h+=sp.html;noteLine=sp.line;noteSay=sp.say}
+  if(o.qb)h+=qbData().html;
   const key=bucket(o);
   if(key&&(DD[key]||TH[key])){
     const th=TH[key]||{},dd=DD[key];let r=null,tag='',note='';
@@ -240,13 +307,13 @@ function render(){
   const st=stats(filt(o,new Set()));
   h+=card('Raw log · '+human(o),'log · '+st.n+' plays',fromStats(st),(st.n?'':warn('No logged plays match every filter.'))+relaxChips(o))+playsList(st);
   res.innerHTML=h;
-  const useLog=st.n>0||!sheetR;
+  const useLog=st.n>0||!sheetR||o.form||o.mo!=null||o.zone||o.sc;
   const src=useLog?{n:st.n,run:st.run,pass:st.pass,calls:st.calls}:{n:sheetR.n,run:sheetR.r,pass:sheetR.p,calls:sheetR.calls};
   const where=human(o);
   const pre=(!useLog&&src.n)?'No non-goal plays in the log. Sheet (may include goal-to-go): ':'';
   const body=src.n?`${pre}<b>${src.run>=src.pass?src.run+'% run':src.pass+'% pass'}</b> over ${src.n} play${src.n==1?'':'s'}. Top call: <b>${esc(src.calls[0][0])}</b>${src.calls[1]&&src.calls[1][1]>=2?', then '+esc(src.calls[1][0]):''}.${src.n<5?' Small sample.':''}`:'No plays logged for that.';
-  sum.innerHTML=`<p>${esc(where)}: ${body}</p>`;
-  lastSay=(where+': '+body).replace(/<[^>]+>/g,'').replace(/ · /g,', ').replace(/ & /g,' and ');
+  sum.innerHTML=(noteLine?`<p><b>${esc(noteLine)}</b></p>`:'')+`<p>${esc(where)}: ${body}</p>`;
+  lastSay=((noteSay?noteSay+' ':'')+where+': '+body).replace(/<[^>]+>/g,'').replace(/ · /g,', ').replace(/ & /g,' and ');
 }
 
 /* ---------- controls ---------- */
@@ -259,7 +326,8 @@ function buildControls(){
     ['Goal-to-go',()=>S.goal,()=>{S.goal=!S.goal;if(S.goal){S.pt=false;S.fp=false}}],
     ['2-pt',()=>S.pt,()=>{S.pt=!S.pt;if(S.pt){S.down=null;S.dist=null;S.fp=false;S.goal=false}}],
     ['Motion',()=>S.mo===true,()=>{S.mo=S.mo===true?null:true}],
-    ['No motion',()=>S.mo===false,()=>{S.mo=S.mo===false?null:false}]]);
+    ['No motion',()=>S.mo===false,()=>{S.mo=S.mo===false?null:false}],
+    ['QB run',()=>S.qb,()=>{S.qb=!S.qb}]]);
   mk('ghs',[['L','L'],['M','M'],['R','R']].map(([t,k])=>[HW[k]+' hash',()=>S.hash===k,()=>{S.hash=S.hash===k?null:k}]));
   $('form').innerHTML='<option value="">Any</option>'+FT.map((f,i)=>`<option value="${i}">${i+1}. ${esc(f.name)} (${f.n})</option>`).join('');
   $('dist').addEventListener('input',e=>{S.dist=e.target.value?+e.target.value:null;$('q').value=speakText(S);render()});
@@ -295,7 +363,7 @@ function onVoice(txt){
   if(/^(clear|reset|start over|new)\b/i.test(t)){$('clr').click();say('Cleared.');return}
   const p=parse(t),hasSit=p.down||p.fp||p.pt||p.goal,cur=S.down||S.fp||S.pt||S.goal;
   if(lastIncomplete){$('q').value=$('q').value+' '+t;const q=parse($('q').value);q.sc=q.sc||S.sc;q.zone=q.zone||S.zone;S=q}
-  else if(!hasSit&&cur){['hash','form','mo','zone','sc'].forEach(k=>{if(p[k]!=null)S[k]=p[k]});$('q').value=speakText(S)}
+  else if(!hasSit&&cur){['hash','form','mo','zone','sc','qb'].forEach(k=>{if(p[k]!=null&&p[k]!==false)S[k]=p[k]});$('q').value=speakText(S)}
   else{p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;$('q').value=speakText(S)}
   lastIncomplete=needsDist(S);refresh();render();
   say(lastIncomplete?'Distance?':lastSay);
