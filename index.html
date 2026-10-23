@@ -1,507 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Sideline Tendencies</title>
-  <style>
-    :root{
-      --bg:#edf3ea;--card:#fffdf8;--ink:#12251a;--mute:#5d7568;--line:#cddbc0;--acc:#173a2d;--accink:#f4d063;--run:#c35a31;--pass:#2e6f9d;--barink:#fff;
-      box-sizing:border-box;
-      padding-top:env(safe-area-inset-top,0px);
-      padding-bottom:env(safe-area-inset-bottom,0px);
-    }
-    *{box-sizing:border-box}
-    html{scroll-padding-top:env(safe-area-inset-top,0px)}
-    body{
-      margin:0;
-      background:radial-gradient(circle at top,#f7f6ee 0%,var(--bg) 42%,#e9efe7 100%);
-      color:var(--ink);
-      font:500 16px/1.45 Barlow,system-ui,sans-serif;
-    }
-    main{
-      max-width:640px;
-      margin:0 auto;
-      padding:14px 14px 48px;
-    }
-    h1{
-      font:700 24px 'Barlow Condensed',sans-serif;
-      margin:0 0 10px;
-      letter-spacing:.02em;
-      color:var(--ink);
-    }
-    .grp{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-    .grp button{
-      flex:1 1 140px;
-      min-height:48px;
-      border:1.5px solid var(--line);
-      background:var(--card);
-      color:var(--ink);
-      padding:8px;
-      border-radius:8px;
-      font-weight:600;
-      font-size:16px;
-      box-shadow:0 1px 0 rgba(18,37,26,.04);
-      cursor:pointer;
-    }
-    .grp button[aria-pressed="true"]{
-      background:var(--acc);
-      color:var(--accink);
-      border-color:var(--acc);
-    }
-    .lbl{
-      display:block;
-      font-weight:600;
-      margin:14px 0 6px;
-    }
-    #q{
-      width:100%;
-      font:600 22px Barlow,sans-serif;
-      padding:12px;
-      border:2px solid var(--ink);
-      border-radius:10px;
-      background:var(--card);
-      color:var(--ink);
-    }
-    #heard{
-      min-height:22px;
-      color:var(--mute);
-      font-size:15px;
-      margin:6px 0 12px;
-    }
-    .section{
-      background:linear-gradient(180deg,#fefefb 0%,#f3f5ee 100%);
-      border:2px solid var(--ink);
-      border-radius:10px;
-      padding:14px;
-      margin-bottom:12px;
-      box-shadow:0 3px 0 rgba(18,37,26,.06);
-      color:#12251a;
-    }
-    .section h2{
-      margin:0 0 12px;
-      font:700 22px 'Barlow Condensed',sans-serif;
-      letter-spacing:.02em;
-    }
-    .card{
-      background:linear-gradient(180deg,#fff,#f9faf7);
-      border:1.5px solid var(--line);
-      border-radius:10px;
-      padding:14px;
-      margin-bottom:10px;
-      box-shadow:0 1px 0 rgba(18,37,26,.04);
-      color:#12251a;
-    }
-    .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-    .hd b{font:700 22px 'Barlow Condensed',sans-serif}
-    .n{color:#5d7568;font-size:13px}
-    .bar{
-      display:flex;
-      height:36px;
-      border-radius:6px;
-      overflow:hidden;
-      font:700 18px/36px 'Barlow Condensed',sans-serif;
-      color:var(--barink);
-    }
-    .bar span{padding-left:8px;white-space:nowrap;overflow:hidden}
-    .bar .r{background:var(--run)}
-    .bar .p{background:var(--pass)}
-    .meta{
-      margin-top:8px;
-      font-size:15px;
-      line-height:1.5;
-    }
-    .meta i{font-style:normal;color:#5d7568}
-    .warn{
-      border-left:4px solid var(--acc);
-      padding:6px 10px;
-      margin:8px 0;
-      font-size:14px;
-      color:var(--mute);
-    }
-    ul{margin:6px 0 0 18px;padding:0}
-    li{margin:4px 0}
-    .foot{color:var(--mute);font-size:12px;margin-top:18px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sideline Tendencies — Laton</title>
+<style>
+:root{--bg:#edf3ea;--card:#fffdf8;--ink:#12251a;--mute:#5d7568;--line:#cddbc0;--acc:#173a2d;--accink:#f4d063;--run:#c35a31;--pass:#2e6f9d;--warn:#fff1c2;--warnink:#5a4300;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1a14;--card:#16251d;--ink:#e9f1ea;--mute:#9db3a5;--line:#2b4235;--acc:#f4d063;--accink:#12251a;--warn:#3a3114;--warnink:#f4e3a0}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.45 Barlow,system-ui,sans-serif}
+main{max-width:600px;margin:0 auto;padding:14px 14px 56px}
+h1{font:700 24px 'Barlow Condensed',system-ui,sans-serif;margin:0 0 10px;letter-spacing:.02em}
+h1 small{font:500 13px system-ui,sans-serif;color:var(--mute);letter-spacing:0;margin-left:6px}
+button{font-family:inherit;cursor:pointer;min-height:48px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;font-weight:600;font-size:16px;padding:8px 12px}
+button.go{background:var(--acc);color:var(--accink);border-color:var(--acc);font-weight:700}
+button[aria-pressed="true"]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+.row,.grp{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.row button{flex:1 1 110px}.grp button{flex:1 1 70px}
+#q{width:100%;font:600 22px Barlow,system-ui,sans-serif;padding:12px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);margin:2px 0 6px}
+#heard{min-height:22px;color:var(--mute);font-size:15px;margin:2px 0 8px}
+.sel{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.sel label{flex:1 1 130px;font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:2px}
+.sel select,.sel input{min-height:44px;font:600 16px system-ui,sans-serif;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:6px 8px;width:100%}
+.sum{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:14px;margin:10px 0 12px}
+.sum p{margin:0;font-size:20px;line-height:1.45}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:14px;margin-bottom:10px}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.hd b{font:700 21px 'Barlow Condensed',system-ui,sans-serif}.n{color:var(--mute);font-size:13px;text-align:right}
+.bar{display:flex;height:34px;border-radius:6px;overflow:hidden;font:700 17px/34px 'Barlow Condensed',system-ui,sans-serif;color:#fff}
+.bar span{padding-left:8px;white-space:nowrap;overflow:hidden}.r{background:var(--run)}.p{background:var(--pass)}
+.rw{margin-top:7px;font-size:15px}.rw i{font-style:normal;color:var(--mute)}
+.warn{background:var(--warn);color:var(--warnink);border-radius:6px;padding:7px 10px;margin:8px 0;font-size:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips button{min-height:40px;font-size:14px;padding:4px 10px}
+details{margin-top:8px}summary{cursor:pointer;color:var(--mute);font-size:14px;min-height:32px}
+.pl{font-size:13px;padding:5px 0;border-top:1px solid var(--line)}
+.foot{color:var(--mute);font-size:12px;margin-top:18px}
+ul.t{margin:6px 0 0;padding-left:18px;font-size:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
 </head>
 <body>
-  <main>
-    <h1>Sideline Tendencies</h1>
+<main>
+<h1>Sideline Tendencies<small>Laton · 2 games vs Orcutt</small></h1>
+<div class="row">
+  <button id="mic" type="button" class="go">Start hands-free</button>
+  <button id="spk" type="button" aria-pressed="false">Voice reply: off</button>
+  <button id="clr" type="button">Clear</button>
+</div>
+<input id="q" autocomplete="off" autocapitalize="off" enterkeyhint="go" placeholder="3 5 2   ·   third and five middle   ·   i tight">
+<div id="heard" aria-live="polite"></div>
+<div class="grp" id="gdn"></div>
+<div class="grp" id="gfl"></div>
+<div class="grp" id="ghs"></div>
+<div class="sel">
+  <label>Distance<input id="dist" type="number" inputmode="numeric" min="1" max="30" placeholder="yards"></label>
+  <label>Formation<select id="form"></select></label>
+  <label>Score<select id="sc"><option value="">Any</option><option value="close">Close (within 14)</option><option value="lead">Blowout (over 14)</option></select></label>
+  <label>Field zone<select id="zn"><option value="">Any</option><option>Own 1-20</option><option>Own 21-40</option><option>Opp 21-40</option><option>Opp 1-20</option></select></label>
+</div>
+<div class="sum" id="sum" aria-live="polite"></div>
+<div id="res"></div>
+<div class="foot" id="foot"></div>
+</main>
+<script>
+const DATA={"DD":{"fp":{"calls":[["TB POWER",4],["QB KEEPER",3],["TB DIVE",2],["TB SWEEP TOSS",2],["WR JET SWEEP",2],["FAKE TB POWER / TE GO ROUTES",1],["FB DIVE",1],["QB SNEAK",1],["SLOT SWING",1],["WR POST",1]],"d":{"R":33.3,"L":38.9,"M":27.8},"n":19,"r":89.5,"p":10.5},"d1":{"calls":[["TB POWER",5],["QB KEEPER",4],["TB SWEEP TOSS",3],["TB DIVE",2],["WR JET SWEEP",2],["CROSSING ROUTES",1],["CROSSING ROUTES + POST",1],["FAKE TB POWER / TE GO ROUTES",1],["FB DIVE",1],["QB SNEAK",1],["SLOT SWING",1],["WR POST",1],["WR SCREEN",1]],"d":{"R":31.8,"L":45.5,"M":22.7},"n":25,"r":80,"p":20},"d2a":{"calls":[["TB POWER",1]],"d":{"L":100},"n":1,"r":100,"p":0},"d2b":{"calls":[["TB POWER",4],["GO ROUTES + SLOT DRAGS",1],["QB KEEPER",1],["QB SWEEP",1],["TB SWEEP TOSS",1]],"d":{"R":42.9,"L":14.3,"M":42.9},"n":8,"r":87.5,"p":12.5},"d2c":{"calls":[["WR SCREEN",3],["QB KEEPER",2],["TB POWER",2],["GO / SLANT / CURL",1],["SLOT POWER",1],["TB DIVE",1],["TB SWEEP TOSS",1]],"d":{"R":36.4,"L":36.4,"M":27.3},"n":11,"r":63.6,"p":36.4},"d3a":{"calls":[["QB KEEPER",1],["QB SNEAK",1],["TB DIVE",1]],"d":{"L":33.3,"M":66.7},"n":3,"r":100,"p":0},"d3b":{"calls":[["QB KEEPER",1],["WR SCREEN",1]],"d":{"R":100},"n":2,"r":50,"p":50},"d3c":{"calls":[["TB POWER",1],["WR SCREEN",1]],"d":{"R":50,"M":50},"n":2,"r":50,"p":50},"d3d":{"calls":[["QB KEEPER",2],["CORNER / FLAT / DRAG",1],["QB DRAW",1],["TB DIVE",1],["TB SWEEP TOSS",1],["WRS CROSSING RTES SLOT GO RTES",1]],"d":{"R":20,"L":60,"M":20},"n":7,"r":71.4,"p":28.6},"g1":{"calls":[["QB KEEPER",4],["TB DIVE",1],["TB SWEEP TOSS",1],["WR SCREEN",1]],"d":{"R":42.9,"L":42.9,"M":14.3},"n":7,"r":85.7,"p":14.3},"g2":{"calls":[["TB POWER",2],["TB SWEEP TOSS",2]],"d":{"R":100},"n":4,"r":100,"p":0},"g3":{"calls":[["CORNER / FLAT / DRAG",1],["QB KEEPER",1],["QB SNEAK",1],["TB DIVE",1]],"d":{"R":66.7,"M":33.3},"n":4,"r":75,"p":25},"pt":{"calls":[["QB SNEAK",3],["FAKE SCREEN / INSIDE WR LEAK",1],["FAKE TB POWER / TE CORNER ROUTES",1],["TB POWER",1],["TE END AROUND",1]],"d":{"R":16.7,"L":16.7,"M":66.7},"n":7,"r":71.4,"p":28.6}},"TH":{"fp":{"L":{"calls":[["TB POWER",2],["SLOT SWING",1],["TB DIVE",1],["TB SWEEP TOSS",1],["WR POST",1]],"d":{"R":33.3,"L":33.3,"M":33.3},"r":66.7,"p":33.3,"n":6},"M":{"calls":[["WR JET SWEEP",2],["QB KEEPER",1],["TB DIVE",1],["TB POWER",1]],"d":{"R":40,"L":40,"M":20},"r":100,"p":0,"n":5},"R":{"calls":[["QB KEEPER",2],["FAKE TB POWER / TE GO ROUTES",1],["FB DIVE",1],["QB SNEAK",1],["TB POWER",1],["TB SWEEP TOSS",1]],"d":{"R":28.6,"L":42.9,"M":28.6},"r":100,"p":0,"n":7}},"d1":{"L":{"calls":[["TB POWER",2],["CROSSING ROUTES + POST",1],["SLOT SWING",1],["TB DIVE",1],["TB SWEEP TOSS",1],["WR POST",1]],"d":{"R":33.3,"L":33.3,"M":33.3},"r":57.1,"p":42.9,"n":7},"M":{"calls":[["WR JET SWEEP",2],["CROSSING ROUTES",1],["QB KEEPER",1],["TB DIVE",1],["TB POWER",1]],"d":{"R":40,"L":40,"M":20},"r":83.3,"p":16.7,"n":6},"R":{"calls":[["QB KEEPER",3],["TB POWER",2],["TB SWEEP TOSS",2],["FAKE TB POWER / TE GO ROUTES",1],["FB DIVE",1],["QB SNEAK",1],["WR SCREEN",1]],"d":{"R":27.3,"L":54.5,"M":18.2},"r":91.7,"p":8.3,"n":11}},"d2a":{"R":{"calls":[["TB POWER",1]],"d":{"R":0,"L":100},"r":100,"p":0,"n":1}},"d2b":{"L":{"calls":[["TB POWER",3],["QB KEEPER",1]],"d":{"R":25,"L":0,"M":75},"r":100,"p":0,"n":4},"M":{"calls":[["QB SWEEP",1],["TB POWER",1],["TB SWEEP TOSS",1]],"d":{"R":66.7,"L":33.3},"r":100,"p":0,"n":3},"R":{"calls":[["GO ROUTES + SLOT DRAGS",1]],"d":{},"r":0,"p":100,"n":1}},"d2c":{"L":{"calls":[["QB KEEPER",1],["TB DIVE",1],["TB POWER",1],["TB SWEEP TOSS",1],["WR SCREEN",1]],"d":{"R":40,"L":40,"M":20},"r":80,"p":20,"n":5},"M":{"calls":[["SLOT POWER",1]],"d":{"R":0,"L":0,"M":100},"r":100,"p":0,"n":1},"R":{"calls":[["WR SCREEN",2],["GO / SLANT / CURL",1],["QB KEEPER",1],["TB POWER",1]],"d":{"R":40,"L":40,"M":20},"r":40,"p":60,"n":5}},"d3a":{"M":{"calls":[["QB KEEPER",1],["QB SNEAK",1],["TB DIVE",1]],"d":{"R":0,"L":33.3,"M":66.7},"r":100,"p":0,"n":3}},"d3b":{"L":{"calls":[["WR SCREEN",1]],"d":{"R":100,"L":0},"r":0,"p":100,"n":1},"M":{"calls":[["QB KEEPER",1]],"d":{"R":100,"L":0},"r":100,"p":0,"n":1}},"d3c":{"M":{"calls":[["TB POWER",1],["WR SCREEN",1]],"d":{"R":50,"L":0,"M":50},"r":50,"p":50,"n":2}},"d3d":{"L":{"calls":[["WRS CROSSING RTES SLOT GO RTES",1]],"d":{},"r":0,"p":100,"n":1},"M":{"calls":[["CORNER / FLAT / DRAG",1]],"d":{},"r":0,"p":100,"n":1},"R":{"calls":[["QB KEEPER",2],["QB DRAW",1],["TB DIVE",1],["TB SWEEP TOSS",1]],"d":{"R":20,"L":60,"M":20},"r":100,"p":0,"n":5}},"g1":{"L":{"calls":[["QB KEEPER",3]],"d":{"R":33.3,"L":66.7},"r":100,"p":0,"n":3},"M":{"calls":[["QB KEEPER",1],["TB DIVE",1]],"d":{"R":50,"L":0,"M":50},"r":100,"p":0,"n":2},"R":{"calls":[["TB SWEEP TOSS",1],["WR SCREEN",1]],"d":{"R":50,"L":50},"r":50,"p":50,"n":2}},"g2":{"L":{"calls":[["TB SWEEP TOSS",1]],"d":{"R":100,"L":0},"r":100,"p":0,"n":1},"M":{"calls":[["TB POWER",1],["TB SWEEP TOSS",1]],"d":{"R":100,"L":0},"r":100,"p":0,"n":2},"R":{"calls":[["TB POWER",1]],"d":{"R":100,"L":0},"r":100,"p":0,"n":1}},"g3":{"M":{"calls":[["CORNER / FLAT / DRAG",1],["QB KEEPER",1],["QB SNEAK",1]],"d":{"R":50,"L":0,"M":50},"r":66.7,"p":33.3,"n":3},"R":{"calls":[["TB DIVE",1]],"d":{"R":100,"L":0},"r":100,"p":0,"n":1}}},"HT":{"L":{"forms":["I Tight","Wide L Tight Slot R","Wide L Trips R","Spread","Wide L","Trips L Wide R","Tight Slot L Wide R"],"calls":[["TB POWER",6],["QB KEEPER",5],["TB DIVE",2],["TB SWEEP TOSS",2],["WR SCREEN",2],["CROSSING ROUTES + POST",1],["HITCH PASS",1],["SLOT SWING",1],["WR POST",1],["WRS CROSSING RTES SLOT GO RTES",1]],"d":{"R":40,"L":30,"M":30},"n":22,"r":68.2,"p":31.8},"M":{"forms":["I Tight","Wide L Tight Slot R","Trips L Wide R","Wide L Tight Trips R","Wide L Trips R","Spread","Trips R","Trips L","Double Wide","Tight Slot L Wide R"],"calls":[["QB KEEPER",4],["TB DIVE",3],["TB POWER",3],["QB SNEAK",2],["SLOT POWER",2],["TB SWEEP TOSS",2],["WR JET SWEEP",2],["CORNER / FLAT / DRAG",1],["CROSSING ROUTES",1],["QB SWEEP",1],["WR SCREEN",1]],"d":{"R":35,"L":25,"M":40},"n":22,"r":86.4,"p":13.6},"R":{"forms":["I Tight","Spread","Wide L Trips R","Trips L Wide R","Wide L Tight Slot R","Tight Slot L Wide R","Trips R"],"calls":[["QB KEEPER",6],["TB POWER",4],["TB SWEEP TOSS",4],["WR SCREEN",4],["QB DRAW",2],["FAKE TB POWER / TE GO ROUTES",1],["FB DIVE",1],["GO / SLANT / CURL",1],["GO ROUTES + SLOT DRAGS",1],["L WR DRAG CROSSING RTES RIGHT",1],["QB SNEAK",1],["TB DIVE",1]],"d":{"R":30.8,"L":50,"M":19.2},"n":28,"r":75,"p":25}},"FT":[{"name":"I Tight","calls":[["TB POWER",12],["TB SWEEP TOSS",5],["QB KEEPER",4],["QB SNEAK",3],["FAKE TB POWER / TE CORNER ROUTES",1],["FAKE TB POWER / TE GO ROUTES",1],["FB DIVE",1],["QB SWEEP",1]],"d":{"R":26.9,"L":34.6,"M":38.5},"n":28,"r":96.4,"p":3.6},{"name":"Wide L Tight Slot R","calls":[["TB DIVE",5],["SLOT POWER",2],["QB KEEPER",1],["SLOT SWING",1],["TB POWER",1],["TB SWEEP TOSS",1],["WR JET SWEEP",1]],"d":{"R":25,"L":25,"M":50},"n":12,"r":91.7,"p":8.3},{"name":"Wide L Trips R","calls":[["WR SCREEN",5],["FAKE SCREEN / INSIDE WR LEAK",1],["L WR DRAG CROSSING RTES RIGHT",1],["QB KEEPER",1],["QB SNEAK",1],["WR POST",1]],"d":{"R":60,"L":20,"M":20},"n":10,"r":20,"p":80},{"name":"Spread","calls":[["QB DRAW",2],["QB KEEPER",2],["CROSSING ROUTES + POST",1],["GO / SLANT / CURL",1],["GO ROUTES + SLOT DRAGS",1],["WRS CROSSING RTES SLOT GO RTES",1]],"d":{"R":20,"L":40,"M":40},"n":8,"r":50,"p":50},{"name":"Trips L Wide R","calls":[["QB KEEPER",4],["HITCH PASS",1],["WR JET SWEEP",1],["WR SCREEN",1]],"d":{"R":25,"L":75},"n":8,"r":75,"p":25},{"name":"Heavy","calls":[["QB SNEAK",2],["TE END AROUND",1]],"d":{"R":33.3,"M":66.7},"n":3,"r":100,"p":0},{"name":"Tight Slot L Wide R","calls":[["TB SWEEP TOSS",2],["TB DIVE",1]],"d":{"L":100},"n":3,"r":100,"p":0},{"name":"Trips R","calls":[["CROSSING ROUTES",1],["WR SCREEN",1]],"d":{"R":100},"n":2,"r":0,"p":100},{"name":"Wide L","calls":[["QB KEEPER",1],["TB POWER",1]],"d":{"R":50,"M":50},"n":2,"r":100,"p":0},{"name":"Double Wide","calls":[["QB KEEPER",1]],"d":{"R":100},"n":1,"r":100,"p":0},{"name":"Trips L","calls":[["CORNER / FLAT / DRAG",1]],"d":{},"n":1,"r":0,"p":100},{"name":"Wide L Tight Trips R","calls":[["QB KEEPER",1]],"d":{"R":100},"n":1,"r":100,"p":0}],"LOG":[{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 1-20","hs":"M","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"R","yds":7,"out":"Rush"},{"g":"G2","dn":2,"di":3,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"R","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"L","yds":1,"out":"Rush"},{"g":"G2","dn":3,"di":2,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"M","sd":0,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"TB DIVE","dir":"M","yds":2,"out":"Rush"},{"g":"G2","dn":1,"di":8,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":0,"pers":"00","form":"Wide L Tight Trips R","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"R","yds":3,"out":"Rush"},{"g":"G2","dn":2,"di":5,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"R","yds":3,"out":"Rush"},{"g":"G2","dn":3,"di":3,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB SNEAK","dir":"M","yds":2,"out":"Rush"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 21-40","hs":"L","sd":7,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"TB DIVE","dir":"M","yds":1,"out":"Rush"},{"g":"G2","dn":2,"di":9,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":7,"pers":"00","form":"Spread","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":-10,"out":"Rush"},{"g":"G2","dn":3,"di":24,"ds":false,"gl":false,"zn":"Own 1-20","hs":"L","sd":7,"pers":"00","form":"Spread","mo":false,"pt":"Pass","cc":"WRS CROSSING RTES SLOT GO RTES","dir":"","yds":-5,"out":"Sack"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 21-40","hs":"R","sd":7,"pers":"10","form":"Tight Slot L Wide R","mo":true,"pt":"Run","cc":"TB SWEEP TOSS","dir":"L","yds":3,"out":"Rush"},{"g":"G2","dn":2,"di":7,"ds":false,"gl":false,"zn":"Own 21-40","hs":"L","sd":7,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"M","yds":0,"out":"Rush"},{"g":"G2","dn":3,"di":7,"ds":false,"gl":false,"zn":"Own 21-40","hs":"M","sd":7,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"R","yds":53,"out":"TD"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 1-20","hs":"R","sd":14,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Run","cc":"QB SNEAK","dir":"M","yds":6,"out":"Rush"},{"g":"G2","dn":2,"di":4,"ds":false,"gl":false,"zn":"Own 1-20","hs":"M","sd":14,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB SWEEP","dir":"L","yds":73,"out":"TD"},{"g":"G2","dn":2,"di":8,"ds":false,"gl":false,"zn":"Own 1-20","hs":"L","sd":21,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"M","yds":1,"out":"Rush"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 1-20","hs":"R","sd":21,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Run","cc":"","dir":"L","yds":68,"out":"TD"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 1-20","hs":"M","sd":28,"pers":"00","form":"Spread","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":2,"out":"Rush"},{"g":"G2","dn":2,"di":7,"ds":false,"gl":false,"zn":"Own 1-20","hs":"L","sd":28,"pers":"21","form":"Wide L","mo":false,"pt":"Run","cc":"TB POWER","dir":"M","yds":0,"out":"Rush"},{"g":"G2","dn":3,"di":7,"ds":false,"gl":false,"zn":"Own 1-20","hs":"M","sd":28,"pers":"21","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"M","yds":4,"out":"Rush"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 1-20","hs":"R","sd":28,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":68,"out":"TD"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 21-40","hs":"R","sd":35,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"QB KEEPER","dir":"R","yds":3,"out":"Rush"},{"g":"G2","dn":2,"di":12,"ds":false,"gl":false,"zn":"Own 21-40","hs":"R","sd":35,"pers":"00","form":"Spread","mo":false,"pt":"Pass","cc":"GO / SLANT / CURL","dir":"R","yds":0,"out":"Incomplete"},{"g":"G2","dn":3,"di":12,"ds":false,"gl":false,"zn":"Own 21-40","hs":"R","sd":35,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB SWEEP TOSS","dir":"L","yds":10,"out":"Rush"},{"g":"G2","dn":4,"di":2,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"M","sd":35,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB SNEAK","dir":"M","yds":4,"out":""},{"g":"G2","dn":1,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"M","sd":35,"pers":"01","form":"Trips R","mo":false,"pt":"Pass","cc":"CROSSING ROUTES","dir":"","yds":13,"out":"First down"},{"g":"G2","dn":1,"di":10,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"R","sd":35,"pers":"22","form":"I Tight","mo":true,"pt":"Run","cc":"TB SWEEP TOSS","dir":"L","yds":17,"out":"Rush"},{"g":"G2","dn":1,"di":3,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"L","sd":35,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":-5,"out":"penalty"},{"g":"G2","dn":1,"di":8,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":35,"pers":"10","form":"Wide L Tight Slot R","mo":false,"pt":"Run","cc":"TB DIVE","dir":"M","yds":8,"out":""},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 21-40","hs":"L","sd":42,"pers":"10","form":"Wide L Tight Slot R","mo":false,"pt":"Pass","cc":"SLOT SWING","dir":"L","yds":5,"out":""},{"g":"G2","dn":2,"di":5,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"L","sd":42,"pers":"21","form":"Wide L","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"R","yds":3,"out":"Penalty"},{"g":"G2","dn":2,"di":14,"ds":false,"gl":false,"zn":"Own 21-40","hs":"R","sd":42,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"L","yds":0,"out":"Incomplete"},{"g":"G2","dn":3,"di":14,"ds":false,"gl":false,"zn":"Own 21-40","hs":"R","sd":42,"pers":"00","form":"Spread","mo":false,"pt":"Run","cc":"QB DRAW","dir":"M","yds":44,"out":""},{"g":"G2","dn":1,"di":5,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"R","sd":42,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB SWEEP TOSS","dir":"L","yds":1,"out":""},{"g":"G2","dn":2,"di":4,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":42,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB SWEEP TOSS","dir":"R","yds":-11,"out":""},{"g":"G2","dn":3,"di":15,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":42,"pers":"01","form":"Trips L","mo":false,"pt":"Pass","cc":"CORNER / FLAT / DRAG","dir":"","yds":0,"out":"Incomplete"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 1-20","hs":"M","sd":42,"pers":"01","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"TB DIVE","dir":"M","yds":0,"out":""},{"g":"G2","dn":2,"di":10,"ds":false,"gl":false,"zn":"Own 1-20","hs":"M","sd":42,"pers":"01","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"SLOT POWER","dir":"M","yds":-2,"out":""},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 21-40","hs":"R","sd":42,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"FB DIVE","dir":"M","yds":null,"out":"Fumble"},{"g":"G2","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 21-40","hs":"L","sd":42,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB SWEEP TOSS","dir":"L","yds":2,"out":"Fumble"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 21-40","hs":"R","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"R","yds":20,"out":""},{"g":"G1","dn":1,"di":7,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"L","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":3,"out":""},{"g":"G1","dn":2,"di":4,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"L","sd":0,"pers":"00","form":"Wide L Trips R","mo":true,"pt":"","cc":"","dir":"","yds":-5,"out":"Penalty"},{"g":"G1","dn":2,"di":9,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"L","sd":0,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"TB SWEEP TOSS","dir":"R","yds":5,"out":""},{"g":"G1","dn":3,"di":4,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"M","sd":0,"pers":"20","form":"Double Wide","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"R","yds":-4,"out":""},{"g":"G1","dn":4,"di":8,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"R","sd":0,"pers":"01","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"L WR DRAG CROSSING RTES RIGHT","dir":"R","yds":-1,"out":"Sack"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 1-20","hs":"L","sd":0,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"R","yds":65,"out":"TD"},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":6,"pers":"22","form":"Heavy","mo":false,"pt":"Run","cc":"QB SNEAK","dir":"M","yds":1,"out":"No good"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 21-40","hs":"L","sd":6,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"M","yds":6,"out":""},{"g":"G1","dn":2,"di":4,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"L","sd":6,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"M","yds":1,"out":""},{"g":"G1","dn":3,"di":3,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"M","sd":6,"pers":"22","form":"Trips L Wide R","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":7,"out":""},{"g":"G1","dn":1,"di":8,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"L","sd":6,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"R","yds":7,"out":"Penalty"},{"g":"G1","dn":1,"di":18,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"R","sd":6,"pers":"10","form":"Trips R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"R","yds":7,"out":""},{"g":"G1","dn":2,"di":10,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"R","sd":6,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"R","yds":0,"out":""},{"g":"G1","dn":3,"di":10,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"R","sd":6,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"TB DIVE","dir":"R","yds":5,"out":""},{"g":"G1","dn":4,"di":5,"ds":false,"gl":true,"zn":"Opp 1-20","hs":"R","sd":6,"pers":"00","form":"Spread","mo":false,"pt":"Run","cc":"QB DRAW","dir":"M","yds":5,"out":""},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":12,"pers":"22","form":"Heavy","mo":false,"pt":"Run","cc":"TE END AROUND","dir":"R","yds":2,"out":"Good"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 21-40","hs":"R","sd":12,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"FAKE TB POWER / TE GO ROUTES","dir":"","yds":0,"out":"Incompllete"},{"g":"G1","dn":2,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":12,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"M","yds":0,"out":"Incompllete"},{"g":"G1","dn":3,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":12,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":8,"out":""},{"g":"G1","dn":4,"di":2,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"L","sd":12,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Pass","cc":"HITCH PASS","dir":"R","yds":8,"out":""},{"g":"G1","dn":1,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":12,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":-13,"out":""},{"g":"G1","dn":2,"di":23,"ds":false,"gl":false,"zn":"Own 21-40","hs":"L","sd":12,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"R","yds":2,"out":""},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":18,"pers":"22","form":"Heavy","mo":false,"pt":"Run","cc":"QB SNEAK","dir":"M","yds":1,"out":"No good"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 1-20","hs":"M","sd":18,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"","cc":"","dir":"","yds":null,"out":"Penalty"},{"g":"G1","dn":1,"di":5,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"M","sd":18,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"SLOT POWER","dir":"M","yds":7,"out":"Penalty"},{"g":"G1","dn":1,"di":15,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"M","sd":18,"pers":"10","form":"Tight Slot L Wide R","mo":true,"pt":"Run","cc":"TB SWEEP TOSS","dir":"L","yds":8,"out":""},{"g":"G1","dn":2,"di":7,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"L","sd":18,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"","cc":"","dir":"","yds":null,"out":"Penalty"},{"g":"G1","dn":2,"di":12,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"L","sd":18,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"TB POWER","dir":"L","yds":6,"out":""},{"g":"G1","dn":3,"di":6,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"L","sd":18,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"R","yds":9,"out":"TD"},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":24,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"FAKE SCREEN / INSIDE WR LEAK","dir":"L","yds":2,"out":"Good"},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":32,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"M","yds":2,"out":"Good"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Own 21-40","hs":"L","sd":34,"pers":"00","form":"Wide L Trips R","mo":true,"pt":"Pass","cc":"WR POST","dir":"R","yds":0,"out":"Incomplete"},{"g":"G1","dn":2,"di":10,"ds":false,"gl":false,"zn":"Own 21-40","hs":"L","sd":34,"pers":"10","form":"Tight Slot L Wide R","mo":false,"pt":"Run","cc":"TB DIVE","dir":"L","yds":13,"out":""},{"g":"G1","dn":1,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"L","sd":34,"pers":"00","form":"Spread","mo":false,"pt":"Pass","cc":"CROSSING ROUTES + POST","dir":"","yds":6,"out":""},{"g":"G1","dn":2,"di":4,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":34,"pers":"00","form":"Spread","mo":false,"pt":"Pass","cc":"GO ROUTES + SLOT DRAGS","dir":"","yds":-6,"out":"Sack"},{"g":"G1","dn":3,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":34,"pers":"00","form":"Wide L Trips R","mo":true,"pt":"Run","cc":"QB KEEPER","dir":"L","yds":10,"out":""},{"g":"G1","dn":1,"di":10,"ds":false,"gl":false,"zn":"Opp 21-40","hs":"R","sd":34,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"TB POWER","dir":"L","yds":0,"out":"Penalty"},{"g":"G1","dn":1,"di":10,"ds":false,"gl":false,"zn":"Opp 1-20","hs":"R","sd":34,"pers":"00","form":"Wide L Trips R","mo":false,"pt":"Pass","cc":"WR SCREEN","dir":"R","yds":13,"out":""},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":40,"pers":"22","form":"I Tight","mo":false,"pt":"Pass","cc":"FAKE TB POWER / TE CORNER ROUTES","dir":"","yds":2,"out":"Good"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 21-40","hs":"M","sd":42,"pers":"00","form":"Trips L Wide R","mo":false,"pt":"Run","cc":"WR JET SWEEP","dir":"R","yds":23,"out":"TD"},{"g":"G1","dn":"2PT","di":null,"ds":false,"gl":false,"zn":"","hs":"","sd":48,"pers":"22","form":"I Tight","mo":false,"pt":"Run","cc":"QB SNEAK","dir":"M","yds":2,"out":"Good"},{"g":"G1","dn":1,"di":10,"ds":true,"gl":false,"zn":"Opp 1-20","hs":"M","sd":50,"pers":"10","form":"Wide L Tight Slot R","mo":true,"pt":"Run","cc":"WR JET SWEEP","dir":"L","yds":0,"out":""}]};
+const {DD,TH,HT,FT,LOG}=DATA;
+const LBL={fp:'First play of drive',d1:'1st & 10',d2a:'2nd & 1-3',d2b:'2nd & 4-7',d2c:'2nd & 8+',d3a:'3rd & 1-3',d3b:'3rd & 4-6',d3c:'3rd & 7-9',d3d:'3rd & 10+',g1:'1st & Goal',g2:'2nd & Goal',g3:'3rd & Goal',pt:'2-point'};
+const HW={L:'Left',M:'Middle',R:'Right'},HN={1:'L',2:'M',3:'R'},ORD=['','1st','2nd','3rd','4th'];
+const NW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,first:1,second:2,third:3,fourth:4};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const blank=()=>({down:null,dist:null,hash:null,form:null,fp:false,goal:false,pt:false,mo:null,zone:null,sc:null});
+let S=blank(),lastSay='',lastIncomplete=false;
 
-    <div class="grp" id="team" role="group" aria-label="Scouting sheet"></div>
-
-    <label class="lbl" for="q">Say or type the situation</label>
-    <input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="formation, hash, 1st and 10, spread">
-    <div id="heard" aria-live="polite">Laton scouting loaded with formation, hash, and down/distance data.</div>
-
-    <div id="output"></div>
-
-    <div class="foot">Laton scouting data is fully loaded from the sheet notes, formation trends, hash tendencies, and down/distance tendencies.</div>
-  </main>
-
-  <script>
-    const MFORM = [
-      'I Tight','Wide L Tight Slot R','Wide L Trips R','Spread','Trips L Wide R',
-      'Heavy','Tight Slot L Wide R','Trips R','Wide L','Double Wide',
-      'Trips L','Wide L Tight Trips R'
-    ];
-
-    const MFK = [
-      'i tight','wide l tight slot r','wide l trips r','spread','trips l wide r',
-      'heavy','tight slot l wide r','trips r','wide l','double wide',
-      'trips l','wide l tight trips r'
-    ];
-
-    
-const L={name:'Laton',short:'Laton',opp:'Laton',data:{
-fp:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
-d1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
-a:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-b:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-e:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-f:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-g:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-h:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-i:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-g1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-pt:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')]},
-formationTendencies:[
- {name:'I Tight',sample:28,run:96.4,pass:3.6,direction:'26.9% R / 34.6% L / 38.5% M',calls:['TB power','TB sweep toss','QB keeper','QB sneak','Fake TB power / TE corner routes','Fake TB power / TE go routes','FB dive','QB sweep']},
- {name:'Wide L Tight Slot R',sample:12,run:91.7,pass:8.3,direction:'25% R / 25% L / 50% M',calls:['TB dive','Slot power','QB keeper','Slot swing','TB power','TB sweep toss','WR jet sweep']},
- {name:'Wide L Trips R',sample:10,run:20,pass:80,direction:'60% R / 20% L / 20% M',calls:['WR screen','Fake screen / inside WR leak','L WR drag crossing routes right','QB keeper','QB sneak','WR post']},
- {name:'Spread',sample:8,run:50,pass:50,direction:'20% R / 40% L / 40% M',calls:['QB draw','QB keeper','Crossing routes + post','Go / slant / curl','Go routes + slot drags','WRs crossing routes slot go routes']},
- {name:'Trips L Wide R',sample:8,run:75,pass:25,direction:'25% R / 75% L',calls:['QB keeper','Hitch pass','WR jet sweep','WR screen']},
- {name:'Heavy',sample:3,run:100,pass:0,direction:'33.3% R / 66.7% M',calls:['QB sneak','TE end around']},
- {name:'Tight Slot L Wide R',sample:3,run:100,pass:0,direction:'100% L',calls:['TB sweep toss','TB dive']},
- {name:'Trips R',sample:2,run:0,pass:100,direction:'100% R',calls:['Crossing routes','WR screen']},
- {name:'Wide L',sample:2,run:100,pass:0,direction:'50% R / 50% M',calls:['QB keeper','TB power']},
- {name:'Double Wide',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']},
- {name:'Trips L',sample:1,run:0,pass:100,direction:'No direction data logged.',calls:['Corner / flat / drag']},
- {name:'Wide L Tight Trips R',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']}
-],notes:{fp:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',d1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',a:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',b:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',e:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',f:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',h:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',i:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',pt:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.'}};
-
-const MFORM=['I Tight','Wide L Tight Slot R','Wide L Trips R','Spread','Trips L Wide R','Heavy','Tight Slot L Wide R','Trips R','Wide L','Double Wide','Trips L','Wide L Tight Trips R'];
-const MFK=['i tight','wide l tight slot r','wide l trips r','spread','trips l wide r','heavy','tight slot l wide r','trips r','wide l','double wide','trips l','wide l tight trips r'];
-
-// ---- parser for shorthand like 263 or 2 and 6 right hash ----
-const HASH_MAP = {
-  1:'left', left:'left', l:'left',
-  2:'middle', middle:'middle', m:'middle', mid:'middle',
-  3:'right', right:'right', r:'right'
-};
-
-const FORMATION_MAP = {
-  1:'I Tight',
-  2:'Wide L Tight Slot R',
-  3:'Wide L Trips R',
-  4:'Spread',
-  5:'Trips L Wide R',
-  6:'Heavy',
-  7:'Tight Slot L Wide R',
-  8:'Trips R',
-  9:'Wide L',
-  10:'Double Wide',
-  11:'Trips L',
-  12:'Wide L Tight Trips R'
-};
-
-function parseSituationInput(raw) {
-  if (!raw) return null;
-
-  const text = String(raw).toLowerCase().trim();
-  if (!text) return null;
-
-  const clean = text
-    .replace(/,/g,' ')
-    .replace(/&/g,' and ')
-    .replace(/\s+/g,' ')
-    .trim();
-
-  let down = null;
-  let dist = null;
-  let hash = null;
-  let formation = null;
-
-  // Handles: "263", "2 6 3", "2 and 6 right", "2nd and 6 right hash"
-  const first = clean.match(/(\d)\s*(?:and\s*)?(\d+)\s*(?:hash\s*)?(left|middle|right|1|2|3|l|m|r|mid)?/i);
-  if (first) {
-    down = Number(first[1]);
-    dist = Number(first[2]);
-    const h = first[3];
-    hash = HASH_MAP[h] || HASH_MAP[Number(h)] || null;
+/* ---------- parsing (voice or typed) ---------- */
+function parse(raw){
+  let s=' '+String(raw).toLowerCase().replace(/[^a-z0-9+ ]/g,' ').replace(/\s+/g,' ')+' ';
+  const eat=re=>{const m=s.match(re);if(m)s=s.replace(re,' ');return m};
+  const o=blank();
+  o.pt=!!eat(/ (two point|2 point|2 ?pt|conversion) /);
+  o.fp=!!eat(/ (first play|drive start\w*|opening drive|starter) /);
+  o.goal=!!eat(/ goal( to go)? /);
+  if(eat(/ (no motion|without motion) /))o.mo=false;else if(eat(/ motion /))o.mo=true;
+  if(eat(/ (red zone|redzone) /))o.zone='Opp 1-20';
+  if(eat(/ (close game|close) /))o.sc='close';else if(eat(/ (blowout|blow out|big lead) /))o.sc='lead';
+  for(let i=0;i<2;i++)s=s.replace(/ (wide|trips|slot) (left|right) /g,(m,a,b)=>' '+a+' '+b[0]+' ');
+  const fm=s.match(/ formation (\d+) /);
+  if(fm){o.form=FT[+fm[1]-1]||null;s=s.replace(fm[0],' ')}
+  else{const f=[...FT].sort((a,b)=>b.name.length-a.name.length).find(f=>s.includes(' '+f.name.toLowerCase()+' '));if(f){o.form=f;s=s.replace(' '+f.name.toLowerCase()+' ',' ')}}
+  if(/ (left|lefthash) /.test(s))o.hash='L';else if(/ (middle|mid|center|centre) /.test(s))o.hash='M';else if(/ right /.test(s))o.hash='R';
+  const hw=!!o.hash;
+  s=s.replace(/\b(\d+)(st|nd|rd|th)\b/g,'$1').replace(/\b(twenty|thirty) (one|two|three|four|five|six|seven|eight|nine)\b/g,(m,a,b)=>NW[a]+NW[b]).replace(/\b[a-z]+\b/g,w=>NW[w]!=null?NW[w]:w);
+  const n=(s.match(/\d+/g)||[]).map(Number),h=x=>x>=1&&x<=3?HN[x]:null;
+  if(o.pt||o.fp){if(!hw&&n.length)o.hash=h(n[0])}
+  else if(n.length&&n[0]>=1&&n[0]<=4){
+    o.down=n[0];
+    if(o.goal){if(!hw&&n.length>1)o.hash=h(n[n.length-1])}
+    else{o.dist=n.length>1?n[1]:null;if(!hw&&n.length>2)o.hash=h(n[2])}
   }
-
-  // Handles: "3 5 2" or "3 and 5 middle"
-  if ((down === null || dist === null || hash === null)) {
-    const second = clean.match(/(\d+)\s*(?:and\s*)?(\d+)\s*(?:on\s+)?(left|middle|right|1|2|3|l|m|r|mid)/i);
-    if (second) {
-      down = Number(second[1]);
-      dist = Number(second[2]);
-      const h = second[3];
-      hash = HASH_MAP[h] || HASH_MAP[Number(h)] || null;
-    }
-  }
-
-  // Handles: "formation 1", "formation 10", "I Tight"
-  const numFormation = clean.match(/formation\s*(\d+)/i);
-  if (numFormation) {
-    formation = FORMATION_MAP[Number(numFormation[1])] || null;
-  } else {
-    const named = clean.match(/(?:formation\s+)?(i tight|wide l tight slot r|wide l trips r|spread|trips l wide r|heavy|tight slot l wide r|trips r|wide l|double wide|trips l|wide l tight trips r)/i);
-    if (named) {
-      formation = named[1].toLowerCase();
-      formation = formation.replace(/\b\w/g, ch => ch.toUpperCase());
-      formation = formation.replace(/\s+/g, ' ');
-    }
-  }
-
-  if (down === null || dist === null || hash === null) {
-    return null;
-  }
-
-  return {
-    dn: down,
-    ds: dist,
-    hs: hash,
-    formation
-  };
+  return o;
 }
+function bucket(o){
+  if(o.pt)return'pt';if(o.fp)return'fp';
+  if(o.goal)return o.down>=1&&o.down<=3?'g'+o.down:null;
+  const d=o.down,y=o.dist;if(d===1)return'd1';
+  if(d===2&&y!=null)return y<=3?'d2a':y<=7?'d2b':'d2c';
+  if(d===3&&y!=null)return y<=3?'d3a':y<=6?'d3b':y<=9?'d3c':'d3d';
+  return null;
+}
+function human(o){
+  const p=[];
+  if(o.pt)p.push('2-point');else if(o.fp)p.push('First play of drive');
+  else if(o.down)p.push(ORD[o.down]+(o.goal?' & goal':(o.dist!=null?' & '+o.dist:'')));
+  else if(o.goal)p.push('Goal-to-go');
+  if(o.hash)p.push(HW[o.hash]+' hash');if(o.form)p.push(o.form.name);
+  if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone)p.push(o.zone);
+  if(o.sc)p.push(o.sc==='close'?'close game':'blowout');
+  return p.join(' · ');
+}
+function speakText(o){
+  const p=[];
+  if(o.pt)p.push('two point');else if(o.fp)p.push('first play');
+  else if(o.down)p.push(['','first','second','third','fourth'][o.down]+(o.goal?' and goal':(o.dist!=null?' and '+o.dist:'')));
+  else if(o.goal)p.push('goal');
+  if(o.hash)p.push(HW[o.hash].toLowerCase()+' hash');if(o.form)p.push(o.form.name.toLowerCase());
+  if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone==='Opp 1-20')p.push('red zone');
+  if(o.sc)p.push(o.sc==='close'?'close game':'blowout');
+  return p.join(' ');
+}
+const needsDist=o=>o.down>=2&&!o.goal&&!o.fp&&!o.pt&&o.dist==null;
 
-// Example usage in your app:
-const q = document.getElementById('q');
-if (q) {
-  q.addEventListener('change', () => {
-    const parsed = parseSituationInput(q.value);
-    if (!parsed) return;
-    if (typeof S !== 'undefined') {
-      S.dn = parsed.dn;
-      S.ds = parsed.ds;
-      S.hs = parsed.hs;
-      if (parsed.formation) S.fm = parsed.formation;
-      if (typeof upd === 'function') upd();
-    }
+/* ---------- raw-log engine ---------- */
+function rng(d,y){
+  if(y==null)return null;
+  if(d===1)return y>=10?[10,99]:[1,9];
+  if(d===2)return y<=3?[1,3]:y<=7?[4,7]:[8,99];
+  if(d===3)return y<=3?[1,3]:y<=6?[4,6]:y<=9?[7,9]:[10,99];
+  return y<=3?[1,3]:[4,99];
+}
+function filt(o,skip){
+  const r=o.down?rng(o.down,o.dist):null,sit=o.down||o.fp||o.goal;
+  return LOG.filter(x=>{
+    if(o.pt){if(x.dn!=='2PT')return false}
+    else if(o.fp){if(!x.ds)return false}
+    else if(o.down){if(x.dn!==o.down||!!x.gl!==!!o.goal)return false;if(r&&!skip.has('dist')&&(x.di==null||x.di<r[0]||x.di>r[1]))return false}
+    else if(o.goal&&!x.gl)return false;
+    if(x.dn==='2PT'&&sit)return false;
+    if(o.hash&&!skip.has('hash')&&x.hs!==o.hash)return false;
+    if(o.form&&!skip.has('form')&&x.form.toLowerCase()!==o.form.name.toLowerCase())return false;
+    if(o.mo!=null&&!skip.has('mo')&&x.mo!==o.mo)return false;
+    if(o.zone&&!skip.has('zone')&&x.zn!==o.zone)return false;
+    if(o.sc&&!skip.has('sc')){const c=Math.abs(x.sd)<=14;if(o.sc==='close'?!c:c)return false}
+    return true;
   });
 }
-    const teams = { Laton: L };
-    let activeTeam = 'Laton';
+function stats(rows){
+  const pl=rows.filter(x=>x.pt==='Run'||x.pt==='Pass'),n=pl.length,run=pl.filter(x=>x.pt==='Run').length;
+  const dir={L:0,R:0,M:0},calls={};
+  pl.forEach(x=>{if(x.dir)dir[x.dir]++;const c=x.cc||'(not labeled)';calls[c]=(calls[c]||0)+1});
+  const ys=pl.filter(x=>x.yds!=null&&!/penalty/i.test(x.out)).map(x=>x.yds).sort((a,b)=>a-b);
+  const med=ys.length?(ys.length%2?ys[(ys.length-1)/2]:(ys[ys.length/2-1]+ys[ys.length/2])/2):null;
+  return{n,rows:pl,run:n?Math.round(1000*run/n)/10:0,pass:n?Math.round(1000*(n-run)/n)/10:0,dir,
+    calls:Object.entries(calls).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])),med,exp:ys.filter(y=>y>=15).length};
+}
 
-    function renderTeamButtons() {
-      const wrap = document.getElementById('team');
-      wrap.innerHTML = '';
-      Object.keys(teams).forEach(name => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = name;
-        btn.setAttribute('aria-pressed', String(name === activeTeam));
-        btn.addEventListener('click', () => {
-          activeTeam = name;
-          renderTeamButtons();
-          renderResult();
-        });
-        wrap.appendChild(btn);
-      });
+/* ---------- rendering ---------- */
+function dirStr(d,cnt){
+  const t=cnt?d.R+d.L+d.M:1;if(cnt&&!t)return'none logged';
+  const o=['R','L','M'].filter(k=>d[k]!=null).map(k=>(cnt?Math.round(1000*d[k]/t)/10:d[k])+'% '+HW[k]);
+  return o.length?o.join(' · '):'none logged';
+}
+const fromSheet=r=>({n:r.n,run:r.r,pass:r.p,dir:dirStr(r.d,false),calls:r.calls});
+const fromStats=s=>({n:s.n,run:s.run,pass:s.pass,dir:dirStr(s.dir,true),calls:s.calls,
+  extra:s.med==null?'':'Median '+s.med+' yds · '+s.exp+' play'+(s.exp==1?'':'s')+' of 15+ yds'});
+const warn=t=>`<div class="warn">${t}</div>`;
+function card(title,sub,r,note){
+  const top=r.calls.slice(0,7).map(c=>esc(c[0])+' ('+c[1]+')').join(', ')||'none';
+  return `<section class="card"><div class="hd"><b>${esc(title)}</b><span class="n">${esc(sub)}</span></div>
+<div class="bar" role="img" aria-label="${r.run}% run, ${r.pass}% pass"><span class="r" style="width:${r.run}%">${r.run>=22?r.run+'% run':''}</span><span class="p" style="width:${r.pass}%">${r.pass>=22?r.pass+'% pass':''}</span></div>
+<div class="rw"><i>Run / pass:</i> ${r.run}% / ${r.pass}%</div>
+<div class="rw"><i>Direction:</i> ${r.dir}</div>
+<div class="rw"><i>Calls:</i> ${top}</div>${r.extra?`<div class="rw"><i>${esc(r.extra)}</i></div>`:''}${r.n&&r.n<5?warn('Small sample: '+r.n+' play'+(r.n==1?'':'s')+'. Not a trend.'):''}${note||''}</section>`;
+}
+function relaxChips(o){
+  const f=[['hash','hash',o.hash],['form','formation',o.form],['dist','distance',o.dist],['mo','motion',o.mo],['zone','zone',o.zone],['sc','score',o.sc]];
+  const c=f.filter(x=>x[2]!=null&&x[2]!=='').map(([k,l])=>[k,l,stats(filt(o,new Set([k]))).n]);
+  if(!c.length)return'';
+  return '<div class="chips">'+c.map(([k,l,n])=>`<button type="button" data-relax="${k}">Drop ${l}: ${n} plays</button>`).join('')+'</div>';
+}
+function playsList(st){
+  if(!st.rows.length)return'';
+  return `<details><summary>Plays (${st.rows.length})</summary>`+st.rows.slice(0,40).map(x=>{
+    const sit=x.dn==='2PT'?'2PT':ORD[x.dn]+' & '+(x.gl?'G':(x.di==null?'?':x.di));
+    return `<div class="pl">${x.g} · ${sit} · ${x.hs||'–'} · ${esc(x.form)} · <b>${esc(x.cc||'(not labeled)')}</b> → ${x.dir||'–'} · ${x.yds==null?'':(x.yds>0?'+':'')+x.yds} ${esc(x.out)}</div>`}).join('')+'</details>';
+}
+const GROUPS=[['Formation',x=>x.form],['Personnel',x=>x.pers?'Personnel '+x.pers:null],['Motion',x=>x.dn==='2PT'?null:(x.mo?'Motion':'No motion')],['Down',x=>x.dn==='2PT'?null:ORD[x.dn]+' down'],['Hash',x=>x.hs?HW[x.hs]+' hash':null],['Field',x=>x.zn||null],['Score',x=>x.dn==='2PT'?null:(Math.abs(x.sd)<=14?'Close game (within 14)':'Blowout (over 14)')]];
+function tells(){
+  const out=[];
+  GROUPS.forEach(([g,f])=>{
+    const m={};LOG.forEach(x=>{if(x.pt!=='Run'&&x.pt!=='Pass')return;const k=f(x);if(k)(m[k]=m[k]||[]).push(x)});
+    Object.entries(m).forEach(([k,rows])=>{const s=stats(rows);if(s.n>=8&&Math.max(s.run,s.pass)>=80)out.push({g,k,s})});
+  });
+  return out.sort((a,b)=>b.s.n-a.s.n);
+}
+function overview(){
+  const sc=LOG.filter(x=>x.dn!=='2PT'),a=stats(sc),cl=stats(sc.filter(x=>Math.abs(x.sd)<=14)),bl=stats(sc.filter(x=>Math.abs(x.sd)>14));
+  let h=card('Laton overall','raw log · '+a.n+' scrimmage plays',fromStats(a));
+  h+=`<section class="card"><div class="hd"><b>Game script</b><span class="n">read before trusting any run %</span></div>
+<div class="rw"><i>Close (within 14):</i> ${cl.n} plays · ${cl.run}% run</div><div class="rw"><i>Blowout (over 14):</i> ${bl.n} plays · ${bl.run}% run</div>
+${warn('Laton led big in both games, so most of this log is a team protecting a lead. Nothing here shows what they do when trailing.')}</section>`;
+  const t=tells();
+  h+=`<section class="card"><div class="hd"><b>Tells</b><span class="n">8+ plays and 80%+ one way</span></div>`+
+    (t.length?'<ul class="t">'+t.map(x=>`<li><b>${esc(x.k)}</b> (${esc(x.g)}): ${Math.max(x.s.run,x.s.pass)}% ${x.s.run>=x.s.pass?'run':'pass'}, ${x.s.n} plays · top ${esc(x.s.calls[0][0])}</li>`).join('')+'</ul>':'<div class="rw">None clear the bar.</div>')+'</section>';
+  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add "i tight", "formation 3", "motion", "red zone", "close game". Say "clear" to start over.</div></section>`;
+  return h;
+}
+function render(){
+  const o=S,res=$('res'),sum=$('sum');
+  const any=o.pt||o.fp||o.goal||o.down||o.hash||o.form||o.mo!=null||o.zone||o.sc;
+  $('heard').textContent=any?'Reading: '+human(o):'Pick a situation or just talk.';
+  if(!any){sum.innerHTML='<p>Laton. Pick a situation or say it.</p>';res.innerHTML=overview();lastSay='';return}
+  let h='',sheetR=null;
+  const key=bucket(o);
+  if(key&&(DD[key]||TH[key])){
+    const th=TH[key]||{},dd=DD[key];let r=null,tag='',note='';
+    if(o.hash){
+      if(th[o.hash]){r=th[o.hash];tag=HW[o.hash]+' hash'}
+      else if(th.M){r=th.M;tag='Middle stand-in';note=warn('No '+HW[o.hash]+' hash plays on the sheet for this spot. This is Middle, not '+HW[o.hash]+'.')}
     }
+    if(o.down===1&&o.dist!=null&&o.dist!==10)note+=warn('Sheet bucket is 1st & 10 only. Check the log card below for 1st & '+o.dist+'.');
+    if(/^d[23]/.test(key))note+=warn('Sheet counts in this bucket also include goal-to-go plays. The raw log card below is non-goal only, so its numbers can differ.');
+    if(r){sheetR=r;h+=card(LBL[key]+' · '+tag,'sheet · '+r.n+' plays',fromSheet(r),note)}
+    if(dd){if(!sheetR)sheetR=dd;h+=card(LBL[key]+' · all hashes','sheet · '+dd.n+' plays',fromSheet(dd),r?'':note)}
+  }
+  if(o.hash&&!o.down&&!o.fp&&!o.pt&&!o.goal&&HT[o.hash]){const t=HT[o.hash];h+=card(HW[o.hash]+' hash overall','sheet · '+t.n+' plays',fromSheet(t),`<div class="rw"><i>Formations used:</i> ${esc(t.forms.join(', '))}</div>`)}
+  if(o.form)h+=card(o.form.name+' · all situations','sheet · '+o.form.n+' plays',fromSheet(o.form));
+  const st=stats(filt(o,new Set()));
+  h+=card('Raw log · '+human(o),'log · '+st.n+' plays',fromStats(st),(st.n?'':warn('No logged plays match every filter.'))+relaxChips(o))+playsList(st);
+  res.innerHTML=h;
+  const useLog=st.n>0||!sheetR;
+  const src=useLog?{n:st.n,run:st.run,pass:st.pass,calls:st.calls}:{n:sheetR.n,run:sheetR.r,pass:sheetR.p,calls:sheetR.calls};
+  const where=human(o);
+  const pre=(!useLog&&src.n)?'No non-goal plays in the log. Sheet (may include goal-to-go): ':'';
+  const body=src.n?`${pre}<b>${src.run>=src.pass?src.run+'% run':src.pass+'% pass'}</b> over ${src.n} play${src.n==1?'':'s'}. Top call: <b>${esc(src.calls[0][0])}</b>${src.calls[1]&&src.calls[1][1]>=2?', then '+esc(src.calls[1][0]):''}.${src.n<5?' Small sample.':''}`:'No plays logged for that.';
+  sum.innerHTML=`<p>${esc(where)}: ${body}</p>`;
+  lastSay=(where+': '+body).replace(/<[^>]+>/g,'').replace(/ · /g,', ').replace(/ & /g,' and ');
+}
 
-    function parseInput(raw) {
-      const s = (raw || '').trim().toLowerCase();
+/* ---------- controls ---------- */
+function setFrom(){$('q').value=speakText(S);refresh();render()}
+function buildControls(){
+  const mk=(id,list)=>{const el=$(id);el.innerHTML='';list.forEach(([t,test,act])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.className='tog';b._t=test;b.addEventListener('click',()=>{act();setFrom()});el.appendChild(b)})};
+  mk('gdn',[1,2,3,4].map(d=>[ORD[d],()=>S.down===d&&!S.fp&&!S.pt,()=>{const on=S.down===d&&!S.fp&&!S.pt;S.down=on?null:d;S.fp=S.pt=false;if(on)S.dist=null}]));
+  mk('gfl',[
+    ['1st play',()=>S.fp,()=>{S.fp=!S.fp;if(S.fp){S.down=null;S.dist=null;S.pt=false;S.goal=false}}],
+    ['Goal-to-go',()=>S.goal,()=>{S.goal=!S.goal;if(S.goal){S.pt=false;S.fp=false}}],
+    ['2-pt',()=>S.pt,()=>{S.pt=!S.pt;if(S.pt){S.down=null;S.dist=null;S.fp=false;S.goal=false}}],
+    ['Motion',()=>S.mo===true,()=>{S.mo=S.mo===true?null:true}],
+    ['No motion',()=>S.mo===false,()=>{S.mo=S.mo===false?null:false}]]);
+  mk('ghs',[['L','L'],['M','M'],['R','R']].map(([t,k])=>[HW[k]+' hash',()=>S.hash===k,()=>{S.hash=S.hash===k?null:k}]));
+  $('form').innerHTML='<option value="">Any</option>'+FT.map((f,i)=>`<option value="${i}">${i+1}. ${esc(f.name)} (${f.n})</option>`).join('');
+  $('dist').addEventListener('input',e=>{S.dist=e.target.value?+e.target.value:null;$('q').value=speakText(S);render()});
+  $('form').addEventListener('change',e=>{S.form=e.target.value===''?null:FT[+e.target.value];setFrom()});
+  $('sc').addEventListener('change',e=>{S.sc=e.target.value||null;setFrom()});
+  $('zn').addEventListener('change',e=>{S.zone=e.target.value||null;setFrom()});
+  $('res').addEventListener('click',e=>{const k=e.target.getAttribute&&e.target.getAttribute('data-relax');if(!k)return;S[k]=null;setFrom()});
+  $('clr').addEventListener('click',()=>{S=blank();lastIncomplete=false;$('q').value='';refresh();render()});
+}
+function refresh(){
+  document.querySelectorAll('.tog').forEach(b=>b.setAttribute('aria-pressed',String(!!b._t())));
+  $('dist').value=S.dist==null?'':S.dist;
+  $('form').value=S.form?String(FT.indexOf(S.form)):'';
+  $('sc').value=S.sc||'';$('zn').value=S.zone||'';
+}
+function fromText(){const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render()}
 
-      if (!s) return { team: activeTeam, flags: {} };
+/* ---------- voice ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec,on=false,speaking=false,speakOn=false,wl=null;
+function startRec(){if(!on||speaking||!rec)return;try{rec.start()}catch(e){}}
+function say(t){
+  if(!speakOn||!window.speechSynthesis||!t)return;
+  try{
+    speechSynthesis.cancel();speaking=true;try{rec&&rec.stop()}catch(e){}
+    const u=new SpeechSynthesisUtterance(t);u.rate=1.05;
+    u.onend=u.onerror=()=>{speaking=false;startRec()};speechSynthesis.speak(u);
+  }catch(e){speaking=false}
+}
+function onVoice(txt){
+  const t=txt.trim();if(!t)return;
+  $('heard').textContent='Heard: '+t;
+  if(/^(clear|reset|start over|new)\b/i.test(t)){$('clr').click();say('Cleared.');return}
+  const p=parse(t),hasSit=p.down||p.fp||p.pt||p.goal,cur=S.down||S.fp||S.pt||S.goal;
+  if(lastIncomplete){$('q').value=$('q').value+' '+t;const q=parse($('q').value);q.sc=q.sc||S.sc;q.zone=q.zone||S.zone;S=q}
+  else if(!hasSit&&cur){['hash','form','mo','zone','sc'].forEach(k=>{if(p[k]!=null)S[k]=p[k]});$('q').value=speakText(S)}
+  else{p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;$('q').value=speakText(S)}
+  lastIncomplete=needsDist(S);refresh();render();
+  say(lastIncomplete?'Distance?':lastSay);
+}
+$('mic').addEventListener('click',async()=>{
+  if(!SR){$('heard').textContent='Voice input is not supported in this browser. Type it, or use the phone keyboard mic.';return}
+  if(on){on=false;try{rec.stop()}catch(e){}$('mic').textContent='Start hands-free';try{wl&&wl.release()}catch(e){}wl=null;return}
+  rec=new SR();rec.continuous=true;rec.interimResults=false;rec.lang='en-US';
+  rec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)onVoice(e.results[i][0].transcript)};
+  rec.onend=()=>{if(on&&!speaking)startRec()};
+  rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){on=false;$('mic').textContent='Start hands-free';$('heard').textContent='Mic blocked. Allow microphone access for this page.'}};
+  on=true;$('mic').textContent='Stop listening';startRec();
+  try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen')}catch(e){}
+});
+$('spk').addEventListener('click',()=>{speakOn=!speakOn;$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');if(!speakOn&&window.speechSynthesis)speechSynthesis.cancel()});
+$('q').addEventListener('input',fromText);
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur();say(lastSay)}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&on&&!wl&&navigator.wakeLock)navigator.wakeLock.request('screen').then(l=>wl=l).catch(()=>{})});
 
-      if (s.includes('laton')) return { team: 'Laton', flags: {} };
-
-      const formationMatch = s.match(/(i tight|wide l tight slot r|wide l trips r|spread|trips l wide r|heavy|tight slot l wide r|trips r|wide l|double wide|trips l|wide l tight trips r)/);
-      if (formationMatch) {
-        const match = formationMatch[1];
-        const found = MFORM.find((name, idx) => MFK[idx] === match);
-        return { team: 'Laton', flags: { formation: found || match } };
-      }
-
-      const hashMatch = s.match(/(left hash|middle hash|right hash|left|middle|right)/);
-      if (hashMatch) {
-        return { team: 'Laton', flags: { hash: hashMatch[1] } };
-      }
-
-      if (s.includes('1st') || s.includes('2nd') || s.includes('3rd') || s.includes('4th')) {
-        return { team: 'Laton', flags: { downDistance: s } };
-      }
-
-      return { team: activeTeam, flags: {} };
-    }
-
-    function percentBar(run, pass) {
-      return `
-        <div class="bar">
-          <span class="r" style="width:${run}%">${run}% run</span>
-          <span class="p" style="width:${pass}%">${pass}% pass</span>
-        </div>
-      `;
-    }
-
-    function buildFormationCards(team) {
-      const cards = team.formationTendencies.map((item) => {
-        return `
-          <div class="card">
-            <div class="hd">
-              <b>${item.name}</b>
-              <span class="n">${item.sample} plays</span>
-            </div>
-            ${percentBar(item.run, item.pass)}
-            <div class="meta">
-              <i>Direction:</i> ${item.direction}<br>
-              <i>Calls:</i> ${item.calls.slice(0, 6).join(', ')}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      return `
-        <div class="section">
-          <h2>Formation tendencies</h2>
-          ${cards}
-        </div>
-      `;
-    }
-
-    function buildHashCards(team) {
-      const left = team.hashTendencies.left;
-      const middle = team.hashTendencies.middle;
-      const right = team.hashTendencies.right;
-
-      const make = (label, {sample, run, pass, direction, calls}) => `
-        <div class="card">
-          <div class="hd">
-            <b>${label}</b>
-            <span class="n">${sample} plays</span>
-          </div>
-          ${percentBar(run, pass)}
-          <div class="meta">
-            <i>Direction:</i> ${direction}<br>
-            <i>Calls:</i> ${calls.slice(0, 10).join(', ')}
-          </div>
-        </div>
-      `;
-
-      return `
-        <div class="section">
-          <h2>Hash tendencies</h2>
-          ${make('Left hash', left)}
-          ${make('Middle hash', middle)}
-          ${make('Right hash', right)}
-        </div>
-      `;
-    }
-
-    function buildDownCards(team) {
-      const rows = team.downDistanceTendencies.map((item) => `
-        <div class="card">
-          <div class="hd">
-            <b>${item.label}</b>
-            <span class="n">${item.sample} plays</span>
-          </div>
-          ${percentBar(item.run, item.pass)}
-          <div class="meta">
-            <i>Direction:</i> ${item.direction}<br>
-            <i>Calls:</i> ${item.calls.slice(0, 8).join(', ')}
-          </div>
-        </div>
-      `).join('');
-
-      return `
-        <div class="section">
-          <h2>Down & distance tendencies</h2>
-          ${rows}
-        </div>
-      `;
-    }
-
-    function renderResult() {
-      const raw = document.getElementById('q').value;
-      const parsed = parseInput(raw);
-      const team = teams[parsed.team || activeTeam] || L;
-      const output = document.getElementById('output');
-
-      const selectedName = parsed.flags.formation || 'All formations';
-      const selectedHash = parsed.flags.hash || 'All hashes';
-      const selectedDown = parsed.flags.downDistance || 'All downs';
-
-      const heading = `
-        <div class="section">
-          <h2>Laton scouting summary</h2>
-          <div class="card">
-            <div class="hd"><b>Selected view</b><span class="n">${selectedName}</span></div>
-            <div class="meta">
-              <i>Hash:</i> ${selectedHash}<br>
-              <i>Down / distance:</i> ${selectedDown}
-            </div>
-          </div>
-        </div>
-      `;
-
-      const byFormation = parsed.flags.formation ? (() => {
-        const item = team.formationTendencies.find(x => x.name.toLowerCase() === parsed.flags.formation.toLowerCase());
-        if (!item) return '';
-        return `
-          <div class="section">
-            <h2>Selected formation: ${item.name}</h2>
-            <div class="card">
-              <div class="hd">
-                <b>${item.name}</b>
-                <span class="n">${item.sample} plays</span>
-              </div>
-              ${percentBar(item.run, item.pass)}
-              <div class="meta">
-                <i>Direction:</i> ${item.direction}<br>
-                <i>Calls:</i> ${item.calls.join(', ')}
-              </div>
-            </div>
-          </div>
-        `;
-      })() : '';
-
-      const byHash = parsed.flags.hash ? (() => {
-        const key = parsed.flags.hash.toLowerCase();
-        const map = {
-          'left hash': 'left',
-          'left': 'left',
-          'middle hash': 'middle',
-          'middle': 'middle',
-          'right hash': 'right',
-          'right': 'right'
-        };
-        const k = map[key];
-        if (!k || !team.hashTendencies[k]) return '';
-        const item = team.hashTendencies[k];
-        return `
-          <div class="section">
-            <h2>Selected hash: ${k.charAt(0).toUpperCase() + k.slice(1)} hash</h2>
-            <div class="card">
-              <div class="hd">
-                <b>${k.charAt(0).toUpperCase() + k.slice(1)} hash</b>
-                <span class="n">${item.sample} plays</span>
-              </div>
-              ${percentBar(item.run, item.pass)}
-              <div class="meta">
-                <i>Direction:</i> ${item.direction}<br>
-                <i>Calls:</i> ${item.calls.join(', ')}
-              </div>
-            </div>
-          </div>
-        `;
-      })() : '';
-
-      output.innerHTML = `
-        ${heading}
-        ${byFormation}
-        ${byHash}
-        ${buildFormationCards(team)}
-        ${buildHashCards(team)}
-        ${buildDownCards(team)}
-      `;
-    }
-
-    document.getElementById('q').addEventListener('input', renderResult);
-    renderTeamButtons();
-    renderResult();
-  </script>
+$('foot').textContent='Source: LATON SCOUTING sheet (Tendencies, Down & Distance, Hash, Formation tabs) plus the raw Game Log, '+LOG.length+' rows. Headline numbers come from the raw log (non-goal plays for normal downs). The sheet D&amp;D tabs also fold goal-to-go plays into the 2nd and 3rd down buckets, so a few counts differ.';
+buildControls();refresh();render();
+</script>
 </body>
 </html>
