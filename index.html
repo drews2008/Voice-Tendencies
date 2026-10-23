@@ -86,8 +86,18 @@ pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
 notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}};
 
 const L={name:'Laton',short:'Laton',opp:'Laton',data:{
-fp:same(null),d1:same(null),a:same(null),b:same(null),e:same(null),f:same(null),g:same(null),h:same(null),i:same(null),g1:same(null),pt:same(null)},
-notes:{fp:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',d1:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',a:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',b:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',e:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',f:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',g:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',h:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',i:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',g1:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',pt:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.'}};
+fp:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
+d1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
+a:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+b:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+e:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+f:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+g:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+h:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+i:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+g1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+pt:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')]},
+notes:{fp:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',d1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',a:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',b:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',e:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',f:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',h:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',i:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',pt:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.'}};
 
 /* Alpaugh raw log. Fields: game|down|dist|driveStarter|goal|zone|hash|personnel|formation|motion|type|call|dir|yards|outcome|success */
 const RAW=[
@@ -140,8 +150,8 @@ pt:same(cm(33.3,66.7,'60% R / 20% L / 20% M',['QB keeper','Slot out rte Wide go 
 notes:{fp:'16 plays. Strong run tendency early.',d1:'20 plays. 85% run, 15% pass overall.',a:'2 plays. 100% run in short yardage.',b:'2nd and 4 to 7 shows all-run tendencies.',e:'11 plays. 90.9% run, 9.1% pass overall.',f:'3rd and short = all run.',g:'3rd and 4 to 6 = mostly run with a few option tosses.',h:'3rd and 7-9 = split but mostly power and flood.',i:'3rd and 10+ = run heavy but more pass than short yardage.'}};
 const T={vca:V,alp:A,mar:MR,lat:L},$=id=>document.getElementById(id);
 const S={team:'alp',dn:null,ds:null,hs:0,mode:'play',fm:'',mo:'',rz:false,lk:null,pc:''};
-const MFORM=['Shotgun Split Back','Pro R Wide R','Pistol L','Pro R','Double pro R Tight Wide R','Pro L Ugly R Gun RB I','Pistol R Wide','Under center Split Back','Slot R','Wide R','Ugly L','Ugly R'];
-const MFK=['shotgun','pro','pistol','pro','pro','pro','pistol','under center','slot','wide','ugly','ugly'];
+const MFORM=['Shotgun Split Back','Pro R Wide R','Pistol L','Pro R','Double pro R Tight Wide R','Pro L Ugly R Gun RB I','Pistol R Wide','Under center Split Back','Wide L','Double Wide','Slot R','Wide R','Ugly L','Ugly R'];
+const MFK=['shotgun','pro','pistol','pro','pro','pro','pistol','under center','wide l','double wide','slot','wide','ugly','ugly'];
 const MPLAY=['TB power','QB power','QB sneak','TE drag Pro fade Wide post','TB sweep','TB dive','TE corner RTE RB leak','TB Sweep toss','QB keeper','Slot out rte Wide go rte','TE slant WR go rte','Option toss','Flood','QB keeper','Triple option','QB sweep','TE leak Pro out rte','RB dive'];
 const FAM=['Shotgun','Pro','Pistol','Pro','Pro','Pro','Pistol','Under center','Slot','Wide','Ugly','Ugly'];
 const FAMRE=/\b(ugly|pro|doubles|trips|tight|wide|shotgun|pistol|slot|under center)\b/;
@@ -280,25 +290,29 @@ function moreText(t,rows,hv,k){
 function lookup(type,n){
  const name=(type==='f'?MFORM:MPLAY)[n-1];if(!name)return null;
  const hits=[];
- Object.keys(MR.data).forEach(k=>{if(k==='g1')return;
-  MR.data[k].forEach((x,j)=>{if(!x||(k==='pt'&&j>0))return;
-   const m=type==='p'?x.c.some(c=>c.toLowerCase()===name.toLowerCase()):x.f.some(f=>f.toLowerCase().includes(MFK[n-1]));
-   if(m)hits.push({k,j,x})})});
+ Object.keys(T).forEach(sheet=>{
+  const data=T[sheet].data;
+  if(!data)return;
+  Object.keys(data).forEach(k=>{if(k==='g1')return;
+   data[k].forEach((x,j)=>{if(!x||(k==='pt'&&j>0))return;
+    const match = type==='p'?x.c.some(c=>c.toLowerCase()===name.toLowerCase()):x.f.some(f=>f.toLowerCase().includes(name.toLowerCase().replace(/\s+/g,' ')) || f.toLowerCase().includes(name.toLowerCase().split(' ')[0]));
+    if(match)hits.push({sheet,k,j,x})})});
+ });
  return{name,hits}}
 function renderLk(){
  const ty=S.lk.t,n=S.lk.n,L=lookup(ty,n),kind=ty==='f'?'Formation':'Play';
  if(!L)return msg(kind+' '+n+' is not on the list. Formations run 1 to 12, plays 1 to 21.',kind+' '+n);
  const hs_=h=>h.k==='pt'?'any hash':HN[h.j].toLowerCase(),H=L.hits;
- let o=`<div class="sit">${kind} ${n}</div><div class="sub">${L.name} · Maricopa</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">More</button><button id="bk">Back</button></div></div>`;
+ let o=`<div class="sit">${kind} ${n}</div><div class="sub">${L.name} · Maricopa + Laton</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">More</button><button id="bk">Back</button></div></div>`;
  o+=H.map(h=>card(h.x,h.j,false,SLn[h.k]+' · '+(h.k==='pt'?'any hash':HN[h.j]))).join('');
- if(!H.length)o+=`<div class="none">Not logged on any Maricopa situation.</div>`;
+ if(!H.length)o+=`<div class="none">Not logged on any sheet.</div>`;
  if(ty==='f'&&H.length)o+=`<div class="warn">The sheet lists formations per situation, not play by play. These cards show where the formation appears, and the run/pass numbers cover everything run in that situation.</div>`;
  $('res').innerHTML=o;
  let s=`${kind} ${n}, ${EX(L.name)}. `;
- if(!H.length)s+=ty==='f'?'The Maricopa sheet does not show that formation on any situation.':'It is on your list, but the Maricopa situation sheet does not log it.';
- else s+=`Maricopa shows it in ${H.length} ${H.length===1?'spot':'spots'}. `+H.slice(0,3).map(h=>`${spokenSL(h.k)}, ${hs_(h)}, ${Math.round(h.x.r)} percent run`).join('. ')+'.'+(H.length>3?' And more.':'');
+ if(!H.length)s+=ty==='f'?'The sheet does not show that formation on any situation.':'It is on your list, but the sheet does not log it.';
+ else s+=`This shows it in ${H.length} ${H.length===1?'spot':'spots'}. `+H.slice(0,3).map(h=>`${spokenSL(h.k)}, ${hs_(h)}, ${Math.round(h.x.r)} percent run`).join('. ')+'.'+(H.length>3?' And more.':'');
  lastSum=s;
- lastMore=H.length?H.map(h=>`${spokenSL(h.k)}, ${hs_(h)}: ${Math.round(h.x.r)} percent run, ${Math.round(h.x.p)} percent pass${h.x.n!=null?', '+plays(h.x.n):''}.`).join(' ')+(ty==='f'?' Heads up: the sheet lists formations per situation, and the run-pass numbers cover all plays in that bucket.':''):'No matches on the Maricopa sheet.';
+ lastMore=H.length?H.map(h=>`${spokenSL(h.k)}, ${hs_(h)}: ${Math.round(h.x.r)} percent run, ${Math.round(h.x.p)} percent pass${h.x.n!=null?', '+plays(h.x.n):''}.`).join(' ')+(ty==='f'?' Heads up: the sheet lists formations per situation, and the run-pass numbers cover all plays in that bucket.':''):'No matches on the available sheet data.';
  $('sumtxt').textContent=s;
  $('rd').onclick=()=>speak(lastSum);$('mr').onclick=doMore;$('bk').onclick=()=>{S.lk=null;pending='';upd()}}
 function respondLk(){pending='';upd();if(auto()){pending=lastSum?'more':'';speak(lastSum||lastMsg)}}
@@ -415,7 +429,7 @@ setInterval(()=>{
  if(speaking&&sok()&&!speechSynthesis.speaking&&!speechSynthesis.pending&&Date.now()-spokeAt>1500){speaking=false;setMic()}
  if(listening&&!speaking&&!recActive)startRec()},1200);
 
-$('rf').innerHTML=Object.keys(T).filter(k=>k!=='vca'&&k!=='alp'&&k!=='lat').map((f,i)=>bt('lk','f'+(i+1),(i+1)+'. '+(f==='mar'?'Maricopa':'') ,false)).join('');
+$('rf').innerHTML=Object.keys(T).filter(k=>k!=='vca'&&k!=='alp'&&k!=='lat').map((f,i)=>bt('lk','f'+(i+1),(i+1)+'. '+(f==='mar'?'Maricopa':''),false)).join('');
 $('rp').innerHTML=[...Array(21).keys()].map(i=>bt('lk','p'+(i+1),(i+1)+'. '+MPLAY[i],false)).join('');
 loadVoices();upd();
 </script></body></html>
