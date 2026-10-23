@@ -1,29 +1,299 @@
-const L={name:'Laton',short:'Laton',opp:'Laton',data:{
-fp:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
-d1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
-a:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-b:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-e:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-f:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-g:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-h:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-i:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-g1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
-pt:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')]},
-formationTendencies:[
- {name:'I Tight',sample:28,run:96.4,pass:3.6,direction:'26.9% R / 34.6% L / 38.5% M',calls:['TB power','TB sweep toss','QB keeper','QB sneak','Fake TB power / TE corner routes','Fake TB power / TE go routes','FB dive','QB sweep']},
- {name:'Wide L Tight Slot R',sample:12,run:91.7,pass:8.3,direction:'25% R / 25% L / 50% M',calls:['TB dive','Slot power','QB keeper','Slot swing','TB power','TB sweep toss','WR jet sweep']},
- {name:'Wide L Trips R',sample:10,run:20,pass:80,direction:'60% R / 20% L / 20% M',calls:['WR screen','Fake screen / inside WR leak','L WR drag crossing RTEs right','QB keeper','QB sneak','WR post']},
- {name:'Spread',sample:8,run:50,pass:50,direction:'20% R / 40% L / 40% M',calls:['QB draw','QB keeper','Crossing routes + post','Go / slant / curl','Go routes + slot drags','WRs crossing routes + slot go routes']},
- {name:'Trips L Wide R',sample:8,run:75,pass:25,direction:'25% R / 75% L',calls:['QB keeper','Hitch pass','WR jet sweep','WR screen']},
- {name:'Heavy',sample:3,run:100,pass:0,direction:'33.3% R / 66.7% M',calls:['QB sneak','TE end around']},
- {name:'Tight Slot L Wide R',sample:3,run:100,pass:0,direction:'100% L',calls:['TB sweep toss','TB dive']},
- {name:'Trips R',sample:2,run:0,pass:100,direction:'100% R',calls:['Crossing routes','WR screen']},
- {name:'Wide L',sample:2,run:100,pass:0,direction:'50% R / 50% M',calls:['QB keeper','TB power']},
- {name:'Double Wide',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']},
- {name:'Trips L',sample:1,run:0,pass:100,direction:'No direction data logged.',calls:['Corner / flat / drag']},
- {name:'Wide L Tight Trips R',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']}
-],notes:{fp:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',d1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',a:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',b:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',e:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',f:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',h:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',i:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',pt:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.'}};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sideline Tendencies</title>
+  <style>
+    :root{
+      --bg:#edf3ea;--card:#fffdf8;--ink:#12251a;--mute:#5d7568;--line:#cddbc0;--acc:#173a2d;--accink:#f4d063;--run:#c35a31;--pass:#2e6f9d;--barink:#fff;
+      box-sizing:border-box;
+      padding-top:env(safe-area-inset-top,0px);
+      padding-bottom:env(safe-area-inset-bottom,0px);
+    }
+    *{box-sizing:border-box}
+    html{scroll-padding-top:env(safe-area-inset-top,0px)}
+    body{
+      margin:0;
+      background:radial-gradient(circle at top,#f7f6ee 0%,var(--bg) 42%,#e9efe7 100%);
+      color:var(--ink);
+      font:500 16px/1.45 Barlow,system-ui,sans-serif;
+    }
+    main{
+      max-width:560px;
+      margin:0 auto;
+      padding:14px 14px 48px;
+    }
+    h1{
+      font:700 24px 'Barlow Condensed',sans-serif;
+      margin:0 0 10px;
+      letter-spacing:.02em;
+      color:var(--ink);
+    }
+    .grp{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+    .grp button{
+      flex:1 1 120px;
+      min-height:48px;
+      border:1.5px solid var(--line);
+      background:var(--card);
+      color:var(--ink);
+      padding:8px;
+      border-radius:8px;
+      font-weight:600;
+      font-size:16px;
+      box-shadow:0 1px 0 rgba(18,37,26,.04);
+      cursor:pointer;
+    }
+    .grp button[aria-pressed="true"]{
+      background:var(--acc);
+      color:var(--accink);
+      border-color:var(--acc);
+    }
+    .lbl{
+      display:block;
+      font-weight:600;
+      margin:14px 0 6px;
+    }
+    #q{
+      width:100%;
+      font:600 22px Barlow,sans-serif;
+      padding:12px;
+      border:2px solid var(--ink);
+      border-radius:10px;
+      background:var(--card);
+      color:var(--ink);
+    }
+    #heard{
+      min-height:22px;
+      color:var(--mute);
+      font-size:15px;
+      margin:6px 0;
+    }
+    .sum{
+      background:linear-gradient(180deg,#fefefb 0%,#f3f5ee 100%);
+      border:2px solid var(--ink);
+      border-radius:10px;
+      padding:14px;
+      margin:14px 0 12px;
+      box-shadow:0 3px 0 rgba(18,37,26,.06);
+      color:#12251a;
+    }
+    .sum p{margin:0 0 12px;font-size:18px;line-height:1.55}
+    .sumbar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .sumbar button{
+      min-height:48px;
+      padding:8px 18px;
+      border:1.5px solid var(--ink);
+      background:var(--acc);
+      color:var(--accink);
+      border-radius:8px;
+      font-weight:700;
+      font-size:16px;
+      cursor:pointer;
+    }
+    .card{
+      background:linear-gradient(180deg,#fff,#f9faf7);
+      border:1.5px solid var(--line);
+      border-radius:10px;
+      padding:14px;
+      margin-bottom:10px;
+      box-shadow:0 1px 0 rgba(18,37,26,.04);
+      color:#12251a;
+    }
+    .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+    .hd b{font:700 22px 'Barlow Condensed',sans-serif}
+    .n{color:#5d7568;font-size:13px}
+    .bar{
+      display:flex;
+      height:36px;
+      border-radius:6px;
+      overflow:hidden;
+      font:700 18px/36px 'Barlow Condensed',sans-serif;
+      color:var(--barink);
+    }
+    .bar span{padding-left:8px;white-space:nowrap;overflow:hidden}
+    .bar .r{background:var(--run)}
+    .bar .p{background:var(--pass)}
+    .rw{margin-top:8px;font-size:15px}
+    .rw i{font-style:normal;color:#5d7568}
+    .warn{
+      border-left:4px solid var(--acc);
+      padding:6px 10px;
+      margin:8px 0;
+      font-size:14px;
+      color:var(--mute);
+    }
+    .none{color:var(--mute);padding:8px 0;font-size:17px}
+    .foot{color:var(--mute);font-size:12px;margin-top:18px}
+    button{font-family:inherit;cursor:pointer}
+    @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Sideline Tendencies</h1>
 
-const MFORM=['I Tight','Wide L Tight Slot R','Wide L Trips R','Spread','Trips L Wide R','Heavy','Tight Slot L Wide R','Trips R','Wide L','Double Wide','Trips L','Wide L Tight Trips R'];
-const MFK=['i tight','wide l tight slot r','wide l trips r','spread','trips l wide r','heavy','tight slot l wide r','trips r','wide l','double wide','trips l','wide l tight trips r'];
+    <div class="grp" id="team" role="group" aria-label="Scouting sheet"></div>
+
+    <label class="lbl" for="q">Say or type the situation</label>
+    <input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="third and five, middle, ugly">
+    <div id="heard" aria-live="polite">Tap Start hands-free once, then just talk. Or type here.</div>
+
+    <div class="sum" id="res" aria-live="polite"></div>
+
+    <div class="foot">Laton is loaded as a scouting sheet. Update the raw data later as more play samples are entered.</div>
+  </main>
+
+  <script>
+    const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
+
+    const L={
+      name:'Laton',
+      short:'Laton',
+      opp:'Laton',
+      data:{
+        fp:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
+        d1:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
+        a:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        b:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        e:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        f:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        g:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        h:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        i:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        g1:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+        pt:[c(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),c(100,0,'100% R',['QB keeper'],1,'Double Wide'),c(100,0,'100% R',['QB keeper'],1,'Double Wide')]
+      },
+      notes:{
+        fp:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        d1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        a:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        b:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        e:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        f:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        g:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        h:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        i:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        g1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
+        pt:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.'
+      }
+    };
+
+    const MFORM=[
+      'I Tight','Wide L Tight Slot R','Wide L Trips R','Spread','Trips L Wide R',
+      'Heavy','Tight Slot L Wide R','Trips R','Wide L','Double Wide',
+      'Trips L','Wide L Tight Trips R'
+    ];
+
+    const MFK=[
+      'i tight','wide l tight slot r','wide l trips r','spread','trips l wide r',
+      'heavy','tight slot l wide r','trips r','wide l','double wide',
+      'trips l','wide l tight trips r'
+    ];
+
+    const teams = { Laton: L };
+    let activeTeam = 'Laton';
+
+    function safeText(v){ return (v==null ? '' : String(v).trim()); }
+
+    function renderTeamButtons() {
+      const wrap = document.getElementById('team');
+      wrap.innerHTML = '';
+      Object.keys(teams).forEach(name => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = name;
+        btn.setAttribute('aria-pressed', String(name === activeTeam));
+        btn.addEventListener('click', () => {
+          activeTeam = name;
+          renderTeamButtons();
+          renderResult();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function parseInput(raw) {
+      const s = safeText(raw).toLowerCase();
+
+      if (!s) return { team: activeTeam, flags: {} };
+
+      if (s.includes('laton')) return { team: 'Laton', flags: {} };
+
+      if (s.includes('formation')) {
+        const m = s.match(/formation\s*(\d+)/i);
+        const idx = m ? Number(m[1]) - 1 : -1;
+        if (idx >= 0 && idx < MFORM.length) return { team: 'Laton', flags: { formation: MFORM[idx] } };
+      }
+
+      if (s.includes('play')) {
+        const m = s.match(/play\s*(\d+)/i);
+        const idx = m ? Number(m[1]) - 1 : -1;
+        if (idx >= 0 && idx < MFORM.length) return { team: 'Laton', flags: { formation: MFORM[idx] } };
+      }
+
+      const g = /^(1st|2nd|3rd|4th|1|2|3|4)\s*(and)?\s*(\d+)/i;
+      const downMatch = s.match(/(1st|2nd|3rd|4th|1|2|3|4)/i);
+      const distMatch = s.match(/(\d+)\s*(yards|yd)?/i);
+      return { team: activeTeam, flags: { down: downMatch ? downMatch[1] : null, distance: distMatch ? Number(distMatch[1]) : null } };
+    }
+
+    function buildSummary(teamName, flags = {}) {
+      const t = teams[teamName] || L;
+      const callList = [];
+      const data = t.data || {};
+      const formation = flags.formation || MFORM[0];
+
+      const matchName = formation && MFORM.includes(formation) ? formation : MFORM[0];
+      const idx = MFORM.indexOf(matchName);
+      const displayFormation = matchName || 'I Tight';
+
+      if (data.fp && data.fp[idx]) {
+        const row = data.fp[idx];
+        callList.push(...(row && row.c ? row.c : []));
+      }
+
+      const runPct = data.fp && data.fp[idx] ? (data.fp[idx].r || 0) : 0;
+      const passPct = data.fp && data.fp[idx] ? (data.fp[idx].p || 0) : 0;
+
+      const lines = [
+        `<p><strong>${t.name}</strong> — ${displayFormation}</p>`,
+        `<div class="card">`,
+        `  <div class="hd"><b>Formation tendency</b><span class="n">${displayFormation}</span></div>`,
+        `  <div class="bar"><span class="r" style="width:${runPct}%">${runPct}% run</span><span class="p" style="width:${passPct}%">${passPct}% pass</span></div>`,
+        `  <div class="rw"><i>Calls:</i> ${callList.length ? callList.slice(0,6).join(', ') : 'No call list loaded yet.'}</div>`,
+        `</div>`
+      ];
+
+      if (t.notes && t.notes.fp) {
+        lines.push(`<div class="warn">${t.notes.fp}</div>`);
+      }
+
+      if (flags.distance) {
+        lines.push(`<div class="warn">Situation: ${flags.distance}-yard distance</div>`);
+      }
+
+      return lines.join('');
+    }
+
+    function renderResult() {
+      const q = document.getElementById('q').value;
+      const parsed = parseInput(q);
+      const teamName = parsed.team || activeTeam;
+      const summary = buildSummary(teamName, parsed.flags);
+      const res = document.getElementById('res');
+      res.innerHTML = summary;
+      document.getElementById('heard').textContent = `Team: ${teamName} • ${parsed.flags.formation || 'Formation not selected yet'}`;
+    }
+
+    document.getElementById('q').addEventListener('input', renderResult);
+    renderTeamButtons();
+    renderResult();
+  </script>
+</body>
+</html>
