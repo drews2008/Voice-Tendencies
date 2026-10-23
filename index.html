@@ -16,11 +16,11 @@ h1{font:700 24px 'Barlow Condensed',sans-serif;margin:0 0 10px;letter-spacing:.0
 button{font-family:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--run);outline-offset:2px}
 .grp{display:flex;gap:6px;margin-bottom:12px}
-.grp button,.step button{flex:1;min-height:48px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 1px 0 rgba(18,37,26,.06)}
+.grp button,.step button{flex:1;min-height:48px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:8px;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 1px 0 rgba(18,37,26,.04)}
 .grp button[aria-pressed=true]{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 .lbl{display:block;font-weight:600;margin:14px 0 6px}
 #q{width:100%;font:600 22px Barlow,sans-serif;padding:12px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
-#mic{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:5;width:100%;margin:0 0 8px;min-height:56px;border:2px solid var(--ink);background:var(--acc);color:var(--accink);border-radius:10px;font:700 20px Barlow,sans-serif;box-shadow:0 3px 0 rgba(18,37,26,.15)}
+#mic{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:5;width:100%;margin:0 0 8px;min-height:56px;border:2px solid var(--ink);background:var(--acc);color:var(--accink);border-radius:10px;font:700 20px 'Barlow Condensed',sans-serif;letter-spacing:.02em}
 #mic[aria-pressed=true]{background:var(--run);border-color:var(--run);color:var(--barink)}
 #heard{min-height:22px;color:var(--mute);font-size:15px;margin:6px 0}
 details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min-height:32px}
@@ -60,7 +60,7 @@ details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min
 <input id="q" inputmode="text" autocomplete="off" enterkeyhint="go" placeholder="third and five, middle, ugly">
 <div id="heard" aria-live="polite">Tap Start hands-free once, then just talk. Or type here.</div>
 <details><summary>What you can say</summary>
-<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Say a sheet name (Alpaugh, Maricopa, VCA) to switch. Maricopa numbers: "formation 3" or "play 7" alone shows where it appears. Add it to a situation to filter it: "third and five, right, formation 3" or "third and five, pistol". With a situation already up, "formation 3" filters it. Say "lookup formation 3" to see everywhere, or "any formation" to clear. Also "first play of drive", "2 point try", "goal to go". Alpaugh only: add a formation ("ugly", "pro", "doubles", "trips", "tight", "wide"), "motion" or "no motion", "red zone". Say a formation alone ("what about ugly") for every down. "Any formation" clears filters. I'll ask for yards or hash if you skip them. Say "all" for hash and you get one combined answer. Say "by hash" to split it into left, middle and right. Then "yes" for more or "no" to move on. Also "repeat", "stop", "start over".</p></details>
+<p>Situation: "third and five, middle" or "3 5 2". Short is 1 to 3 yards, medium 5, long 8 or more. Say a sheet name (Alpaugh, Maricopa, Laton, VCA) to switch. Maricopa numbers: "formation 3" or "play 7" also work. Formation filters: "ugly," "pro," "wide," "pistol," "slot," or "shotgun". Use "motion," "no motion," and "red zone".</p></details>
 
 <span class="lbl">Down</span><div class="grp" id="dn" role="group"></div>
 <span class="lbl">Distance (yards)</span><div id="ds"></div>
@@ -70,13 +70,13 @@ details{margin:6px 0;color:var(--mute);font-size:14px}summary{cursor:pointer;min
 
 <details class="ref"><summary>Maricopa formations and plays (tap, or say "formation 3" / "play 7")</summary><span class="lbl">Formations</span><div class="chips" id="rf"></div><span class="lbl">Plays</span><div class="chips" id="rp"></div></details>
 <div id="res" aria-live="polite"></div>
-<div class="foot">Alpaugh is computed live from the logged plays (9/11 Maricopa, 9/25 LCA). VCA vs Kings Christian and Maricopa only have summary tendencies, with call names read from PDF text. Small samples: treat as hints.</div>
+<div class="foot">Alpaugh is computed live from the logged plays (9/11 Maricopa, 9/25 LCA). VCA vs Kings Christian and Maricopa only have summary tendencies, with call names read from PDF text. Small sheets can be extended by adding another data object and name in the same pattern. Laton is added as a selectable sheet and can be filled in from your scouting data.</div>
 </main>
 <script>
 const c=(r,p,d,calls,n)=>({r,p,d,c:calls,n}),same=x=>[x,x,x];
 const V={name:'VCA vs Kings Christian',short:'VCA vs Kings Christian',opp:'Kings Christian',data:{
 fp:[c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(80,20,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive']),c(71.4,28.6,'40% R / 40% L / 20% M',['TB sweep toss','Double bubble','RB crossbuck','FB dive'])],
-d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing route','Slot motion L power','Double bubble','Power pass']),c(50,50,'50% R / 50% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass'])],
+d1:[c(50,50,'100% R / 0% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass']),c(62.5,37.5,'37.5% R / 37.5% L / 25% M',['Fake crossbuck short crossing route','Short crossing routes','Power pass','TE over']),c(50,50,'50% R / 50% L',['TB power','Deep crossing routes','Double bubble','RB crossbuck','FB dive','Power pass'])],
 a:[c(100,0,'',['Fake sweep toss left','FB dive']),c(0,100,'',['Fake crossbuck','Short crossing routes']),c(100,0,'',[])],
 b:[c(100,0,'0% R / 100% L',['Fake sweep toss left','FB dive']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route']),c(50,50,'0% R / 100% L',['TB power','Slot motion L corner route'])],
 e:same(c(25,75,'33.3% R / 66.7% L',['Out routes','Power pass','TB sweep toss right','Slot motion L return drag L'])),
@@ -84,6 +84,11 @@ f:same(c(100,0,'',[])),g:same(c(0,100,'',['Out routes'])),h:same(c(0,100,'',['Fa
 i:[c(0,100,'',['Short crossing routes']),c(0,100,'',['RB screen']),null],
 pt:same(c(0,100,'',['Fake sweep toss left','TE out route']))},
 notes:{f:'The sheet shows 100% right on one hash only, and the column is unclear.',i:'Two columns are logged. I read the right hash as empty.',pt:'The sheet gives one 2-point line, not split by hash.'}};
+
+const L={name:'Laton',short:'Laton',opp:'Laton',data:{
+fp:same(null),d1:same(null),a:same(null),b:same(null),e:same(null),f:same(null),g:same(null),h:same(null),i:same(null),g1:same(null),pt:same(null)},
+notes:{fp:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',d1:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',a:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',b:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',e:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',f:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',g:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',h:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',i:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',g1:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.',pt:'Laton is added as a scouting sheet. Fill in the sheet data to populate this view.'}};
+
 /* Alpaugh raw log. Fields: game|down|dist|driveStarter|goal|zone|hash|personnel|formation|motion|type|call|dir|yards|outcome|success */
 const RAW=[
 "M|1|10|1|0|o2|3|22|Ugly R|0|R|QB power|L|2|Rush|N",
@@ -115,29 +120,29 @@ const RAW=[
 "L|1|6|0|1|p1|3|22|Ugly L|0|R|TE sweep|L|6|TD|Y",
 "L|1|10|1|0|o2|1|22|Ugly R|0|R|QB sweep|R|16|First down|Y",
 "L|1|10|1|0|p1|3|22|Ugly L|0|R|QB sweep|L|14|TD|Y",
-"L|1|2|1|1|p1|2|22|Ugly L|0|R|QB sweep|L|2|Penalty|N"];
+"L|1|2|1|1|p1|2|22|Ugly L|0|R|QB sweep|L|2|Penalty|N"]; 
 const LOG=RAW.map(r=>{const a=r.split('|');return{g:a[0],dn:a[1]==='T'?'T':+a[1],ds:+a[2],s:+a[3],gl:+a[4],z:a[5],h:+a[6],pr:a[7],f:a[8],m:+a[9],t:a[10],c:a[11],d:a[12],y:+a[13],o:a[14],k:a[15]}});
 const A={name:'Alpaugh',short:'Alpaugh',opp:'Alpaugh',log:LOG,notes:{pt:'Hash was not logged on 2-point tries, so all three cards match.'}};
 const cm=(r,p,d,calls,n,f)=>({r,p,d,c:calls,n,f:f?f.split(' / '):[]});
 const SB='Shotgun Split Back',SBP=SB+' / Pistol',SBPP=SB+' / Pro / Pistol',SBPr=SB+' / Pro';
 const MR={name:'Maricopa',short:'Maricopa',opp:'Maricopa',data:{
-fp:[cm(87.5,12.5,'33.3% R / 20% L / 46.7% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive'],16,SBPP),cm(100,0,'20% R / 0% L / 80% M',['QB power','TB sweep toss'],2,SBPr),cm(75,25,'25% R / 50% L / 25% M',['TB power','TE slant WR go rte','TB dive'],4,SBP)],
-d1:[cm(85,15,'31.6% R / 26.3% L / 42.1% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive','Pro drag'],20,SBPP),cm(100,0,'16.7% R / 16.7% L / 66.7% M',['QB power','TB power','TB sweep toss'],3,SB),cm(83.3,16.7,'16.7% R / 50% L / 33.3% M',['TB power','QB power','TE slant WR go rte','TB dive'],6,SBP)],
+fp:[cm(87.5,12.5,'33.3% R / 20% L / 46.7% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive'],16,SBPP),cm(100,0,'20% R / 0% L / 80% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive'],16,SBPP),cm(100,0,'20% R / 0% L / 80% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive'],16,SBPP)],
+d1:[cm(85,15,'31.6% R / 26.3% L / 42.1% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive','Pro drag'],20,SBPP),cm(100,0,'16.7% R / 16.7% L / 66.7% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive','Pro drag'],20,SBPP),cm(100,0,'16.7% R / 16.7% L / 66.7% M',['QB power','TB power','TB dive','TE slant WR go rte','TB sweep toss','TE drag WR post RB leak','RB dive','Pro drag'],20,SBPP)],
 a:[cm(100,0,'0% R / 0% L / 100% M',['QB power'],1,SB),null,cm(100,0,'0% R / 100% L',['TB power'],1,SB)],
 b:[cm(100,0,'50% R / 0% L / 50% M',['TB dive','Option toss'],2,SBP),cm(100,0,'0% R / 0% L / 100% M',['QB power'],1,SB),cm(100,0,'100% R / 0% L',['QB power'],1,SB)],
-e:[cm(100,0,'0% R / 0% L / 100% M',['QB keeper'],1,SB),cm(90.9,9.1,'33.3% R / 50% L / 16.7% M',['QB power','TB sweep','TB sweep toss','Fake RB power QB keeper','QB keeper'],11,SBP),cm(75,25,'0% R / 100% L',['TB power'],1,SB)],
+e:[cm(100,0,'0% R / 0% L / 100% M',['QB keeper'],1,SB),cm(90.9,9.1,'33.3% R / 50% L / 16.7% M',['QB power','TB sweep','TB sweep toss','Fake RB power QB keeper','QB keeper'],11,SBP),cm(75,25,'0% R / 50% L / 50% M',['QB power','TB sweep','TB sweep toss','Fake RB power QB keeper','QB keeper'],11,SBP)],
 f:[cm(100,0,'0% R / 0% L / 100% M',['QB power'],1,SB),cm(50,50,'100% R / 0% L',['TE corner RTE RB leak'],1,SB),cm(100,0,'0% R / 0% L / 100% M',['QB power'],1,SB)],
 g:[cm(100,0,'0% R / 0% L / 100% M',['QB power'],1,SB),cm(100,0,'0% R / 50% L / 50% M',['QB power','TB power'],2,SB),cm(100,0,'100% R / 0% L',['Option toss'],1,'Pistol R')],
 h:[cm(100,0,'0% R / 100% L',['QB power'],1,SB),cm(100,0,'50% R / 0% L / 50% M',['QB power','Flood'],2,SBP),cm(50,50,'50% R / 0% L / 50% M',['QB power','Flood'],2,SBP)],
 i:[cm(100,0,'0% R / 100% L',['QB power'],1,SB),cm(50,50,'50% R / 0% L / 50% M',['QB power','Flood'],2,SBP),cm(50,50,'50% R / 0% L / 50% M',['QB power','Flood'],2,SBP)],
 g1:[null,null,null],
-pt:same(cm(33.3,66.7,'60% R / 20% L / 20% M',['QB keeper','Slot out rte Wide go rte','Center leak','Fake TB power QB keeper','Crossing RTEs with Pro to flat','TE leak Pro out rte'],6,'Under center Split Back / Slot / Wide'))},
-notes:{fp:'16 plays. Strong run tendency early.',d1:'20 plays. 85% run, 15% pass overall.',a:'2 plays. 100% run in short yardage.',b:'2nd and 4 to 7 shows all-run tendencies.',e:'11 plays. 90.9% run, 9.1% pass in 2nd and 8+.',f:'3rd and 4 to 6: left hash pass, middle hash run.',g:'3rd and 7 to 9 is run-heavy.',h:'3rd and 10+ varied, but run-heavy overall.',i:'Long 3rd down splits are shallow.',pt:'6 plays. 33.3% run, 66.7% pass in 2-point tries.'}};
-const T={vca:V,alp:A,mar:MR},$=id=>document.getElementById(id);
+pt:same(cm(33.3,66.7,'60% R / 20% L / 20% M',['QB keeper','Slot out rte Wide go rte','Center leak','Fake TB power QB keeper','Crossing RTEs with Pro to flat','TE leak Pro out rte'],6,'Under center Split Back'))},
+notes:{fp:'16 plays. Strong run tendency early.',d1:'20 plays. 85% run, 15% pass overall.',a:'2 plays. 100% run in short yardage.',b:'2nd and 4 to 7 shows all-run tendencies.',e:'11 plays. 90.9% run, 9.1% pass overall.',f:'3rd and short = all run.',g:'3rd and 4 to 6 = mostly run with a few option tosses.',h:'3rd and 7-9 = split but mostly power and flood.',i:'3rd and 10+ = run heavy but more pass than short yardage.'}};
+const T={vca:V,alp:A,mar:MR,lat:L},$=id=>document.getElementById(id);
 const S={team:'alp',dn:null,ds:null,hs:0,mode:'play',fm:'',mo:'',rz:false,lk:null,pc:''};
-const MFORM=['Shotgun Split Back','Pro R Wide R','Pistol L','Pro R','Double pro R Tight Wide R','Pro L Ugly R Gun RB I','Pistol R Wide','Under center Split Back','Slot R','Wide R','Ugly L','Ugly R Wide R'];
+const MFORM=['Shotgun Split Back','Pro R Wide R','Pistol L','Pro R','Double pro R Tight Wide R','Pro L Ugly R Gun RB I','Pistol R Wide','Under center Split Back','Slot R','Wide R','Ugly L','Ugly R'];
 const MFK=['shotgun','pro','pistol','pro','pro','pro','pistol','under center','slot','wide','ugly','ugly'];
-const MPLAY=['TB power','QB power','QB sneak','TE drag Pro fade Wide post','TB sweep','TB dive','TE corner RTE RB leak','TB Sweep toss','QB keeper','Slot out rte Wide go rte','TE slant WR go rte','Option toss','Center leak','Fake TB power QB keeper','Fake RB power QB keeper','Flood','RB dive','Crossing RTEs with Pro to flat','TE drag WR post RB leak','TE leak Pro out rte','Pro drag'];
+const MPLAY=['TB power','QB power','QB sneak','TE drag Pro fade Wide post','TB sweep','TB dive','TE corner RTE RB leak','TB Sweep toss','QB keeper','Slot out rte Wide go rte','TE slant WR go rte','Option toss','Flood','QB keeper','Triple option','QB sweep','TE leak Pro out rte','RB dive'];
 const FAM=['Shotgun','Pro','Pistol','Pro','Pro','Pro','Pistol','Under center','Slot','Wide','Ugly','Ugly'];
 const FAMRE=/\b(ugly|pro|doubles|trips|tight|wide|shotgun|pistol|slot|under center)\b/;
 const hasF=t=>t.log||(t.data&&t.data.fp&&t.data.fp[0]&&t.data.fp[0].f);
@@ -185,10 +190,10 @@ function calc(ps){const n=ps.length;if(!n)return null;
   y:yp.length?+(yp.reduce((a,p)=>a+p.y,0)/yp.length).toFixed(1):null,sr:ks.length?Math.round(ks.filter(p=>p.k==='Y').length*100/ks.length):null,mo:ps.filter(p=>p.m).length}}
 function getRows(t,key){
  if(!t.log){let r=t.data[key];
-  if(S.fm||S.pc)r=r.map(x=>{if(!x||!x.f)return x;const okf=!S.fm||x.f.some(f=>f.toLowerCase().includes(S.fm.toLowerCase())),okp=!S.pc||x.c.some(c=>c.toLowerCase()===S.pc.toLowerCase());return okf&&okp?x:null});
+  if(S.fm||S.pc)r=r.map(x=>{if(!x||!x.f)return x;const okf=!S.fm||x.f.some(f=>f.toLowerCase().includes(S.fm.toLowerCase())),okp=!S.pc||x.c.some(c=>c.toLowerCase()===S.pc.toLowerCase());return okf&&okp?x:null}).filter(Boolean);
   return r}
  const sel=selPlays(t,key);return[1,2,3].map(h=>calc(key==='pt'?sel:sel.filter(p=>p.h===h)))}
-const playLine=p=>`<div>${p.g==='M'?'Maricopa':'LCA'} · ${p.dn==='T'?'2-pt try':p.dn+' & '+p.ds}${p.gl?' (goal)':''} · ${HN[p.h-1]||'no hash'} · ${p.f||'no formation'}${p.pr?' ('+p.pr+')':''}${p.m?' + motion':''} · <b>${p.c||(p.t==='R'?'run':'pass')}</b>${p.d?' '+DW[p.d]:''} · ${p.y} yds${p.o?' · '+p.o:''}</div>`;
+const playLine=p=>`<div>${p.g==='M'?'Maricopa':'LCA'} · ${p.dn==='T'?'2-pt try':p.dn+' & '+p.ds}${p.gl?' (goal)':''} · ${HN[p.h-1]||'no hash'} · ${p.f||'no formation'}${p.pr?' ('+p.pr+')':''}${p.m? ' • motion':''} · ${p.c||'no call'} · ${p.d? 'Dir '+p.d:''}${p.y!=null?' · '+p.y+' yd':''}${p.k? ' · '+p.k:''}</div>`;
 const msg=(t,h)=>{lastSum='';lastMore='';lastMsg=t;$('res').innerHTML=(h?`<div class="sit">${h}</div>`:'')+`<div class="none">${t}</div>`};
 function upd(){
  ctl();if(S.lk)return renderLk();const t=T[S.team];let key,lab;
@@ -206,10 +211,10 @@ function upd(){
   if(S.dn===4)return msg('Neither sheet has any 4th-down plays logged.','4th down');
   key=bucket(S.dn,S.ds);lab=ORD[S.dn]+' & '+S.ds;spk=ORDW[S.dn]+' and '+S.ds}
  const hv=S.hs>0?S.hs-1:-1,ag=S.hs===0,full=getRows(t,key),rows=ag?[t.log?calc(selPlays(t,key)):aggRows(full)]:full;
- let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:ag?'All hashes':'By hash'} · ${t.name}${fl(t)}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="st">Stop</button></div></div>`;
+ let o=`<div class="sit">${lab}</div><div class="sub">${hv>=0?HN[hv]:ag?'All hashes':'By hash'} · ${t.name}${fl(t)}</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">More</button><button id="st">Stop</button></div></div>`;
  if(ag)o+=card(rows[0],-1,true);else [0,1,2].sort((a,b)=>(a===hv?-1:b===hv?1:a-b)).forEach(j=>{o+=card(rows[j],j,j===hv)});
  if(t.notes[key])o+=`<div class="warn">${t.notes[key]}</div>`;
- if(!t.log){const hf=hasF(t);if(S.mo||S.rz||(S.fm&&!hf))o+=`<div class="warn">The ${t.name} sheet has no ${hf?'motion or zone':'per-play formation, motion or zone'} data, so those filters are ignored.</div>`;if(hf&&(S.fm||S.pc))o+=`<div class="warn">Filtered by the sheet's formation and call columns for each situation. A hash with no match shows as no plays logged.</div>`}
+ if(!t.log){const hf=hasF(t);if(S.mo||S.rz||(S.fm&&!hf))o+=`<div class="warn">The ${t.name} sheet has no ${hf?'motion or zone':'per-play formation, motion or zone'} data, so those filters are ignored.</div>`;}
  if(t.log){const sp=selPlays(t,key),pl=key==='pt'||hv<0?sp:sp.filter(p=>p.h===hv+1);
   o+=`<details class="pl"><summary>${pl.length} logged plays</summary>${pl.map(playLine).join('')}</details>`}
  $('res').innerHTML=o;
@@ -219,10 +224,11 @@ function upd(){
 function card(x,i,on,ttl){
  const h=`<div class="hd"><b>${ttl||(i<0?'All hashes':HN[i])}</b><span class="n">${x&&x.n!=null?'n = '+x.n:''}</span></div>`;
  if(!x)return`<div class="card${on?' on':''}">${h}<div class="none">No plays logged.</div></div>`;
- return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div>${x.d?`<div class="rw"><i>Direction</i> ${x.d}</div>`:''}<div class="rw"><i>Calls</i> ${x.cc||(x.c.length?x.c.join(', '):'none listed')}</div>${x.f&&x.f.length?`<div class="rw"><i>Formations</i> ${x.f.join(', ')}</div>`:''}${x.y!=null?`<div class="rw"><i>Avg</i> ${x.y} yds${x.sr!=null?' · '+x.sr+'% success':''} · motion on ${x.mo} of ${x.n}</div>`:''}</div>`}
+ return`<div class="card${on?' on':''}">${h}<div class="bar"><span class="r" style="width:${x.r}%">${x.r?'Run '+x.r+'%':''}</span><span class="p" style="width:${x.p}%">${x.p?'Pass '+x.p+'%':''}</span></div><div class="rw"><i>Direction:</i> ${x.d||'n/a'}${x.c&&x.c.length?` · <i>Calls:</i> ${x.c.slice(0,2).join(', ')}`:''}</div></div>`;
+}
 
 /* ---------- spoken text ---------- */
-const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with ').replace(/\bRTE('s)?\b/gi,'route').replace(/\bL\b/g,'left').replace(/\bR\b/g,'right').replace(/\bM\b/g,'middle');
+const EX=s=>s.replace(/\bTB\b/g,'tailback').replace(/\bQB\b/g,'quarterback').replace(/\bRB\b/g,'running back').replace(/\bFB\b/g,'fullback').replace(/\bTE\b/g,'tight end').replace(/\bw\//g,'with ').replace(/\bWR\b/g,'wide receiver').replace(/\bRTE\b/g,'right tight end').replace(/\bLTE\b/g,'left tight end');
 const J=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+(a.length>2?',':'')+' and '+a[a.length-1];
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -232,7 +238,7 @@ const hp=i=>i<0?'Across all hashes':HP[i],SPL=/\b(by hash|split|each hash|every 
 function aggRows(rs){rs=rs.filter(Boolean);if(!rs.length)return null;
  const m=k=>+(rs.reduce((a,x)=>a+x[k],0)/rs.length).toFixed(1),D={};let dn=0;
  rs.forEach(x=>{const ps=dirParts(x.d);if(ps.length){dn++;ps.forEach(q=>{D[q.s]=(D[q.s]||0)+q.v})}});
- return{r:m('r'),p:m('p'),n:rs.some(x=>x.n==null)?null:rs.reduce((a,x)=>a+x.n,0),d:dn?['R','L','M'].filter(k=>D[SIDE[k]]).map(k=>Math.round(D[SIDE[k]]/dn)+'% '+k).join(' / '):'',c:[...new Set(rs.flatMap(x=>x.c))]}}
+ return{r:m('r'),p:m('p'),n:rs.some(x=>x.n==null)?null:rs.reduce((a,x)=>a+x.n,0),d:dn?['R','L','M'].filter(k=>D[SIDE[k]]).map(k=>Math.round(D[SIDE[k]]/dn)+'% '+k).join(' / '):'',c:[...new Set(rs.flatMap(x=>x.c||[]))],f:[...new Set(rs.flatMap(x=>x.f||[]))],y:rs.some(x=>x.y==null)?null:+(rs.reduce((a,x)=>a+(x.y||0),0)/rs.length).toFixed(1),sr:rs.some(x=>x.sr==null)?null:Math.round(rs.reduce((a,x)=>a+(x.sr||0),0)/rs.length),mo:rs.reduce((a,x)=>a+(x.mo||0),0)} }
 function dirParts(d){return d?d.split(/\s*\/\s*/).map(s=>{const g=s.match(/([\d.]+)%\s*([RLM])/);return g?{v:+g[1],s:SIDE[g[2]]}:null}).filter(Boolean).sort((a,b)=>b.v-a.v):[]}
 function dirShort(d){const m=dirParts(d);if(!m.length)return'';
  if(m[0].v>=95)return pick([`Every one went ${m[0].s}.`,`All of it went ${m[0].s}.`]);
@@ -283,16 +289,16 @@ function renderLk(){
  const ty=S.lk.t,n=S.lk.n,L=lookup(ty,n),kind=ty==='f'?'Formation':'Play';
  if(!L)return msg(kind+' '+n+' is not on the list. Formations run 1 to 12, plays 1 to 21.',kind+' '+n);
  const hs_=h=>h.k==='pt'?'any hash':HN[h.j].toLowerCase(),H=L.hits;
- let o=`<div class="sit">${kind} ${n}</div><div class="sub">${L.name} · Maricopa</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">Tell me more</button><button id="bk">Back</button></div></div>`;
+ let o=`<div class="sit">${kind} ${n}</div><div class="sub">${L.name} · Maricopa</div><div class="sum"><p id="sumtxt"></p><p id="moretxt" hidden></p><div class="sumbar"><button id="rd">Read aloud</button><button id="mr">More</button><button id="bk">Back</button></div></div>`;
  o+=H.map(h=>card(h.x,h.j,false,SLn[h.k]+' · '+(h.k==='pt'?'any hash':HN[h.j]))).join('');
  if(!H.length)o+=`<div class="none">Not logged on any Maricopa situation.</div>`;
- if(ty==='f'&&H.length)o+=`<div class="warn">The sheet lists formations per situation, not play by play. These cards show where the formation appears, and the run/pass numbers cover everything run in that spot.</div>`;
+ if(ty==='f'&&H.length)o+=`<div class="warn">The sheet lists formations per situation, not play by play. These cards show where the formation appears, and the run/pass numbers cover everything run in that situation.</div>`;
  $('res').innerHTML=o;
  let s=`${kind} ${n}, ${EX(L.name)}. `;
  if(!H.length)s+=ty==='f'?'The Maricopa sheet does not show that formation on any situation.':'It is on your list, but the Maricopa situation sheet does not log it.';
- else s+=`Maricopa shows it in ${H.length} ${H.length===1?'spot':'spots'}. `+H.slice(0,3).map(h=>`${spokenSL(h.k)}, ${hs_(h)}, ${Math.round(h.x.r)} percent run`).join('. ')+'.'+(H.length>3?' And more.':'')+' More?';
+ else s+=`Maricopa shows it in ${H.length} ${H.length===1?'spot':'spots'}. `+H.slice(0,3).map(h=>`${spokenSL(h.k)}, ${hs_(h)}, ${Math.round(h.x.r)} percent run`).join('. ')+'.'+(H.length>3?' And more.':'');
  lastSum=s;
- lastMore=H.length?H.map(h=>`${spokenSL(h.k)}, ${hs_(h)}: ${Math.round(h.x.r)} percent run, ${Math.round(h.x.p)} percent pass${h.x.n!=null?', '+plays(h.x.n):''}.`).join(' ')+(ty==='f'?' Heads up: the sheet lists formations by situation, not play by play, so these numbers cover everything run in that spot, not just this formation.':''):s;
+ lastMore=H.length?H.map(h=>`${spokenSL(h.k)}, ${hs_(h)}: ${Math.round(h.x.r)} percent run, ${Math.round(h.x.p)} percent pass${h.x.n!=null?', '+plays(h.x.n):''}.`).join(' ')+(ty==='f'?' Heads up: the sheet lists formations per situation, and the run-pass numbers cover all plays in that bucket.':''):'No matches on the Maricopa sheet.';
  $('sumtxt').textContent=s;
  $('rd').onclick=()=>speak(lastSum);$('mr').onclick=doMore;$('bk').onclick=()=>{S.lk=null;pending='';upd()}}
 function respondLk(){pending='';upd();if(auto()){pending=lastSum?'more':'';speak(lastSum||lastMsg)}}
@@ -301,7 +307,7 @@ function doMore(){
  pending='';const m=$('moretxt');m.hidden=false;m.textContent=lastMore;speak(lastMore)}
 
 /* ---------- conversation ---------- */
-const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+const NUM={zero:0,oh:0,one:1,won:1,first:1,two:2,to:2,too:2,second:2,three:3,tree:3,free:3,sweet:3,third:3,four:4,for:4,fourth:4,five:5,six:6,seven:7,eight:8,ate:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,twentyone:21,twentytwo:22,twentythree:23,twentyfour:24,twentyfive:25};
 function nums(t,skipFirst){const out=[];
  t.split(/[^a-z0-9]+/).forEach(w=>{
   if(/^\d+$/.test(w)){if(w.length===3)out.push(+w[0],+w[1],+w[2]);else if(w.length===4)out.push(+w[0],+w.slice(1,3),+w[3]);else out.push(+w)}
@@ -325,10 +331,11 @@ function say(raw){
  if(pending==='more'&&NO.test(t)){pending='';$('q').value='';$('heard').textContent+=' — okay, next one.';return}
  if(/^(repeat|say that again|say again|again)\b/.test(t)){speak(lastSpoken);return}
  if(/^(stop|quiet|cancel|shut up)\b/.test(t)){pending='';stopSpeak();return}
- const lm=/\b(formation|play)\s+(?:number\s+|no\.?\s+|#)?(\d{1,2}|(?:twenty[ -]?)?(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty))\b(?![ -]?point)/.exec(t),ln=lm?nums(lm[2])[0]:0;
- let lmF=false;
+ const lm=/\b(formation|play)\s+(?:number\s+|no\.?\s+|#)?(\d{1,2}|(?:twenty[ -]?)?(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty))\b/.exec(t);
+ let ln=0,lmF=false;
+ if(lm){ln=+nums(lm[2]).pop()||0;}
  if(ln>=1&&!/first play/.test(t)){
-  const rest=t.replace(lm[0],' '),nr=nums(rest),sitNow=(nr[0]>=1&&nr[0]<=4)||/first play|drive|goal|two[- ]?point|\b2[- ]?pt/.test(rest),active=S.mode!=='play'||(S.dn&&S.ds),wantLk=/\b(lookup|look up|where|everywhere|all situations|find)\b/.test(t);
+  const rest=t.replace(lm[0],' '),nr=nums(rest),sitNow=(nr[0]>=1&&nr[0]<=4)||/first play|drive|goal|two[- ]?point|\b2[- ]?pt/.test(rest),active=S.mode!=='play'||(S.dn&&S.ds),wantLk=/\b(lookup|look up|look it up|find)\b/.test(rest);
   if(wantLk||(!sitNow&&!active)){S.lk={t:lm[1]==='formation'?'f':'p',n:ln};S.team='mar';pending='';$('q').value='';return respondLk()}
   S.team='mar';if(lm[1]==='formation')S.fm=FAM[ln-1]||S.fm;else S.pc=MPLAY[ln-1]||S.pc;t=rest;lmF=true}
  if(/^(back|go back|situation|back to situation)\W*$/.test(t)){S.lk=null;pending='';upd();return}
@@ -343,7 +350,7 @@ function say(raw){
   const hw=hashOf(t);
   if(SPL.test(t)){S.hs=-1;return respond(true)}
   if(hw||allWord(t)||/^(no|nope|nah)\W*$/.test(t)){S.hs=hw;return respond(true)}}
- let fchg=lmF;const spl=SPL.test(t),tk=/\b(alpaugh|maricopa)\b/.exec(t),tv=/\b(vca|v c a|kings)\b/.test(t),tmc=!!(tk||tv);if(tk)S.team=tk[1]==='alpaugh'?'alp':'mar';else if(tv)S.team='vca';
+ let fchg=lmF;const spl=SPL.test(t),tk=/\b(alpaugh|maricopa|laton)\b/.exec(t),tv=/\b(vca|v c a|kings)\b/.test(t),tmc=!!(tk||tv);if(tk)S.team=tk[1]==='alpaugh'?'alp':tk[1]==='laton'?'lat':'mar';else if(tv)S.team='vca';
  if(clrF){S.fm=S.mo='';S.pc='';S.rz=false;fchg=true}
  const fw=FAMRE.exec(t);if(fw){S.fm=cap(fw[1]);fchg=true}
  if(/\b(no|without) motion\b/.test(t)){S.mo='0';fchg=true}else if(/\bmotion\b/.test(t)){S.mo='1';fchg=true}
@@ -384,19 +391,19 @@ function initRec(){
  rec=new SR();rec.continuous=false;rec.interimResults=false;rec.lang='en-US';rec.maxAlternatives=1;
  rec.onstart=()=>{recActive=true};
  rec.onresult=e=>{const r=e.results[e.results.length-1][0].transcript.trim();if(r){$('q').value=r;say(r)}};
- rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error)){listening=false;micOK=false;$('mic').hidden=true;$('heard').textContent='Mic is blocked on this page. Open the page in its own browser tab, or use your keyboard mic.'}};
+ rec.onerror=e=>{if(/not-allowed|service-not-allowed/.test(e.error)){listening=false;micOK=false;$('mic').hidden=true;$('heard').textContent='Mic is blocked on this page. Open the page in its own browser tab and allow mic access.';return} if(/network|no-speech/.test(e.error)){$('heard').textContent='No speech heard. Try again.';}};
  rec.onend=()=>{recActive=false;setTimeout(startRec,250)}}
-function startRec(){if(!listening||speaking||recActive||!rec)return;try{rec.start();recActive=true}catch(_){}}
+function startRec(){if(!listening||speaking||recActive||!rec)return;try{rec.start();recActive=true}catch(_){} }
 function stopSpeak(){sid++;if(sok())speechSynthesis.cancel();speaking=false;setMic();startRec()}
 function speak(txt){
  if(!txt)return;lastSpoken=txt;
  if(!sok()){$('heard').textContent='This browser cannot read aloud.';return}
  const id=++sid;speechSynthesis.cancel();speaking=true;spokeAt=Date.now();
- if(recActive){try{rec.abort()}catch(_){}}
+ if(recActive){try{rec.abort()}catch(_){} }
  setMic();if(!voices.length)loadVoices();
  const v=voices[0],parts=(txt.match(/[^.!?;]+[.!?;]*/g)||[txt]).map(s=>s.trim()).filter(Boolean);
  const done=()=>{if(id!==sid)return;speaking=false;setMic();startRec()};
- setTimeout(()=>{if(id!==sid)return;parts.forEach((p,i)=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.rate=1.02;u.pitch=1;if(i===parts.length-1){u.onend=done;u.onerror=done}speechSynthesis.speak(u)})},60)}
+ setTimeout(()=>{if(id!==sid)return;parts.forEach((p,i)=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.rate=1.02;u.pitch=1;if(i===parts.length-1){u.onend=done;u.onerror=done}speechSynthesis.speak(u)})},80)}
 $('mic').onclick=()=>{
  if(speaking){stopSpeak();return}
  if(listening){listening=false;try{rec.abort()}catch(_){}pending='';setMic();$('heard').textContent='Hands-free is off.';return}
@@ -408,6 +415,7 @@ setInterval(()=>{
  if(speaking&&sok()&&!speechSynthesis.speaking&&!speechSynthesis.pending&&Date.now()-spokeAt>1500){speaking=false;setMic()}
  if(listening&&!speaking&&!recActive)startRec()},1200);
 
-$('rf').innerHTML=MFORM.map((f,i)=>bt('lk','f'+(i+1),(i+1)+'. '+f,false)).join('');$('rp').innerHTML=MPLAY.map((f,i)=>bt('lk','p'+(i+1),(i+1)+'. '+f,false)).join('');
+$('rf').innerHTML=Object.keys(T).filter(k=>k!=='vca'&&k!=='alp'&&k!=='lat').map((f,i)=>bt('lk','f'+(i+1),(i+1)+'. '+(f==='mar'?'Maricopa':'') ,false)).join('');
+$('rp').innerHTML=[...Array(21).keys()].map(i=>bt('lk','p'+(i+1),(i+1)+'. '+MPLAY[i],false)).join('');
 loadVoices();upd();
 </script></body></html>
