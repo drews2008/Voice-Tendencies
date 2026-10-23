@@ -152,152 +152,136 @@
       'trips l','wide l tight trips r'
     ];
 
-    const L = {
-      name: 'Laton',
-      short: 'Laton',
-      opp: 'Laton',
-      data: {
-        fp: [
-          {r:96.4,p:3.6,d:'26.9% R / 34.6% L / 38.5% M',c:['TB power','TB sweep toss','QB keeper','QB sneak','Fake TB power / TE corner routes','Fake TB power / TE go routes','FB dive','QB sweep'],n:28,form:'I Tight'},
-          {r:91.7,p:8.3,d:'25% R / 25% L / 50% M',c:['TB dive','Slot power','QB keeper','Slot swing','TB power','TB sweep toss','WR jet sweep'],n:12,form:'Wide L Tight Slot R'},
-          {r:20,p:80,d:'60% R / 20% L / 20% M',c:['WR screen','Fake screen / inside WR leak','L WR drag crossing RTES right','QB keeper','QB sneak','WR post'],n:10,form:'Wide L Trips R'},
-          {r:50,p:50,d:'20% R / 40% L / 40% M',c:['QB draw','QB keeper','Crossing routes + post','Go / slant / curl','Go routes + slot drags','WRs crossing RTES slot go RTES'],n:8,form:'Spread'},
-          {r:75,p:25,d:'25% R / 75% L',c:['QB keeper','Hitch pass','WR jet sweep','WR screen'],n:8,form:'Trips L Wide R'},
-          {r:100,p:0,d:'33.3% R / 66.7% M',c:['QB sneak','TE end around'],n:3,form:'Heavy'},
-          {r:100,p:0,d:'100% L',c:['TB sweep toss','TB dive'],n:3,form:'Tight Slot L Wide R'},
-          {r:0,p:100,d:'100% R',c:['Crossing routes','WR screen'],n:2,form:'Trips R'},
-          {r:100,p:0,d:'50% R / 50% M',c:['QB keeper','TB power'],n:2,form:'Wide L'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:0,p:100,d:'No direction data logged.',c:['Corner / flat / drag'],n:1,form:'Trips L'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Wide L Tight Trips R'}
-        ],
-        d1: [
-          {r:96.4,p:3.6,d:'26.9% R / 34.6% L / 38.5% M',c:['TB power','TB sweep toss','QB keeper','QB sneak','Fake TB power / TE corner routes','Fake TB power / TE go routes','FB dive','QB sweep'],n:28,form:'I Tight'},
-          {r:91.7,p:8.3,d:'25% R / 25% L / 50% M',c:['TB dive','Slot power','QB keeper','Slot swing','TB power','TB sweep toss','WR jet sweep'],n:12,form:'Wide L Tight Slot R'},
-          {r:20,p:80,d:'60% R / 20% L / 20% M',c:['WR screen','Fake screen / inside WR leak','L WR drag crossing RTES right','QB keeper','QB sneak','WR post'],n:10,form:'Wide L Trips R'},
-          {r:50,p:50,d:'20% R / 40% L / 40% M',c:['QB draw','QB keeper','Crossing routes + post','Go / slant / curl','Go routes + slot drags','WRs crossing RTES slot go RTES'],n:8,form:'Spread'},
-          {r:75,p:25,d:'25% R / 75% L',c:['QB keeper','Hitch pass','WR jet sweep','WR screen'],n:8,form:'Trips L Wide R'},
-          {r:100,p:0,d:'33.3% R / 66.7% M',c:['QB sneak','TE end around'],n:3,form:'Heavy'},
-          {r:100,p:0,d:'100% L',c:['TB sweep toss','TB dive'],n:3,form:'Tight Slot L Wide R'},
-          {r:0,p:100,d:'100% R',c:['Crossing routes','WR screen'],n:2,form:'Trips R'},
-          {r:100,p:0,d:'50% R / 50% M',c:['QB keeper','TB power'],n:2,form:'Wide L'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:0,p:100,d:'No direction data logged.',c:['Corner / flat / drag'],n:1,form:'Trips L'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Wide L Tight Trips R'}
-        ],
-        a: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        b: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        e: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        f: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        g: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        h: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        i: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        g1: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ],
-        pt: [
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'},
-          {r:100,p:0,d:'100% R',c:['QB keeper'],n:1,form:'Double Wide'}
-        ]
-      },
-      formationTendencies: [
-        {name:'I Tight',sample:28,run:96.4,pass:3.6,direction:'26.9% R / 34.6% L / 38.5% M',calls:['TB power','TB sweep toss','QB keeper','QB sneak','Fake TB power / TE corner routes','Fake TB power / TE go routes','FB dive','QB sweep']},
-        {name:'Wide L Tight Slot R',sample:12,run:91.7,pass:8.3,direction:'25% R / 25% L / 50% M',calls:['TB dive','Slot power','QB keeper','Slot swing','TB power','TB sweep toss','WR jet sweep']},
-        {name:'Wide L Trips R',sample:10,run:20,pass:80,direction:'60% R / 20% L / 20% M',calls:['WR screen','Fake screen / inside WR leak','L WR drag crossing RTES right','QB keeper','QB sneak','WR post']},
-        {name:'Spread',sample:8,run:50,pass:50,direction:'20% R / 40% L / 40% M',calls:['QB draw','QB keeper','Crossing routes + post','Go / slant / curl','Go routes + slot drags','WRs crossing RTES slot go RTES']},
-        {name:'Trips L Wide R',sample:8,run:75,pass:25,direction:'25% R / 75% L',calls:['QB keeper','Hitch pass','WR jet sweep','WR screen']},
-        {name:'Heavy',sample:3,run:100,pass:0,direction:'33.3% R / 66.7% M',calls:['QB sneak','TE end around']},
-        {name:'Tight Slot L Wide R',sample:3,run:100,pass:0,direction:'100% L',calls:['TB sweep toss','TB dive']},
-        {name:'Trips R',sample:2,run:0,pass:100,direction:'100% R',calls:['Crossing routes','WR screen']},
-        {name:'Wide L',sample:2,run:100,pass:0,direction:'50% R / 50% M',calls:['QB keeper','TB power']},
-        {name:'Double Wide',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']},
-        {name:'Trips L',sample:1,run:0,pass:100,direction:'No direction data logged.',calls:['Corner / flat / drag']},
-        {name:'Wide L Tight Trips R',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']}
-      ],
-      hashTendencies: {
-        left: {
-          sample:22,
-          run:68.2,
-          pass:31.8,
-          direction:'40% R / 30% L / 30% M',
-          calls:['TB power (6 plays)','QB keeper (5 plays)','TB dive (2 plays)','TB sweep toss (2 plays)','WR screen (2 plays)','Crossing routes + post (1 play)','Hitch pass (1 play)','Slot swing (1 play)','WR post (1 play)','WRs crossing RTES slot go RTES (1 play)']
-        },
-        middle: {
-          sample:22,
-          run:86.4,
-          pass:13.6,
-          direction:'35% R / 25% L / 40% M',
-          calls:['QB keeper (4 plays)','TB dive (3 plays)','TB power (3 plays)','QB sneak (2 plays)','Slot power (2 plays)','TB sweep toss (2 plays)','WR jet sweep (2 plays)','Corner / flat / drag (1 play)','Crossing routes (1 play)','QB sweep (1 play)','WR screen (1 play)']
-        },
-        right: {
-          sample:28,
-          run:75,
-          pass:25,
-          direction:'30.8% R / 50% L / 19.2% M',
-          calls:['QB keeper (6 plays)','TB power (4 plays)','TB sweep toss (4 plays)','WR screen (4 plays)','QB draw (2 plays)','Fake TB power / TE go routes (1 play)','FB dive (1 play)','Go / slant / curl (1 play)','Go routes + slot drags (1 play)','L WR drag crossing RTES right (1 play)','QB sneak (1 play)','TB dive (1 play)']
-        }
-      },
-      downDistanceTendencies: [
-        {label:'First play of drive',sample:19,run:89.5,pass:10.5,direction:'33.3% R / 38.9% L / 27.8% M',calls:['TB power (4 plays)','QB keeper (3 plays)','TB dive (2 plays)','TB sweep toss (2 plays)','WR jet sweep (2 plays)','Fake TB power / TE go routes (1 play)','FB dive (1 play)','QB sneak (1 play)','Slot swing (1 play)','WR post (1 play)']},
-        {label:'1st & 10',sample:25,run:80,pass:20,direction:'31.8% R / 45.5% L / 22.7% M',calls:['TB power (5 plays)','QB keeper (4 plays)','TB sweep toss (3 plays)','TB dive (2 plays)','WR jet sweep (2 plays)','Crossing routes (1 play)','Crossing routes + post (1 play)','Fake TB power / TE go routes (1 play)','FB dive (1 play)','QB sneak (1 play)','Slot swing (1 play)','WR post (1 play)','WR screen (1 play)']},
-        {label:'2nd & 1-3',sample:1,run:100,pass:0,direction:'100% L',calls:['TB power (1 play)']},
-        {label:'2nd & 4-7',sample:8,run:87.5,pass:12.5,direction:'42.9% R / 14.3% L / 42.9% M',calls:['TB power (4 plays)','Go routes + slot drags (1 play)','QB keeper (1 play)','QB sweep (1 play)','TB sweep toss (1 play)']},
-        {label:'2nd & 8+',sample:11,run:63.6,pass:36.4,direction:'36.4% R / 36.4% L / 27.3% M',calls:['WR screen (3 plays)','QB keeper (2 plays)','TB power (2 plays)','Go / slant / curl (1 play)','Slot power (1 play)','TB dive (1 play)','TB sweep toss (1 play)']},
-        {label:'3rd & 1-3',sample:3,run:100,pass:0,direction:'33.3% L / 66.7% M',calls:['QB keeper (1 play)','QB sneak (1 play)','TB dive (1 play)']},
-        {label:'3rd & 4-6',sample:2,run:50,pass:50,direction:'100% R',calls:['QB keeper (1 play)','WR screen (1 play)']},
-        {label:'3rd & 7-9',sample:2,run:50,pass:50,direction:'50% R / 50% M',calls:['TB power (1 play)','WR screen (1 play)']},
-        {label:'3rd & 10+',sample:7,run:71.4,pass:28.6,direction:'20% R / 60% L / 20% M',calls:['QB keeper (2 plays)','Corner / flat / drag (1 play)','QB draw (1 play)','TB dive (1 play)','TB sweep toss (1 play)','WRs crossing RTES slot go RTES (1 play)']},
-        {label:'1st & Goal',sample:7,run:85.7,pass:14.3,direction:'42.9% R / 42.9% L / 14.3% M',calls:['QB keeper (4 plays)','TB dive (1 play)','TB sweep toss (1 play)','WR screen (1 play)']},
-        {label:'2nd & Goal',sample:4,run:100,pass:0,direction:'100% R',calls:['TB power (2 plays)','TB sweep toss (2 plays)']},
-        {label:'3rd & Goal',sample:4,run:75,pass:25,direction:'66.7% R / 33.3% M',calls:['Corner / flat / drag (1 play)','QB keeper (1 play)','QB sneak (1 play)','TB dive (1 play)']},
-        {label:'2 PT',sample:7,run:71.4,pass:28.6,direction:'16.7% R / 16.7% L / 66.7% M',calls:['QB sneak (3 plays)','Fake screen / inside WR leak (1 play)','Fake TB power / TE corner routes (1 play)','TB power (1 play)','TE end around (1 play)']}
-      ],
-      notes: {
-        fp:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        d1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        a:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        b:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        e:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        f:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        g:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        h:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        i:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        g1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',
-        pt:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.'
-      }
-    };
+    
+const L={name:'Laton',short:'Laton',opp:'Laton',data:{
+fp:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
+d1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L')],
+a:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+b:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+e:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+f:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+g:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+h:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+i:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+g1:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')],
+pt:[cm(100,0,'50% R / 50% M',['QB keeper','TB power'],2,'Wide L'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide'),cm(100,0,'100% R',['QB keeper'],1,'Double Wide')]},
+formationTendencies:[
+ {name:'I Tight',sample:28,run:96.4,pass:3.6,direction:'26.9% R / 34.6% L / 38.5% M',calls:['TB power','TB sweep toss','QB keeper','QB sneak','Fake TB power / TE corner routes','Fake TB power / TE go routes','FB dive','QB sweep']},
+ {name:'Wide L Tight Slot R',sample:12,run:91.7,pass:8.3,direction:'25% R / 25% L / 50% M',calls:['TB dive','Slot power','QB keeper','Slot swing','TB power','TB sweep toss','WR jet sweep']},
+ {name:'Wide L Trips R',sample:10,run:20,pass:80,direction:'60% R / 20% L / 20% M',calls:['WR screen','Fake screen / inside WR leak','L WR drag crossing routes right','QB keeper','QB sneak','WR post']},
+ {name:'Spread',sample:8,run:50,pass:50,direction:'20% R / 40% L / 40% M',calls:['QB draw','QB keeper','Crossing routes + post','Go / slant / curl','Go routes + slot drags','WRs crossing routes slot go routes']},
+ {name:'Trips L Wide R',sample:8,run:75,pass:25,direction:'25% R / 75% L',calls:['QB keeper','Hitch pass','WR jet sweep','WR screen']},
+ {name:'Heavy',sample:3,run:100,pass:0,direction:'33.3% R / 66.7% M',calls:['QB sneak','TE end around']},
+ {name:'Tight Slot L Wide R',sample:3,run:100,pass:0,direction:'100% L',calls:['TB sweep toss','TB dive']},
+ {name:'Trips R',sample:2,run:0,pass:100,direction:'100% R',calls:['Crossing routes','WR screen']},
+ {name:'Wide L',sample:2,run:100,pass:0,direction:'50% R / 50% M',calls:['QB keeper','TB power']},
+ {name:'Double Wide',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']},
+ {name:'Trips L',sample:1,run:0,pass:100,direction:'No direction data logged.',calls:['Corner / flat / drag']},
+ {name:'Wide L Tight Trips R',sample:1,run:100,pass:0,direction:'100% R',calls:['QB keeper']}
+],notes:{fp:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',d1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',a:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',b:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',e:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',f:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',h:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',i:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',g1:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.',pt:'Laton: formation 9 wide L and formation 10 double wide are loaded from the sheet notes. Update data as more plays are logged.'}};
 
+const MFORM=['I Tight','Wide L Tight Slot R','Wide L Trips R','Spread','Trips L Wide R','Heavy','Tight Slot L Wide R','Trips R','Wide L','Double Wide','Trips L','Wide L Tight Trips R'];
+const MFK=['i tight','wide l tight slot r','wide l trips r','spread','trips l wide r','heavy','tight slot l wide r','trips r','wide l','double wide','trips l','wide l tight trips r'];
+
+// ---- parser for shorthand like 263 or 2 and 6 right hash ----
+const HASH_MAP = {
+  1:'left', left:'left', l:'left',
+  2:'middle', middle:'middle', m:'middle', mid:'middle',
+  3:'right', right:'right', r:'right'
+};
+
+const FORMATION_MAP = {
+  1:'I Tight',
+  2:'Wide L Tight Slot R',
+  3:'Wide L Trips R',
+  4:'Spread',
+  5:'Trips L Wide R',
+  6:'Heavy',
+  7:'Tight Slot L Wide R',
+  8:'Trips R',
+  9:'Wide L',
+  10:'Double Wide',
+  11:'Trips L',
+  12:'Wide L Tight Trips R'
+};
+
+function parseSituationInput(raw) {
+  if (!raw) return null;
+
+  const text = String(raw).toLowerCase().trim();
+  if (!text) return null;
+
+  const clean = text
+    .replace(/,/g,' ')
+    .replace(/&/g,' and ')
+    .replace(/\s+/g,' ')
+    .trim();
+
+  let down = null;
+  let dist = null;
+  let hash = null;
+  let formation = null;
+
+  // Handles: "263", "2 6 3", "2 and 6 right", "2nd and 6 right hash"
+  const first = clean.match(/(\d)\s*(?:and\s*)?(\d+)\s*(?:hash\s*)?(left|middle|right|1|2|3|l|m|r|mid)?/i);
+  if (first) {
+    down = Number(first[1]);
+    dist = Number(first[2]);
+    const h = first[3];
+    hash = HASH_MAP[h] || HASH_MAP[Number(h)] || null;
+  }
+
+  // Handles: "3 5 2" or "3 and 5 middle"
+  if ((down === null || dist === null || hash === null)) {
+    const second = clean.match(/(\d+)\s*(?:and\s*)?(\d+)\s*(?:on\s+)?(left|middle|right|1|2|3|l|m|r|mid)/i);
+    if (second) {
+      down = Number(second[1]);
+      dist = Number(second[2]);
+      const h = second[3];
+      hash = HASH_MAP[h] || HASH_MAP[Number(h)] || null;
+    }
+  }
+
+  // Handles: "formation 1", "formation 10", "I Tight"
+  const numFormation = clean.match(/formation\s*(\d+)/i);
+  if (numFormation) {
+    formation = FORMATION_MAP[Number(numFormation[1])] || null;
+  } else {
+    const named = clean.match(/(?:formation\s+)?(i tight|wide l tight slot r|wide l trips r|spread|trips l wide r|heavy|tight slot l wide r|trips r|wide l|double wide|trips l|wide l tight trips r)/i);
+    if (named) {
+      formation = named[1].toLowerCase();
+      formation = formation.replace(/\b\w/g, ch => ch.toUpperCase());
+      formation = formation.replace(/\s+/g, ' ');
+    }
+  }
+
+  if (down === null || dist === null || hash === null) {
+    return null;
+  }
+
+  return {
+    dn: down,
+    ds: dist,
+    hs: hash,
+    formation
+  };
+}
+
+// Example usage in your app:
+const q = document.getElementById('q');
+if (q) {
+  q.addEventListener('change', () => {
+    const parsed = parseSituationInput(q.value);
+    if (!parsed) return;
+    if (typeof S !== 'undefined') {
+      S.dn = parsed.dn;
+      S.ds = parsed.ds;
+      S.hs = parsed.hs;
+      if (parsed.formation) S.fm = parsed.formation;
+      if (typeof upd === 'function') upd();
+    }
+  });
+}
     const teams = { Laton: L };
     let activeTeam = 'Laton';
 
