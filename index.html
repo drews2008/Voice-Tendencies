@@ -36,6 +36,7 @@ button[aria-pressed="true"]{background:var(--acc);color:var(--accink);border-col
 .chips button{min-height:40px;font-size:14px;padding:4px 10px}
 details{margin-top:8px}summary{cursor:pointer;color:var(--mute);font-size:14px;min-height:32px}
 .pl{font-size:13px;padding:5px 0;border-top:1px solid var(--line)}
+.lst{margin:6px 0 0;padding-left:0;list-style:none;font-size:15px}.lst li{margin:4px 0}.lst button{width:100%;min-height:40px;text-align:left;font-size:15px;padding:6px 10px;border-left:8px solid var(--line)}.lst .kr{border-left-color:var(--run)}.lst .kp{border-left-color:var(--pass)}.lst .km{border-left-color:var(--mute)}.lst small{color:var(--mute)}
 .foot{color:var(--mute);font-size:12px;margin-top:18px}
 ul.t{margin:6px 0 0;padding-left:18px;font-size:15px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -57,6 +58,7 @@ ul.t{margin:6px 0 0;padding-left:18px;font-size:15px}
 <div class="sel">
   <label>Distance<input id="dist" type="number" inputmode="numeric" min="1" max="30" placeholder="yards"></label>
   <label>Formation<select id="form"></select></label>
+  <label>Play<select id="play"></select></label>
   <label>Score<select id="sc"><option value="">Any</option><option value="close">Close (within 14)</option><option value="lead">Blowout (over 14)</option></select></label>
   <label>Field zone<select id="zn"><option value="">Any</option><option>Own 1-20</option><option>Own 21-40</option><option>Opp 21-40</option><option>Opp 1-20</option></select></label>
 </div>
@@ -73,7 +75,7 @@ const HW={L:'Left',M:'Middle',R:'Right'},HN={1:'L',2:'M',3:'R'},ORD=['','1st','2
 const NW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,first:1,second:2,third:3,fourth:4};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const blank=()=>({down:null,dist:null,hash:null,form:null,fp:false,goal:false,pt:false,mo:null,zone:null,sc:null,qb:false});
+const blank=()=>({down:null,dist:null,hash:null,form:null,fp:false,goal:false,pt:false,mo:null,zone:null,sc:null,qb:false,play:null});
 let S=blank(),lastSay='',lastIncomplete=false;
 
 /* ---------- parsing (voice or typed) ---------- */
@@ -90,6 +92,9 @@ function parse(raw){
   if(eat(/ (close game|close) /))o.sc='close';else if(eat(/ (blowout|blow out|big lead) /))o.sc='lead';
   for(let i=0;i<2;i++)s=s.replace(FW,(m,a,b)=>' '+a+' '+b[0]+' ');
   s=s.replace(/ (i formation|i form|eye formation|eye tight) /,' i tight ');
+  s=s.replace(/ (formation|play) (to|too|for|[a-z]+) /g,(m,k,w)=>{const v={to:2,too:2,for:4}[w]??NW[w];return v!=null?' '+k+' '+v+' ':m});
+  const pm=s.match(/ play (\d+) /);
+  if(pm){o.play=(PL[+pm[1]-1]||{}).name||null;s=s.replace(pm[0],' ')}
   const fm=s.match(/ formation (\d+) /);
   if(fm){o.form=FT[+fm[1]-1]||null;s=s.replace(fm[0],' ')}
   else{const f=[...FT].sort((a,b)=>b.name.length-a.name.length).find(f=>s.includes(' '+f.name.toLowerCase()+' '));if(f){o.form=f;s=s.replace(' '+f.name.toLowerCase()+' ',' ')}}
@@ -118,7 +123,7 @@ function human(o){
   if(o.pt)p.push('2-point');else if(o.fp)p.push('First play of drive');
   else if(o.down)p.push(ORD[o.down]+(o.goal?' & goal':(o.dist!=null?' & '+o.dist:'')));
   else if(o.goal)p.push('Goal-to-go');
-  if(o.hash)p.push(HW[o.hash]+' hash');if(o.form)p.push(o.form.name);
+  if(o.hash)p.push(HW[o.hash]+' hash');if(o.form)p.push(o.form.name);if(o.play)p.push(o.play);
   if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone)p.push(o.zone);
   if(o.sc)p.push(o.sc==='close'?'close game':'blowout');
   if(o.qb)p.push('QB run indicators');
@@ -129,13 +134,16 @@ function speakText(o){
   if(o.pt)p.push('two point');else if(o.fp)p.push('first play');
   else if(o.down)p.push(['','first','second','third','fourth'][o.down]+(o.goal?' and goal':(o.dist!=null?' and '+o.dist:'')));
   else if(o.goal)p.push('goal');
-  if(o.hash)p.push(HW[o.hash].toLowerCase()+' hash');if(o.form)p.push(o.form.name.toLowerCase());
+  if(o.hash)p.push(HW[o.hash].toLowerCase()+' hash');if(o.form)p.push(o.form.name.toLowerCase());if(o.play)p.push('play '+(PL.findIndex(x=>x.name===o.play)+1));
   if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone==='Opp 1-20')p.push('red zone');
   if(o.sc)p.push(o.sc==='close'?'close game':'blowout');
   if(o.qb)p.push('qb run');
   return p.join(' ');
 }
 const FW=(()=>{const w=new Set(['wide','trips','slot']);FT.forEach(f=>{const t=f.name.toLowerCase().split(' ');t.forEach((x,i)=>{if(i&&(x==='l'||x==='r'))w.add(t[i-1])})});return new RegExp(' ('+[...w].map(x=>x.replace(/[^a-z0-9]/g,'')).filter(Boolean).join('|')+') (left|right) ','g')})();
+const PL=(()=>{const m={};LOG.forEach(x=>{if((x.pt==='Run'||x.pt==='Pass')&&x.cc){const e=m[x.cc]=m[x.cc]||{name:x.cc,n:0,run:0};e.n++;if(x.pt==='Run')e.run++}});
+  return Object.values(m).map(e=>({...e,k:e.run===e.n?'kr':e.run===0?'kp':'km'})).sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name))})();
+const fk=f=>f.r>=70?'kr':f.r<=30?'kp':'km';
 const needsDist=o=>o.down>=2&&!o.goal&&!o.fp&&!o.pt&&o.dist==null;
 
 /* ---------- raw-log engine ---------- */
@@ -156,6 +164,7 @@ function filt(o,skip){
     if(x.dn==='2PT'&&sit)return false;
     if(o.hash&&!skip.has('hash')&&x.hs!==o.hash)return false;
     if(o.form&&!skip.has('form')&&x.form.toLowerCase()!==o.form.name.toLowerCase())return false;
+    if(o.play&&!skip.has('play')&&x.cc!==o.play)return false;
     if(o.mo!=null&&!skip.has('mo')&&x.mo!==o.mo)return false;
     if(o.zone&&!skip.has('zone')&&x.zn!==o.zone)return false;
     if(o.sc&&!skip.has('sc')){const c=Math.abs(x.sd)<=14;if(o.sc==='close'?!c:c)return false}
@@ -241,7 +250,7 @@ function card(title,sub,r,note){
 <div class="rw"><i>Calls:</i> ${top}</div>${r.extra?`<div class="rw"><i>${esc(r.extra)}</i></div>`:''}${r.n&&r.n<5?warn('Small sample: '+r.n+' play'+(r.n==1?'':'s')+'. Not a trend.'):''}${note||''}</section>`;
 }
 function relaxChips(o){
-  const f=[['hash','hash',o.hash],['form','formation',o.form],['dist','distance',o.dist],['mo','motion',o.mo],['zone','zone',o.zone],['sc','score',o.sc]];
+  const f=[['hash','hash',o.hash],['form','formation',o.form],['play','play',o.play],['dist','distance',o.dist],['mo','motion',o.mo],['zone','zone',o.zone],['sc','score',o.sc]];
   const c=f.filter(x=>x[2]!=null&&x[2]!=='').map(([k,l])=>[k,l,stats(filt(o,new Set([k]))).n]);
   if(!c.length)return'';
   return '<div class="chips">'+c.map(([k,l,n])=>`<button type="button" data-relax="${k}">Drop ${l}: ${n} plays</button>`).join('')+'</div>';
@@ -261,6 +270,14 @@ function tells(){
   });
   return out.sort((a,b)=>b.s.n-a.s.n);
 }
+function listsCard(){
+  const fl=FT.map((f,i)=>`<li><button type="button" class="${fk(f)}" data-pick="form:${i}"><b>${i+1}.</b> ${esc(f.name)} <small>(${f.n} snap${f.n==1?'':'s'} · ${f.r}% run)</small></button></li>`).join('');
+  const pl=PL.map((p,i)=>`<li><button type="button" class="${p.k}" data-pick="play:${i}"><b>${i+1}.</b> ${esc(p.name)} <small>(${p.n})</small></button></li>`).join('');
+  return `<section class="card"><div class="hd"><b>Lists</b><span class="n">tap one, or say "formation 2" / "play 5"</span></div>
+<div class="rw"><i>Color:</i> <span style="color:var(--run)">■</span> run · <span style="color:var(--pass)">■</span> pass · <span style="color:var(--mute)">■</span> mixed (formations: 70%+ one way)</div>
+<div class="rw"><b>Formations (${FT.length})</b></div><ol class="lst">${fl}</ol>
+<div class="rw"><b>Plays (${PL.length})</b></div><ol class="lst">${pl}</ol></section>`;
+}
 function overview(){
   const sc=LOG.filter(x=>x.dn!=='2PT'),a=stats(sc),cl=stats(sc.filter(x=>Math.abs(x.sd)<=14)),bl=stats(sc.filter(x=>Math.abs(x.sd)>14));
   let h=card(TEAM+' overall','raw log · '+a.n+' scrimmage plays',fromStats(a));
@@ -271,13 +288,14 @@ ${SCRIPT_WARN?warn(esc(SCRIPT_WARN)):''}</section>`;
   h+=`<section class="card"><div class="hd"><b>Tells</b><span class="n">8+ plays and 80%+ one way</span></div>`+
     (t.length?'<ul class="t">'+t.map(x=>`<li><b>${esc(x.k)}</b> (${esc(x.g)}): ${Math.max(x.s.run,x.s.pass)}% ${x.s.run>=x.s.pass?'run':'pass'}, ${x.s.n} plays · top ${esc(x.s.calls[0][0])}</li>`).join('')+'</ul>':'<div class="rw">None clear the bar.</div>')+'</section>';
   h=`<section class="card"><div class="hd"><b>Your keys</b><span class="n">edit COACH_NOTES in the file</span></div><ul class="t">`+(COACH_NOTES.length?'':'<li>No coach keys yet for '+esc(TEAM)+'.</li>')+COACH_NOTES.map(n=>`<li><b>${esc(n.label)}</b>: ${n.watch?'watch for '+esc(n.watch):'mixed, read the situation'}</li>`).join('')+`</ul></section>`+h;
+  h+=listsCard();
   h+=qbData().html;
-  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add ${FT.slice(0,3).map(f=>'"'+esc(f.name.toLowerCase().split(' ').map(w=>w==='l'?'left':w==='r'?'right':w).join(' '))+'"').join(', ')}, "motion", "red zone", "close game". Say "qb run" for the QB indicators. Say "clear" to start over.</div></section>`;
+  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add ${FT.slice(0,3).map(f=>'"'+esc(f.name.toLowerCase().split(' ').map(w=>w==='l'?'left':w==='r'?'right':w).join(' '))+'"').join(', ')}, "motion", "red zone", "close game". Say "formation 2" or "play 5" to use a number from the lists. Say "qb run" for the QB indicators. Say "clear" to start over.</div></section>`;
   return h;
 }
 function render(){
   const o=S,res=$('res'),sum=$('sum');
-  const sit=o.pt||o.fp||o.goal||o.down||o.hash||o.form||o.mo!=null||o.zone||o.sc;
+  const sit=o.pt||o.fp||o.goal||o.down||o.hash||o.form||o.play||o.mo!=null||o.zone||o.sc;
   const any=sit||o.qb;
   $('heard').textContent=any?'Reading: '+human(o):'Pick a situation or just talk.';
   if(!any){sum.innerHTML='<p>'+esc(TEAM)+'. Pick a situation or say it.</p>';res.innerHTML=overview();lastSay='';return}
@@ -300,10 +318,14 @@ function render(){
   }
   if(o.hash&&!o.down&&!o.fp&&!o.pt&&!o.goal&&HT[o.hash]){const t=HT[o.hash];h+=card(HW[o.hash]+' hash overall','sheet · '+t.n+' plays',fromSheet(t),`<div class="rw"><i>Formations used:</i> ${esc(t.forms.join(', '))}</div>`)}
   if(o.form)h+=card(o.form.name+' · all situations','sheet · '+o.form.n+' plays',fromSheet(o.form));
+  if(o.play){const pr=LOG.filter(x=>x.cc===o.play&&(x.pt==='Run'||x.pt==='Pass')),cnt=f=>{const m={};pr.forEach(x=>{const k=f(x);if(k)m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([k,n])=>esc(k)+' ('+n+')').join(', ')||'none'};
+    h+=`<section class="card"><div class="hd"><b>Play ${PL.findIndex(x=>x.name===o.play)+1}: ${esc(o.play)}</b><span class="n">log · ${pr.length} snap${pr.length==1?'':'s'} · all situations</span></div>
+<div class="rw"><i>Formations:</i> ${cnt(x=>x.form)}</div><div class="rw"><i>Downs:</i> ${cnt(x=>x.dn==='2PT'?'2-point':x.gl?ORD[x.dn]+' & goal':ORD[x.dn]+' & '+x.di)}</div>
+<div class="rw"><i>Hash:</i> ${cnt(x=>x.hs?HW[x.hs]:null)}</div><div class="rw"><i>Direction:</i> ${cnt(x=>x.dir?HW[x.dir]:null)}</div></section>`}
   const st=stats(filt(o,new Set()));
   h+=card('Raw log · '+human(o),'log · '+st.n+' plays',fromStats(st),(st.n?'':warn('No logged plays match every filter.'))+relaxChips(o))+playsList(st);
   res.innerHTML=h;
-  const useLog=st.n>0||!sheetR||o.form||o.mo!=null||o.zone||o.sc;
+  const useLog=st.n>0||!sheetR||o.form||o.play||o.mo!=null||o.zone||o.sc;
   const src=useLog?{n:st.n,run:st.run,pass:st.pass,calls:st.calls}:{n:sheetR.n,run:sheetR.r,pass:sheetR.p,calls:sheetR.calls};
   const where=human(o);
   const pre=(!useLog&&src.n)?'No matching plays in the log. Sheet: ':'';
@@ -328,15 +350,18 @@ function buildControls(){
   $('form').innerHTML='<option value="">Any</option>'+FT.map((f,i)=>`<option value="${i}">${i+1}. ${esc(f.name)} (${f.n})</option>`).join('');
   $('dist').addEventListener('input',e=>{S.dist=e.target.value?+e.target.value:null;$('q').value=speakText(S);render()});
   $('form').addEventListener('change',e=>{S.form=e.target.value===''?null:FT[+e.target.value];setFrom()});
+  $('play').innerHTML='<option value="">Any</option>'+PL.map((p,i)=>`<option value="${i}">${i+1}. ${esc(p.name)} (${p.n})</option>`).join('');
+  $('play').addEventListener('change',e=>{S.play=e.target.value===''?null:PL[+e.target.value].name;setFrom()});
   $('sc').addEventListener('change',e=>{S.sc=e.target.value||null;setFrom()});
   $('zn').addEventListener('change',e=>{S.zone=e.target.value||null;setFrom()});
-  $('res').addEventListener('click',e=>{const k=e.target.getAttribute&&e.target.getAttribute('data-relax');if(!k)return;S[k]=null;setFrom()});
+  $('res').addEventListener('click',e=>{const pb=e.target.closest&&e.target.closest('[data-pick]');if(pb){const [t,i]=pb.getAttribute('data-pick').split(':');S=blank();if(t==='form')S.form=FT[+i];else S.play=PL[+i].name;setFrom();window.scrollTo(0,0);return}const k=e.target.getAttribute&&e.target.getAttribute('data-relax');if(!k)return;S[k]=null;setFrom()});
   $('clr').addEventListener('click',()=>{S=blank();lastIncomplete=false;$('q').value='';refresh();render()});
 }
 function refresh(){
   document.querySelectorAll('.tog').forEach(b=>b.setAttribute('aria-pressed',String(!!b._t())));
   $('dist').value=S.dist==null?'':S.dist;
   $('form').value=S.form?String(FT.indexOf(S.form)):'';
+  $('play').value=S.play?String(PL.findIndex(x=>x.name===S.play)):'';
   $('sc').value=S.sc||'';$('zn').value=S.zone||'';
 }
 function fromText(){const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render()}
@@ -359,7 +384,7 @@ function onVoice(txt){
   if(/^(clear|reset|start over|new)\b/i.test(t)){$('clr').click();say('Cleared.');return}
   const p=parse(t),hasSit=p.down||p.fp||p.pt||p.goal,cur=S.down||S.fp||S.pt||S.goal;
   if(lastIncomplete){$('q').value=$('q').value+' '+t;const q=parse($('q').value);q.sc=q.sc||S.sc;q.zone=q.zone||S.zone;S=q}
-  else if(!hasSit&&cur){['hash','form','mo','zone','sc','qb'].forEach(k=>{if(p[k]!=null&&p[k]!==false)S[k]=p[k]});$('q').value=speakText(S)}
+  else if(!hasSit&&cur){['hash','form','play','mo','zone','sc','qb'].forEach(k=>{if(p[k]!=null&&p[k]!==false)S[k]=p[k]});$('q').value=speakText(S)}
   else{p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;$('q').value=speakText(S)}
   lastIncomplete=needsDist(S);refresh();render();
   say(lastIncomplete?'Distance?':lastSay);
