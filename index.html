@@ -175,10 +175,12 @@ function bucket(o){
   if(d===3&&y!=null)return y<=3?'d3a':y<=6?'d3b':y<=9?'d3c':'d3d';
   return null;
 }
+// distance shown as the bucket the lookup actually uses: 2nd & 5 -> 2nd & 4-7
+const bLbl=(d,y)=>{const r=rng(d,y);return !r?String(y):r[1]>=99?r[0]+'+':r[0]===r[1]?String(r[0]):r[0]+'-'+r[1]};
 function human(o){
   const p=[];
   if(o.pt)p.push('2-point');else if(o.fp)p.push('First play of drive');
-  else if(o.down)p.push(ORD[o.down]+(o.goal?' & goal':(o.dist!=null?' & '+o.dist:'')));
+  else if(o.down)p.push(ORD[o.down]+(o.goal?' & goal':(o.dist!=null?' & '+bLbl(o.down,o.dist):'')));
   else if(o.goal)p.push('Goal-to-go');
   if(o.hash)p.push(HW[o.hash]+' hash');if(o.form)p.push(o.form.name);if(o.play)p.push(o.play);
   if(o.mo!=null)p.push(o.mo?'motion':'no motion');if(o.zone)p.push(o.zone);
@@ -387,7 +389,7 @@ function render(){
   const pre=(!useLog&&src.n)?'No matching plays in the log. Sheet: ':'';
   const body=src.n?`${pre}<b>${src.run>=src.pass?src.run+'% run':src.pass+'% pass'}</b> over ${src.n} play${src.n==1?'':'s'}. Top call: <b>${esc(src.calls[0][0])}</b>${src.calls[1]&&src.calls[1][1]>=2?', then '+esc(src.calls[1][0]):''}.${src.n<5?' Small sample.':''}`:'No plays logged for that.';
   sum.innerHTML=(noteLine?`<p><b>${esc(noteLine)}</b></p>`:'')+`<p>${esc(where)}: ${body}</p>`;
-  lastSay=((noteSay?noteSay+' ':'')+where+': '+body).replace(/<[^>]+>/g,'').replace(/ · /g,', ').replace(/ & /g,' and ');
+  lastSay=((noteSay?noteSay+' ':'')+where+': '+body).replace(/<[^>]+>/g,'').replace(/ · /g,', ').replace(/ & /g,' and ').replace(/(\d+)-(\d+)/g,'$1 to $2').replace(/(\d+)\+/g,'$1 plus');
 }
 
 /* ---------- controls ---------- */
