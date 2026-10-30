@@ -78,30 +78,85 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const blank=()=>({down:null,dist:null,hash:null,form:null,fp:false,goal:false,pt:false,mo:null,zone:null,sc:null,qb:false,play:null});
 let S=blank(),lastSay='',lastIncomplete=false;
 
+/* ---------- speech cleanup (fixes what phone recognizers write down) ---------- */
+// misheard word -> intended word. Edit freely.
+const SAY=[
+  [/ (write|rite|wright|ride) /g,' right '],[/ (lift|laughed|lefts) /g,' left '],[/ (medal|meddle|metal|fiddle|mid field) /g,' middle '],
+  [/ (forth|fourths|fort) /g,' fourth '],[/ seconds /g,' second '],[/ thirds /g,' third '],[/ firsts /g,' first '],
+  [/ (1st|first) play( of (the )?drive)? /g,' first play '],
+  [/ (two|to|too|2) points? /g,' two point '],[/ (extra point|2pt|two pt|2 pt) /g,' two point '],
+  [/ and (go|gold|goals|gole|gol|ghoul|coal) /g,' and goal '],[/ goal line /g,' goal '],
+  [/ (tailback|tail back|halfback|half back) /g,' tb '],[/ (fullback|full back) /g,' fb '],[/ (wingback|wing back) /g,' wb '],
+  [/ (quarterback|quarter back) /g,' qb '],[/ tight ends? /g,' te '],[/ wide receivers? /g,' wrs '],[/ receivers? /g,' wrs '],
+  [/ routes /g,' rtes '],[/ route /g,' rte '],[/ cross (buck|back|bucks) /g,' crossbuck '],[/ (crossback|crossbucks) /g,' crossbuck '],
+  [/ (type|tied|tide|tights|tyke|tie) (split|splits|slit) /g,' tight split '],[/ split (bag|bat|black|backs|pack|beck) /g,' split back '],[/ splitback /g,' split back '],
+  [/ shot gun /g,' shotgun '],
+  [/ (bro|pros|prom|prone|pearl) (left|right) /g,' pro $2 '],[/ (slat|slots|slaw|sloth|slut|slaughter) (left|right) /g,' slot $2 '],
+  [/ (wang|wings|win) (left|right) /g,' wing $2 '],[/ (wyde|wired|wild) (left|right) /g,' wide $2 '],[/ (strips|trip|tripped) (left|right) /g,' trips $2 '],
+  [/ (spray|spreads|shred|spred|sprint) /g,' spread '],
+  [/ (i formation|i form|eye formation|eye tight) /g,' i tight ']
+];
+// number sound-alikes, only converted next to a number or after "and"
+const HOMO={to:'2',too:'2',for:'4',fore:'4',won:'1',tree:'3',free:'3',ate:'8',tin:'10'};
+const isNum=w=>/^\d+(st|nd|rd|th)?$/.test(w)||NW[w]!=null;
+function clean(raw){
+  let s=' '+String(raw).toLowerCase().replace(/[^a-z0-9+ ]/g,' ').replace(/\s+/g,' ')+' ';
+  s=s.replace(/ (\d+) (st|nd|rd|th) /g,' $1$2 ');
+  for(let k=0;k<2;k++)SAY.forEach(([re,to])=>{s=s.replace(re,to)});
+  s=s.replace(/( [a-z]){2,}(?= )/g,m=>' '+m.replace(/ /g,''));            // "t b power" -> "tb power"
+  const t=s.trim().split(' ');
+  t.forEach((w,i)=>{if(HOMO[w]&&(isNum(t[i-1]||'')||isNum(t[i+1]||'')||t[i-1]==='and'||(i===0&&t[1]==='and')))t[i]=HOMO[w]});
+  return ' '+t.join(' ')+' ';
+}
+function lev(a,b){const m=a.length,n=b.length;if(!m||!n)return m||n;let r=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){let p=r[0];r[0]=i;for(let j=1;j<=n;j++){const q=r[j];r[j]=Math.min(r[j]+1,r[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=q}}return r[n]}
+const sim=(a,b)=>1-lev(a,b)/Math.max(a.length,b.length);
+const FILL=/^(\d+|left|right|middle|hash|and|on|the|a|of|in|at|play|formation|motion|no|goal|down)$/;
+// best fuzzy match of a list of names in the token list; tokens inside the match get removed
+function fuzzy(toks,items,min,anchor){
+  let best=null;
+  items.forEach(x=>{const L=x.w.length,target=x.w.join(''),exact=x.w.join(' ');
+    for(let k=Math.max(1,L-1);k<=L+1;k++)for(let i=anchor==null?0:anchor;i+k<=toks.length&&(anchor==null||i===anchor);i++){
+      const win=toks.slice(i,i+k);if(win.every(w=>FILL.test(w)))continue;
+      const v=win.join(' ')===exact?2:sim(win.join(''),target);
+      if(v>=min&&(!best||v>best.v||(v===best.v&&L>best.L)))best={x,i,k,v,L}}});
+  return best;
+}
+const FS=FT.map(f=>({f,w:f.name.toLowerCase().replace(/\bl\b/g,'left').replace(/\br\b/g,'right').split(/\s+/)}));
+
 /* ---------- parsing (voice or typed) ---------- */
 function parse(raw){
-  let s=' '+String(raw).toLowerCase().replace(/[^a-z0-9+ ]/g,' ').replace(/\s+/g,' ')+' ';
+  let s=clean(raw);
   const eat=re=>{const m=s.match(re);if(m)s=s.replace(re,' ');return m};
   const o=blank();
-  o.pt=!!eat(/ (two point|2 point|2 ?pt|conversion) /);
+  o.pt=!!eat(/ (two point|conversion) /);
   o.fp=!!eat(/ (first play|drive start\w*|opening drive|starter) /);
-  o.qb=!!eat(/ (qb runs?|q b runs?|quarterback runs?|qb indicators?|indicators) /);
+  o.qb=!!eat(/ (qb runs?|quarterback runs?|qb indicators?|indicators) /);
   o.goal=!!eat(/ goal( to go)? /);
   if(eat(/ (no motion|without motion) /))o.mo=false;else if(eat(/ motion /))o.mo=true;
   if(eat(/ (red zone|redzone) /))o.zone='Opp 1-20';
   if(eat(/ (close game|close) /))o.sc='close';else if(eat(/ (blowout|blow out|big lead) /))o.sc='lead';
-  for(let i=0;i<2;i++)s=s.replace(FW,(m,a,b)=>' '+a+' '+b[0]+' ');
-  s=s.replace(/ (i formation|i form|eye formation|eye tight) /,' i tight ');
-  s=s.replace(/ (formation|play) (to|too|for|[a-z]+) /g,(m,k,w)=>{const v={to:2,too:2,for:4}[w]??NW[w];return v!=null?' '+k+' '+v+' ':m});
+  s=s.replace(/ (formation|play) (to|too|for|won|[a-z]+) /g,(m,k,w)=>{const v={to:2,too:2,for:4,won:1}[w]??NW[w];return v!=null?' '+k+' '+v+' ':m});
   const pm=s.match(/ play (\d+) /);
   if(pm){o.play=(PL[+pm[1]-1]||{}).name||null;s=s.replace(pm[0],' ')}
+  else{const t=s.trim().split(' '),a=t.indexOf('play');
+    if(a>=0&&a<t.length-1){const b=fuzzy(t,PL.map(p=>({p,w:p.name.toLowerCase().split(/\s+/)})),0.7,a+1)
+      ||fuzzy(t,PL.map(p=>({p,w:p.name.toLowerCase().split(/\s+/).filter(w=>!/^(tb|fb|wb|qb|rb|te|tes|wr|wrs)$/.test(w))})).filter(x=>x.w.length),0.75,a+1);
+      if(b){o.play=b.x.p.name;t.splice(a,b.k+1);s=' '+t.join(' ')+' '}}}
   const fm=s.match(/ formation (\d+) /);
   if(fm){o.form=FT[+fm[1]-1]||null;s=s.replace(fm[0],' ')}
-  else{const f=[...FT].sort((a,b)=>b.name.length-a.name.length).find(f=>s.includes(' '+f.name.toLowerCase()+' '));if(f){o.form=f;s=s.replace(' '+f.name.toLowerCase()+' ',' ')}}
+  else{const t=s.trim().split(' '),b=fuzzy(t,FS,0.8);if(b){o.form=b.x.f;t.splice(b.i,b.k);s=' '+t.join(' ')+' '}}
   if(/ (left|lefthash) /.test(s))o.hash='L';else if(/ (middle|mid|center|centre) /.test(s))o.hash='M';else if(/ right /.test(s))o.hash='R';
   const hw=!!o.hash;
   s=s.replace(/\b(\d+)(st|nd|rd|th)\b/g,'$1').replace(/\b(twenty|thirty) (one|two|three|four|five|six|seven|eight|nine)\b/g,(m,a,b)=>NW[a]+NW[b]).replace(/\b[a-z]+\b/g,w=>NW[w]!=null?NW[w]:w);
-  const n=(s.match(/\d+/g)||[]).map(Number),h=x=>x>=1&&x<=3?HN[x]:null;
+  let d=s.match(/\d+/g)||[];
+  // phones glue spoken digits together: "352" = 3rd & 5, middle; "1102" = 1st & 10, middle
+  if(!o.pt&&!o.fp){
+    if(d.length===1&&d[0].length>=2&&/^[1-4][1-9]/.test(d[0])){const x=d[0];
+      d=o.goal?[x[0],x.slice(1)]:(x.length>=3&&/[123]$/.test(x)&&!hw)?[x[0],x.slice(1,-1),x.slice(-1)]:[x[0],x.slice(1)]}
+    else if(d.length>=2&&d[0].length===2&&/^[1-4][1-9]$/.test(d[0]))d=[d[0][0],d[0][1],...d.slice(1)];
+    if(!o.goal&&!hw&&d.length===2&&+d[1]>=40&&/[123]$/.test(d[1]))d=[d[0],d[1].slice(0,-1),d[1].slice(-1)];
+  }
+  const n=d.map(Number),h=x=>x>=1&&x<=3?HN[x]:null;
   if(o.pt||o.fp){if(!hw&&n.length)o.hash=h(n[0])}
   else if(n.length&&n[0]>=1&&n[0]<=4){
     o.down=n[0];
@@ -110,6 +165,8 @@ function parse(raw){
   }
   return o;
 }
+// how much of a transcript made sense; used to pick the best of the phone's guesses
+function score(o){let v=0;if(o.pt||o.fp)v+=3;if(o.down)v+=3;if(o.dist!=null)v+=o.dist>=1&&o.dist<=40?2:-5;if(o.hash)v+=2;if(o.goal)v+=2;if(o.form)v+=2;if(o.play)v+=2;if(o.mo!=null)v++;if(o.zone)v++;if(o.sc)v++;if(o.qb)v++;return v}
 function bucket(o){
   if(o.pt)return'pt';if(o.fp)return'fp';
   if(o.goal)return o.down>=1&&o.down<=3?'g'+o.down:null;
@@ -140,7 +197,6 @@ function speakText(o){
   if(o.qb)p.push('qb run');
   return p.join(' ');
 }
-const FW=(()=>{const w=new Set(['wide','trips','slot']);FT.forEach(f=>{const t=f.name.toLowerCase().split(' ');t.forEach((x,i)=>{if(i&&(x==='l'||x==='r'))w.add(t[i-1])})});return new RegExp(' ('+[...w].map(x=>x.replace(/[^a-z0-9]/g,'')).filter(Boolean).join('|')+') (left|right) ','g')})();
 const PL=(()=>{const m={};LOG.forEach(x=>{if((x.pt==='Run'||x.pt==='Pass')&&x.cc){const e=m[x.cc]=m[x.cc]||{name:x.cc,n:0,run:0};e.n++;if(x.pt==='Run')e.run++}});
   return Object.values(m).map(e=>({...e,k:e.run===e.n?'kr':e.run===0?'kp':'km'})).sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name))})();
 const fk=f=>f.r>=70?'kr':f.r<=30?'kp':'km';
@@ -290,7 +346,7 @@ ${SCRIPT_WARN?warn(esc(SCRIPT_WARN)):''}</section>`;
   h=`<section class="card"><div class="hd"><b>Your keys</b><span class="n">edit COACH_NOTES in the file</span></div><ul class="t">`+(COACH_NOTES.length?'':'<li>No coach keys yet for '+esc(TEAM)+'.</li>')+COACH_NOTES.map(n=>`<li><b>${esc(n.label)}</b>: ${n.watch?'watch for '+esc(n.watch):'mixed, read the situation'}</li>`).join('')+`</ul></section>`+h;
   h+=listsCard();
   h+=qbData().html;
-  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add ${FT.slice(0,3).map(f=>'"'+esc(f.name.toLowerCase().split(' ').map(w=>w==='l'?'left':w==='r'?'right':w).join(' '))+'"').join(', ')}, "motion", "red zone", "close game". Say "formation 2" or "play 5" to use a number from the lists. Say "qb run" for the QB indicators. Say "clear" to start over.</div></section>`;
+  h+=`<section class="card"><div class="hd"><b>Say it like this</b></div><div class="rw">"3 5 2" (down, distance, hash: 1 left, 2 middle, 3 right) · "first play" · "second and goal" · "two point" · then add ${FT.slice(0,3).map(f=>'"'+esc(f.name.toLowerCase().split(' ').map(w=>w==='l'?'left':w==='r'?'right':w).join(' '))+'"').join(', ')}, "motion", "red zone", "close game". Say "formation 2" or "play 5" to use a number from the lists. Say "qb run" for the QB indicators. Say a play by number ("play 3") or by name ("play crossbuck"). Fast digits like "352" work. Say "clear" to start over.</div></section>`;
   return h;
 }
 function render(){
@@ -378,22 +434,27 @@ function say(t){
     u.onend=u.onerror=()=>{speaking=false;startRec()};speechSynthesis.speak(u);
   }catch(e){speaking=false}
 }
-function onVoice(txt){
-  const t=txt.trim();if(!t)return;
-  $('heard').textContent='Heard: '+t;
-  if(/^(clear|reset|start over|new)\b/i.test(t)){$('clr').click();say('Cleared.');return}
+function onVoice(alts){
+  alts=(Array.isArray(alts)?alts:[alts]).map(x=>String(x||'').trim()).filter(Boolean);if(!alts.length)return;
+  if(alts.some(a=>/^(clear|clean|cleared|reset|start over)\b/i.test(a))){$('clr').click();$('heard').textContent='Heard: clear';say('Cleared.');return}
+  // the phone sends up to 5 guesses; use the one that makes the most football sense
+  let t=alts[0],bv=-99;
+  alts.forEach(a=>{const v=score(parse(lastIncomplete?$('q').value+' '+a:a));if(v>bv){bv=v;t=a}});
   const p=parse(t),hasSit=p.down||p.fp||p.pt||p.goal,cur=S.down||S.fp||S.pt||S.goal;
   if(lastIncomplete){$('q').value=$('q').value+' '+t;const q=parse($('q').value);q.sc=q.sc||S.sc;q.zone=q.zone||S.zone;S=q}
   else if(!hasSit&&cur){['hash','form','play','mo','zone','sc','qb'].forEach(k=>{if(p[k]!=null&&p[k]!==false)S[k]=p[k]});$('q').value=speakText(S)}
   else{p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;$('q').value=speakText(S)}
   lastIncomplete=needsDist(S);refresh();render();
+  $('heard').textContent='Heard "'+t+'" → '+(human(S)||'nothing I recognize. Try "3 5 2".')+(t!==alts[0]?'  (phone first guessed "'+alts[0]+'")':'');
   say(lastIncomplete?'Distance?':lastSay);
 }
 $('mic').addEventListener('click',async()=>{
   if(!SR){$('heard').textContent='Voice input is not supported in this browser. Type it, or use the phone keyboard mic.';return}
   if(on){on=false;try{rec.stop()}catch(e){}$('mic').textContent='Start hands-free';try{wl&&wl.release()}catch(e){}wl=null;return}
-  rec=new SR();rec.continuous=true;rec.interimResults=false;rec.lang='en-US';
-  rec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)onVoice(e.results[i][0].transcript)};
+  rec=new SR();rec.lang='en-US';rec.interimResults=false;rec.maxAlternatives=5;
+  // phones repeat or merge results in continuous mode; one phrase per session there, restarted automatically
+  rec.continuous=!/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  rec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal){const r=e.results[i],a=[];for(let j=0;j<r.length;j++)a.push(r[j].transcript);onVoice(a)}};
   rec.onend=()=>{if(on&&!speaking)startRec()};
   rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){on=false;$('mic').textContent='Start hands-free';$('heard').textContent='Mic blocked. Allow microphone access for this page.'}};
   on=true;$('mic').textContent='Stop listening';startRec();
