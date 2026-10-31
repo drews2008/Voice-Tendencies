@@ -13,10 +13,25 @@ Only one device should have **Start hands-free** on if another device is playing
 
 ## Notes
 
-- Hands-free: say **"note"** followed by the note ("note 22 is limping"), or say "note", wait for "Go ahead", then say it. "Cancel" drops it.
-- Typed: the **Notes** panel, or type `note ...` in the main box and press Enter.
-- Every note is tagged with the time, device name, and the situation on screen, and goes to every device in the game. Notes from other devices are read out loud if that box is checked.
-- **Copy / share all** exports the notes after the game.
+Each device carries a person's name (set it when you start or join a game, or tap your name in the game bar). Phone and tablet can both be "Drew".
+
+Say it hands-free or type it in the main box:
+
+| Say | What happens |
+|---|---|
+| "note 22 is limping" | Note to everyone in the game |
+| "send note to Mike 22 is limping" | Note for Mike only; read out on Mike's devices |
+| "save note for later check punt protection" | Saved for later, never read out during the game |
+| "note" … "Go ahead" … then the note | Two-step version of any of the above ("send note to Mike" works too) |
+| "what notes do I have" / "read my notes" | Reads your unread notes |
+| "read all my notes" | Reads every note sent to you this game |
+| "what's saved for later" | Reads your for-later notes |
+| "cancel" | Drops a two-step note |
+
+- **Quick note** panel: type a note and pick who it goes to (Everyone, a person, For later).
+- **Notes** button: every note on this device, grouped by game, with All / For me / For later tabs and search. It turns red when notes for you are waiting.
+- Each note is tagged with the time, who sent it, who it's for, and the situation on screen.
+- **Share / copy** exports a game's notes. Notes live in the browser on each device, so export after the game to keep them.
 
 ## Files
 
