@@ -422,7 +422,7 @@ function refresh(){
   $('play').value=S.play?String(PL.findIndex(x=>x.name===S.play)):'';
   $('sc').value=S.sc||'';$('zn').value=S.zone||'';
 }
-function fromText(){if(window.GAME&&GAME.isNote($('q').value))return;const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render();window.GAME&&GAME.typing()}
+function fromText(){if(window.GAME&&GAME.isNote&&GAME.isNote($('q').value))return;const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render();window.GAME&&GAME.typing&&GAME.typing()}
 
 /* ---------- voice ---------- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -439,8 +439,8 @@ function say(t){
     speaking=true;try{rec&&rec.stop()}catch(e){}
     const u=new SpeechSynthesisUtterance(t);u.rate=1.05;u.lang='en-US';utt=u; // keep a reference: Chrome drops utterances that get garbage-collected
     let started=false;
-    const done=ok=>{if(tok!==sayTok)return;speaking=false;utt=null;window.GAME&&GAME.sound(ok);startRec()};
-    u.onstart=()=>{started=true;window.GAME&&GAME.sound(true)};
+    const done=ok=>{if(tok!==sayTok)return;speaking=false;utt=null;window.GAME&&GAME.sound&&GAME.sound(ok);startRec()};
+    u.onstart=()=>{started=true;window.GAME&&GAME.sound&&GAME.sound(true)};
     u.onend=()=>done(true);
     u.onerror=e=>{if(e&&(e.error==='interrupted'||e.error==='canceled'))return;done(started)};
     // speaking right after cancel() is silently dropped on some phones; give it a beat
@@ -476,7 +476,7 @@ $('mic').addEventListener('click',async()=>{
   on=true;$('mic').textContent='Stop listening';startRec();
   try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen')}catch(e){}
 });
-function setSpk(v){speakOn=v;try{localStorage.setItem('sl.voice',v?'1':'0')}catch(e){}$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');window.GAME&&GAME.sound(null)}
+function setSpk(v){speakOn=v;try{localStorage.setItem('sl.voice',v?'1':'0')}catch(e){}$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');window.GAME&&GAME.sound&&GAME.sound(null)}
 $('spk').addEventListener('click',()=>{setSpk(!speakOn);if(speakOn)say('Voice on.');else if(window.speechSynthesis)speechSynthesis.cancel()}); // speaking once on the tap unlocks audio on iPad/iPhone
 setSpk(speakOn);
 $('q').addEventListener('input',fromText);
@@ -486,6 +486,6 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&on&&!wl&&
 $('foot').textContent='Source: LCA SCOUTING sheet (Tendencies, Down & Distance, Hash Tendencies, Formation Tendencies tabs) plus the raw Game Log, '+LOG.length+' rows. Sheet down & distance buckets count goal-to-go plays only in the goal buckets, same as the raw log. 4th down has no sheet bucket; the raw log card covers it.';
 buildControls();refresh();render();
 </script>
-<script src="game.js"></script>
+<script src="game.js?v=4"></script>
 </body>
 </html>

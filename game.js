@@ -17,6 +17,8 @@
      save note for later check the punt team -> saved for later, never read out during the game
      what notes do I have / read my notes    -> reads your unread notes
      read all my notes / what's saved for later / read all notes */
+const SL_VERSION='notes-4';
+window.addEventListener('error',e=>{try{const h=document.getElementById('heard');if(h)h.textContent='⚠ App error ('+SL_VERSION+'): '+(e.message||e)+'. Send Drew a screenshot.'}catch(x){}});
 (()=>{
 const RELAY='https://ntfy.sh/';
 const PREFIX='kcs-sideline-';
@@ -40,7 +42,7 @@ const loadNotes=()=>{notes=get(nkey(),[]);roster=code?get('roster.'+code,[]):[]}
 const norm=s=>String(s||'').trim().toLowerCase();
 const sameName=(a,b)=>{a=norm(a);b=norm(b);return !!a&&!!b&&(a===b||a.split(/\s+/)[0]===b.split(/\s+/)[0])};
 const forMe=n=>!!n.to&&sameName(n.to,devName);
-const mineLater=n=>n.later&&sameName(n.by,devName);
+const mineLater=n=>n.later&&(n.from===me||sameName(n.by,devName));
 const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
 
 /* ---------- styles + markup ---------- */
@@ -306,7 +308,7 @@ const STOP=new Set('the a an this that it they he she we you them their his her 
 FT.forEach(f=>f.name.toLowerCase().split(/\s+/).forEach(w=>STOP.add(w)));
 // "to Mike 22 is limping" -> {to:'Mike', text:'22 is limping'}
 function splitName(rest){
-  const t=rest.trim().split(/\s+/);
+  const t=rest.trim().replace(/^[,:;.\s-]+/,'').split(/\s+/).map(w=>w.replace(/[,:;.!?]+$/,''));
   if(/^(me|myself)$/i.test(t[0]))return{to:devName,text:t.slice(1).join(' ')};
   let best=null;
   roster.forEach(name=>{const w=norm(name).split(/\s+/);
@@ -318,10 +320,23 @@ function splitName(rest){
   return null;
 }
 const tidy=s=>String(s||'').replace(/^\s*(?:that|saying|says|to say|tell (?:him|her|them))\b[\s,:]*/i,'').trim();
+// what phone recognizers write instead of the command words
+const FIXES=[
+  [/^\s*(?:send|sent|sin|sen|set)(?: a| an)? (?:no|know|knows|now|nope|nodes?|not|knot)\b/i,'send note'],
+  [/^\s*senate\b/i,'send note'],
+  [/^\s*(?:safe|say|saved|sale)(?: a)? (?:note|no|know|nope|not)\b/i,'save note'],
+  [/^\s*(?:take|make)(?: a)? (?:no|know|nope|not)\b/i,'take note'],
+  [/^\s*(?:no|know|nope|not) (?:for|to) (later|\w+)/i,'note for $1'],
+  [/\b(?:four|4) later\b/ig,'for later'],[/\b(?:too|2) later\b/ig,'to later'],
+  [/\b(?:knows|nodes|notice)\b/ig,'notes']
+];
+function fix(s){s=String(s||'').trim().replace(/[.!?]+$/,'');FIXES.forEach(([re,to])=>{s=s.replace(re,to)});return s}
 function parseCmd(raw){
-  const s=String(raw||'').trim();if(!s)return null;
+  const s=fix(raw);if(!s)return null;
+  if(/^\s*(?:show|open|see|pull up) (?:me )?(?:my |the |all |saved )*notes\b/i.test(s))return{kind:'query',scope:/later/i.test(s)?'later':'all',show:true};
+  if(/^\s*(?:my|saved|all|game) notes$/i.test(s))return{kind:'query',scope:/^\s*my/i.test(s)?'me':'any',all:/^\s*my/i.test(s)?false:true};
   if(QUERY_RE.test(s)){
-    const scope=/later|saved/i.test(s)?'later':/\b(all|every)\b/i.test(s)&&!/\bmy\b|\bme\b|\bi\b/i.test(s)?'all':'me';
+    const scope=/later/i.test(s)?'later':/\b(all|every)\b/i.test(s)&&!/\bmy\b|\bme\b|\bi\b/i.test(s)?'all':/\bsaved\b/i.test(s)?'any':'me';
     return{kind:'query',scope,all:/\b(all|every|old)\b/i.test(s)};
   }
   let m=s.match(LATER_RE);if(m)return{kind:'note',later:true,text:tidy(m[1])};
@@ -335,14 +350,19 @@ function parseCmd(raw){
 function runQuery(q){
   const pool=notes;
   let list,label;
+  if(q.show){view=q.scope==='later'?'later':'all';openAll();$('heard').textContent='Notes open.';return}
+  if(q.scope==='any'){q.scope='all'}
   if(q.scope==='later'){list=pool.filter(mineLater);label='saved for later'}
   else if(q.scope==='all'){list=pool.filter(n=>!n.later||mineLater(n)).slice(-8);label='in this game'}
   else{const all=pool.filter(forMe);list=q.all?all:all.filter(n=>!readIds.has(n.id));label=q.all?'for you':'new for you';
-    if(!list.length){const msg=all.length?'No new notes for you. You have '+all.length+' older. Say read all my notes.':'No notes for you yet.';
-      $('heard').textContent=msg;say(msg);return}}
+    if(!list.length){
+      const recent=pool.filter(n=>!n.later||mineLater(n)).slice(-5);
+      if(all.length||!recent.length){const msg=all.length?'No new notes for you. You have '+all.length+' older. Say read all my notes.':'No notes yet.';$('heard').textContent=msg;say(msg);return}
+      list=recent;label='in this game, none sent to you directly';
+    }}
   if(!list.length){const msg='No notes '+label+'.';$('heard').textContent=msg;say(msg);return}
   const shown=list.slice(-6);
-  const spoken='You have '+list.length+' note'+(list.length==1?'':'s')+' '+label+'. '+shown.map(n=>(q.scope==='later'?'':'From '+(sameName(n.by,devName)?'you':n.by)+'. ')+n.text).join('. ')+(list.length>shown.length?'. And '+(list.length-shown.length)+' more on the Notes screen.':'');
+  const spoken='You have '+list.length+' note'+(list.length==1?'':'s')+' '+label+'. '+shown.map(n=>(q.scope==='later'||n.from===me||sameName(n.by,devName)?'':'From '+n.by+'. ')+n.text).join('. ')+(list.length>shown.length?'. And '+(list.length-shown.length)+' more on the Notes screen.':'');
   $('heard').textContent=list.length+' note'+(list.length==1?'':'s')+' '+label+' — tap Notes to see them.';
   if(say(spoken)||!speakOn)markRead(list);
   if(!speakOn){view=q.scope==='later'?'later':q.scope==='me'?'me':'all';openAll()}
@@ -427,6 +447,7 @@ $('nlist').addEventListener('click',async e=>{
   if(gd&&confirm('Delete these notes from this device only? Other devices keep their copy.')){
     try{localStorage.removeItem('sl.notes.'+gd)}catch(x){}if(gd===(code||'solo')){notes=[];drawNotes()}drawAll()}
 });
+document.getElementById('foot').textContent+=' · '+SL_VERSION;
 window.GAME={push:pushSit,pushSoon,voice,typed,isNote,typing,sound};
 
 /* ---------- start ---------- */
