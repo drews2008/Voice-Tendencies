@@ -393,7 +393,7 @@ function render(){
 }
 
 /* ---------- controls ---------- */
-function setFrom(){$('q').value=speakText(S);refresh();render()}
+function setFrom(){$('q').value=speakText(S);refresh();render();window.GAME&&GAME.pushSoon()}
 function buildControls(){
   const mk=(id,list)=>{const el=$(id);el.innerHTML='';list.forEach(([t,test,act])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.className='tog';b._t=test;b.addEventListener('click',()=>{act();setFrom()});el.appendChild(b)})};
   mk('gdn',[1,2,3,4].map(d=>[ORD[d],()=>S.down===d&&!S.fp&&!S.pt,()=>{const on=S.down===d&&!S.fp&&!S.pt;S.down=on?null:d;S.fp=S.pt=false;if(on)S.dist=null}]));
@@ -406,14 +406,14 @@ function buildControls(){
     ['QB run',()=>S.qb,()=>{S.qb=!S.qb}]]);
   mk('ghs',[['L','L'],['M','M'],['R','R']].map(([t,k])=>[HW[k]+' hash',()=>S.hash===k,()=>{S.hash=S.hash===k?null:k}]));
   $('form').innerHTML='<option value="">Any</option>'+FT.map((f,i)=>`<option value="${i}">${i+1}. ${esc(f.name)} (${f.n})</option>`).join('');
-  $('dist').addEventListener('input',e=>{S.dist=e.target.value?+e.target.value:null;$('q').value=speakText(S);render()});
+  $('dist').addEventListener('input',e=>{S.dist=e.target.value?+e.target.value:null;$('q').value=speakText(S);render();window.GAME&&GAME.pushSoon()});
   $('form').addEventListener('change',e=>{S.form=e.target.value===''?null:FT[+e.target.value];setFrom()});
   $('play').innerHTML='<option value="">Any</option>'+PL.map((p,i)=>`<option value="${i}">${i+1}. ${esc(p.name)} (${p.n})</option>`).join('');
   $('play').addEventListener('change',e=>{S.play=e.target.value===''?null:PL[+e.target.value].name;setFrom()});
   $('sc').addEventListener('change',e=>{S.sc=e.target.value||null;setFrom()});
   $('zn').addEventListener('change',e=>{S.zone=e.target.value||null;setFrom()});
   $('res').addEventListener('click',e=>{const pb=e.target.closest&&e.target.closest('[data-pick]');if(pb){const [t,i]=pb.getAttribute('data-pick').split(':');S=blank();if(t==='form')S.form=FT[+i];else S.play=PL[+i].name;setFrom();window.scrollTo(0,0);return}const k=e.target.getAttribute&&e.target.getAttribute('data-relax');if(!k)return;S[k]=null;setFrom()});
-  $('clr').addEventListener('click',()=>{S=blank();lastIncomplete=false;$('q').value='';refresh();render()});
+  $('clr').addEventListener('click',()=>{S=blank();lastIncomplete=false;$('q').value='';refresh();render();window.GAME&&GAME.push('')});
 }
 function refresh(){
   document.querySelectorAll('.tog').forEach(b=>b.setAttribute('aria-pressed',String(!!b._t())));
@@ -422,7 +422,7 @@ function refresh(){
   $('play').value=S.play?String(PL.findIndex(x=>x.name===S.play)):'';
   $('sc').value=S.sc||'';$('zn').value=S.zone||'';
 }
-function fromText(){const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render()}
+function fromText(){if(window.GAME&&GAME.isNote($('q').value))return;const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render()}
 
 /* ---------- voice ---------- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -438,6 +438,7 @@ function say(t){
 }
 function onVoice(alts){
   alts=(Array.isArray(alts)?alts:[alts]).map(x=>String(x||'').trim()).filter(Boolean);if(!alts.length)return;
+  if(window.GAME&&GAME.voice(alts))return; // "note ..." keyword
   if(alts.some(a=>/^(clear|clean|cleared|reset|start over)\b/i.test(a))){$('clr').click();$('heard').textContent='Heard: clear';say('Cleared.');return}
   // the phone sends up to 5 guesses; use the one that makes the most football sense
   let t=alts[0],bv=-99;
@@ -448,7 +449,7 @@ function onVoice(alts){
   else{p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;$('q').value=speakText(S)}
   lastIncomplete=needsDist(S);refresh();render();
   $('heard').textContent='Heard "'+t+'" → '+(human(S)||'nothing I recognize. Try "3 5 2".')+(t!==alts[0]?'  (phone first guessed "'+alts[0]+'")':'');
-  say(lastIncomplete?'Distance?':lastSay);
+  const out=lastIncomplete?'Distance?':lastSay;say(out);window.GAME&&GAME.push(out);
 }
 $('mic').addEventListener('click',async()=>{
   if(!SR){$('heard').textContent='Voice input is not supported in this browser. Type it, or use the phone keyboard mic.';return}
@@ -462,13 +463,14 @@ $('mic').addEventListener('click',async()=>{
   on=true;$('mic').textContent='Stop listening';startRec();
   try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen')}catch(e){}
 });
-$('spk').addEventListener('click',()=>{speakOn=!speakOn;$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');if(!speakOn&&window.speechSynthesis)speechSynthesis.cancel()});
+$('spk').addEventListener('click',()=>{speakOn=!speakOn;$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');if(speakOn)say('Voice on.');else if(window.speechSynthesis)speechSynthesis.cancel()}); // speaking once on the tap unlocks audio on iPad/iPhone
 $('q').addEventListener('input',fromText);
-$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.target.blur();say(lastSay)}});
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(window.GAME&&GAME.typed(e.target.value))return;e.target.blur();say(lastSay);window.GAME&&GAME.push(lastSay)}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&on&&!wl&&navigator.wakeLock)navigator.wakeLock.request('screen').then(l=>wl=l).catch(()=>{})});
 
 $('foot').textContent='Source: LCA SCOUTING sheet (Tendencies, Down & Distance, Hash Tendencies, Formation Tendencies tabs) plus the raw Game Log, '+LOG.length+' rows. Sheet down & distance buckets count goal-to-go plays only in the goal buckets, same as the raw log. 4th down has no sheet bucket; the raw log card covers it.';
 buildControls();refresh();render();
 </script>
+<script src="game.js"></script>
 </body>
 </html>
