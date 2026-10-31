@@ -422,19 +422,32 @@ function refresh(){
   $('play').value=S.play?String(PL.findIndex(x=>x.name===S.play)):'';
   $('sc').value=S.sc||'';$('zn').value=S.zone||'';
 }
-function fromText(){if(window.GAME&&GAME.isNote($('q').value))return;const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render()}
+function fromText(){if(window.GAME&&GAME.isNote($('q').value))return;const p=parse($('q').value);p.sc=p.sc||S.sc;p.zone=p.zone||S.zone;S=p;lastIncomplete=false;refresh();render();window.GAME&&GAME.typing()}
 
 /* ---------- voice ---------- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec,on=false,speaking=false,speakOn=false,wl=null;
+try{speakOn=localStorage.getItem('sl.voice')==='1'}catch(e){}
 function startRec(){if(!on||speaking||!rec)return;try{rec.start()}catch(e){}}
+let utt=null,sayTok=0;
+// returns true if it tried to speak. Reports to GAME.sound whether audio actually started.
 function say(t){
-  if(!speakOn||!window.speechSynthesis||!t)return;
+  if(!speakOn||!window.speechSynthesis||!t)return false;
+  const ss=window.speechSynthesis,tok=++sayTok;
   try{
-    speechSynthesis.cancel();speaking=true;try{rec&&rec.stop()}catch(e){}
-    const u=new SpeechSynthesisUtterance(t);u.rate=1.05;
-    u.onend=u.onerror=()=>{speaking=false;startRec()};speechSynthesis.speak(u);
-  }catch(e){speaking=false}
+    const busy=ss.speaking||ss.pending;if(busy)ss.cancel();
+    speaking=true;try{rec&&rec.stop()}catch(e){}
+    const u=new SpeechSynthesisUtterance(t);u.rate=1.05;u.lang='en-US';utt=u; // keep a reference: Chrome drops utterances that get garbage-collected
+    let started=false;
+    const done=ok=>{if(tok!==sayTok)return;speaking=false;utt=null;window.GAME&&GAME.sound(ok);startRec()};
+    u.onstart=()=>{started=true;window.GAME&&GAME.sound(true)};
+    u.onend=()=>done(true);
+    u.onerror=e=>{if(e&&(e.error==='interrupted'||e.error==='canceled'))return;done(started)};
+    // speaking right after cancel() is silently dropped on some phones; give it a beat
+    setTimeout(()=>{if(tok!==sayTok)return;try{ss.resume();ss.speak(u)}catch(e){done(false)}},busy?150:0);
+    setTimeout(()=>{if(tok===sayTok&&!started)done(false)},3000);
+    return true;
+  }catch(e){speaking=false;return false}
 }
 function onVoice(alts){
   alts=(Array.isArray(alts)?alts:[alts]).map(x=>String(x||'').trim()).filter(Boolean);if(!alts.length)return;
@@ -463,7 +476,9 @@ $('mic').addEventListener('click',async()=>{
   on=true;$('mic').textContent='Stop listening';startRec();
   try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen')}catch(e){}
 });
-$('spk').addEventListener('click',()=>{speakOn=!speakOn;$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');if(speakOn)say('Voice on.');else if(window.speechSynthesis)speechSynthesis.cancel()}); // speaking once on the tap unlocks audio on iPad/iPhone
+function setSpk(v){speakOn=v;try{localStorage.setItem('sl.voice',v?'1':'0')}catch(e){}$('spk').setAttribute('aria-pressed',String(speakOn));$('spk').textContent='Voice reply: '+(speakOn?'on':'off');window.GAME&&GAME.sound(null)}
+$('spk').addEventListener('click',()=>{setSpk(!speakOn);if(speakOn)say('Voice on.');else if(window.speechSynthesis)speechSynthesis.cancel()}); // speaking once on the tap unlocks audio on iPad/iPhone
+setSpk(speakOn);
 $('q').addEventListener('input',fromText);
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(window.GAME&&GAME.typed(e.target.value))return;e.target.blur();say(lastSay);window.GAME&&GAME.push(lastSay)}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&on&&!wl&&navigator.wakeLock)navigator.wakeLock.request('screen').then(l=>wl=l).catch(()=>{})});

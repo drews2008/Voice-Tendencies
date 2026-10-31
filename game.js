@@ -30,6 +30,7 @@ const loadNotes=()=>{notes=get(nkey(),[])};
 const css=document.createElement('style');
 css.textContent=`
 #gm{margin:0 0 8px}
+#snd{display:none;width:100%;margin:0 0 8px;min-height:56px;font-size:18px;background:var(--run);color:#fff;border-color:var(--run)}
 .gb{display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
 .gb .gt{flex:1 1 180px;font-size:15px}.gb .gt small{display:block;color:var(--mute);font-size:13px}
 .gb button{min-height:42px;font-size:15px;padding:6px 12px}
@@ -52,7 +53,7 @@ css.textContent=`
 `;
 document.head.appendChild(css);
 const box=document.createElement('div');box.id='gm';
-box.innerHTML=`<div class="gb" id="gbar"></div>
+box.innerHTML=`<button type="button" id="snd"></button><div class="gb" id="gbar"></div>
 <details id="nt"><summary>Notes <span id="ntc"></span></summary>
 <div class="ntin"><textarea id="ntx" rows="2" enterkeyhint="send" placeholder="Type a note, Enter sends. Hands-free: say &quot;note&quot; then the note."></textarea><button id="nts" type="button" class="go">Send</button></div>
 <label class="ck"><input type="checkbox" id="ntr"> Read notes from other devices out loud (needs Voice reply on)</label>
@@ -73,11 +74,13 @@ function bar(){
   }else{
     const st={live:'Live',connecting:'Connecting…',reconnecting:'Reconnecting…'}[status]||status;
     b.innerHTML=`<div class="gt"><b>Game ${fmt(code)}</b> <span class="dot ${status}"></span>${st}<small>This device: <b>${esc(devName)}</b> · <a href="#" id="gnm" style="color:inherit">rename</a></small></div>
-<button type="button" class="go" id="gsh">Add a device</button><button type="button" id="glv">Leave</button>`;
+<button type="button" class="go" id="gsh">Add a device</button><button type="button" id="gts">Test sound</button><button type="button" id="glv">Leave</button>`;
+    $('gts').onclick=()=>{const ok=say('Sound test.');pub({t:'ping'});$('heard').textContent='Sound test sent to every device in the game.'+(ok?'':' This device has Voice reply off.')};
     $('gsh').onclick=share;
     $('glv').onclick=()=>{if(confirm('Leave game '+fmt(code)+'? Notes stay saved on this device.'))leave()};
     $('gnm').onclick=e=>{e.preventDefault();const n=(prompt('Name for this device (shows on notes):',devName)||'').trim().slice(0,24);if(n){devName=n;put('name',n);bar()}};
   }
+  banner();
 }
 function link(){return location.origin+location.pathname+'#game='+code}
 async function share(){
@@ -137,13 +140,17 @@ function handle(p,t){
     if(t<lastSitAt)return;lastSitAt=t;
     S=unpack(p.s);lastIncomplete=!!p.inc;$('q').value=speakText(S);refresh();render();
     $('heard').textContent='From '+p.by+': '+(human(S)||'cleared');
-    if(fresh&&p.say)say(p.say);
+    if(fresh&&p.say)$('heard').textContent+=say(p.say)?'  🔊':'  🔇 sound is off on this device';
   }else if(p.t==='note'&&p.n&&p.n.id){
     if(notes.some(x=>x.id===p.n.id))return;
     notes.push(strip(p.n));notes.sort((a,b)=>a.at-b.at);saveNotes();
     if(!$('nt').open)unread++;drawNotes();
     if(fresh){try{navigator.vibrate&&navigator.vibrate(80)}catch(e){}
       if(readNotes)say('Note from '+p.n.by+'. '+p.n.text)}
+  }else if(p.t==='ping'){
+    if(!fresh)return;
+    const ok=say('Sound test from '+p.by+'.');
+    $('heard').textContent='Sound test from '+p.by+(ok?'  🔊':'  🔇 sound is off on this device — tap the red button');
   }else if(p.t==='del'){
     const i=notes.findIndex(x=>x.id===p.id);if(i>=0){notes.splice(i,1);saveNotes();drawNotes()}
   }
@@ -153,7 +160,27 @@ const unpack=p=>{const o=Object.assign(blank(),p||{});o.form=p&&p.form?FT.find(f
 
 /* ---------- outgoing situation ---------- */
 function pushSit(text){clearTimeout(soonT);soonT=null;pub({t:'sit',s:pack(S),inc:!!lastIncomplete,say:text||''})}
-function pushSoon(){clearTimeout(soonT);soonT=setTimeout(()=>pushSit(lastSay),1200)}
+function pushSoon(){clearTimeout(soonT);soonT=setTimeout(()=>{say(lastSay);pushSit(lastSay)},1200)}
+// typed situation with no Enter: once typing stops and the situation is complete, read it and send it
+function typing(){
+  clearTimeout(soonT);soonT=null;
+  const v=$('q').value.trim();if(!v||isNote(v))return;
+  soonT=setTimeout(()=>{const done=S.pt||S.fp||S.goal||(S.down&&!needsDist(S));if(done){say(lastSay);pushSit(lastSay)}},1800);
+}
+
+/* ---------- sound on/off banner ---------- */
+let unlocked=false,failed=false;
+function banner(){
+  const b=$('snd');
+  if(failed&&speakOn){b.textContent="🔇 Sound didn't play on this device — tap here";b.style.display='block'}
+  else if(code&&!speakOn){b.textContent='🔇 Sound is off on this device — tap to turn on';b.style.display='block'}
+  else if(code&&speakOn&&!unlocked){b.textContent='🔈 Tap here once to wake up sound on this device';b.style.display='block'}
+  else b.style.display='none';
+}
+function sound(ok){if(ok===true){unlocked=true;failed=false}else if(ok===false){failed=true}banner()}
+$('snd').addEventListener('click',()=>{failed=false;if(!speakOn){$('spk').click();return}try{speechSynthesis.cancel()}catch(e){}say('Sound on.');banner()});
+// any first tap on the page wakes speech on iPhone/iPad, silently
+document.addEventListener('pointerdown',()=>{if(unlocked||!speakOn||!window.speechSynthesis)return;try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;u.onend=()=>{unlocked=true;banner()};speechSynthesis.speak(u)}catch(e){}},{capture:true})
 
 /* ---------- notes ---------- */
 function addNote(text){
@@ -201,10 +228,10 @@ function voice(alts){
   if(!text){pendingNote=setTimeout(()=>{pendingNote=null},15000);$('heard').textContent='Note: go ahead, I\'m listening…';say('Go ahead.');return true}
   addNote(text);$('heard').textContent='Note saved: "'+text+'"';say('Noted.');return true;
 }
-function typed(v){const m=String(v||'').match(NOTE_RE);if(!m||!m[1].trim())return false;addNote(m[1]);$('q').value='';$('heard').textContent='Note saved'+(code?' and sent.':'.');return true}
+function typed(v){clearTimeout(soonT);soonT=null;const m=String(v||'').match(NOTE_RE);if(!m||!m[1].trim())return false;addNote(m[1]);$('q').value='';$('heard').textContent='Note saved'+(code?' and sent.':'.');return true}
 const isNote=v=>NOTE_RE.test(String(v||''));
 
-window.GAME={push:pushSit,pushSoon,voice,typed,isNote};
+window.GAME={push:pushSit,pushSoon,voice,typed,isNote,typing,sound};
 
 /* ---------- start ---------- */
 const hm=location.hash.match(/game=([A-Za-z0-9-]+)/);
