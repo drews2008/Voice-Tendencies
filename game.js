@@ -50,17 +50,35 @@ css.textContent=`
 #ntl li.pend .m::after{content:' · not sent yet';color:var(--run)}
 #ntl button{min-height:36px;padding:2px 10px;font-size:14px}
 .nta{display:flex;gap:6px;flex-wrap:wrap}.nta button{flex:1 1 120px;min-height:42px;font-size:15px}
+#nall{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;display:none;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#nall .in{max-width:600px;margin:0 auto;padding:14px 14px 56px}
+#nall .top{display:flex;gap:8px;align-items:center;position:sticky;top:0;background:var(--bg);padding:6px 0 8px;z-index:1}
+#nall .top h2{flex:1;margin:0;font:700 24px 'Barlow Condensed',system-ui,sans-serif}
+#nf{width:100%;min-height:46px;font:500 17px Barlow,system-ui,sans-serif;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);margin-bottom:10px}
+.ng{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.ng .gh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.ng .gh b{flex:1;font:700 19px 'Barlow Condensed',system-ui,sans-serif}.ng .gh span{color:var(--mute);font-size:13px}
+.ng .nb{border-top:1px solid var(--line);padding:7px 0}.ng .nb .m{color:var(--mute);font-size:12px}
+.ng .ga{display:flex;gap:6px;margin-top:6px}.ng .ga button{flex:1;min-height:40px;font-size:14px}
+#nbt{position:relative}
 `;
 document.head.appendChild(css);
 const box=document.createElement('div');box.id='gm';
 box.innerHTML=`<button type="button" id="snd"></button><div class="gb" id="gbar"></div>
-<details id="nt"><summary>Notes <span id="ntc"></span></summary>
+<details id="nt"><summary>Quick note <span id="ntc"></span></summary>
 <div class="ntin"><textarea id="ntx" rows="2" enterkeyhint="send" placeholder="Type a note, Enter sends. Hands-free: say &quot;note&quot; then the note."></textarea><button id="nts" type="button" class="go">Send</button></div>
 <label class="ck"><input type="checkbox" id="ntr"> Read notes from other devices out loud (needs Voice reply on)</label>
 <ol id="ntl"></ol>
 <div class="nta"><button id="ntcp" type="button">Copy / share all</button></div>
 </details>`;
 document.querySelector('main .row').after(box);
+const nb=document.createElement('button');nb.type='button';nb.id='nbt';nb.textContent='Notes';
+document.querySelector('main .row').appendChild(nb);
+const ov=document.createElement('div');ov.id='nall';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','All notes');
+ov.innerHTML=`<div class="in"><div class="top"><h2>All notes</h2><button type="button" class="go" id="nx">Close</button></div>
+<input id="nf" type="search" placeholder="Search notes (number, formation, word…)" autocomplete="off">
+<div id="nlist"></div>
+<div class="foot">Notes are saved in this browser on this device. Every device in a game gets a copy of that game's notes. Clearing browser data or switching browsers removes them, so share or copy a game's notes after it ends to keep them.</div></div>`;
+document.body.appendChild(ov);
 
 /* ---------- game bar ---------- */
 const fmt=c=>c.slice(0,4)+'-'+c.slice(4);
@@ -95,6 +113,7 @@ function setStatus(s){if(status!==s){status=s;bar()}}
 function join(c){
   if(es){es.close();es=null}
   code=c;lastId=null;teamWarned=false;lastSitAt=0;put('game',{code,at:Date.now()});
+  if(!get('gmeta.'+code,null))put('gmeta.'+code,{team:TEAM,at:Date.now()});
   history.replaceState(null,'',location.pathname+location.search+'#game='+code);
   loadNotes();drawNotes();connect();lock();
 }
@@ -128,7 +147,7 @@ function pub(p){
 }
 // resend notes that never made it (dead spot, network blip)
 function flush(){notes.filter(n=>n.from===me&&n.pend).forEach(n=>pub({t:'note',n:strip(n)}).then(ok=>{if(ok){n.pend=false;saveNotes();drawNotes()}}))}
-const strip=n=>({id:n.id,text:n.text,sit:n.sit,by:n.by,from:n.from,at:n.at});
+const strip=n=>({id:n.id,text:n.text,sit:n.sit,team:n.team,by:n.by,from:n.from,at:n.at});
 
 /* ---------- incoming ---------- */
 function handle(p,t){
@@ -186,13 +205,13 @@ document.addEventListener('pointerdown',()=>{if(unlocked||!speakOn||!window.spee
 function addNote(text){
   text=String(text||'').trim().slice(0,1500);if(!text)return null;
   text=text[0].toUpperCase()+text.slice(1);
-  const n={id:Date.now().toString(36)+rid(4),text,sit:human(S)||'',by:devName,from:me,at:Date.now(),pend:!!code};
+  const n={id:Date.now().toString(36)+rid(4),text,sit:human(S)||'',team:TEAM,by:devName,from:me,at:Date.now(),pend:!!code};
   notes.push(n);saveNotes();drawNotes();
   if(code)pub({t:'note',n:strip(n)}).then(ok=>{if(ok){n.pend=false;saveNotes();drawNotes()}});
   return n;
 }
 const tm=at=>new Date(at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-function drawNotes(){
+function drawNotes(){if(typeof drawAll==='function'&&window.GAME)drawAll();
   $('ntc').innerHTML=notes.length+(notes.length==1?' note':' notes')+(code?' in this game':' on this device')+(unread?' <span class="badge">'+unread+' new</span>':'');
   $('ntl').innerHTML=notes.slice().reverse().map(n=>`<li${n.pend?' class="pend"':''}><div><div class="m">${tm(n.at)} · ${esc(n.by)}${n.sit?' · '+esc(n.sit):''}</div><div class="x">${esc(n.text)}</div></div>${n.from===me?`<button type="button" data-del="${esc(n.id)}" aria-label="Delete note">✕</button>`:''}</li>`).join('')||'<li><div class="m">No notes yet.</div></li>';
 }
@@ -231,6 +250,42 @@ function voice(alts){
 function typed(v){clearTimeout(soonT);soonT=null;const m=String(v||'').match(NOTE_RE);if(!m||!m[1].trim())return false;addNote(m[1]);$('q').value='';$('heard').textContent='Note saved'+(code?' and sent.':'.');return true}
 const isNote=v=>NOTE_RE.test(String(v||''));
 
+/* ---------- all-notes viewer (every game saved on this device) ---------- */
+function allGames(){
+  const out=[];
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||!k.startsWith('sl.notes.'))continue;
+    const g=k.slice(9),list=get('notes.'+g,[]);if(!list.length)continue;
+    const meta=get('gmeta.'+g,null)||{};
+    const team=meta.team||(list.find(n=>n.team)||{}).team||'';
+    out.push({g,list,team,last:Math.max(...list.map(n=>n.at))})}}catch(e){}
+  return out.sort((a,b)=>b.last-a.last);
+}
+const day=at=>new Date(at).toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
+const gameText=G=>'Sideline notes · '+(G.team||'')+(G.g==='solo'?' · this device':' · game '+fmt(G.g))+' · '+day(G.last)+'\n\n'+G.list.map(n=>tm(n.at)+' · '+n.by+(n.sit?' · '+n.sit:'')+'\n'+n.text).join('\n\n');
+function drawAll(){
+  const f=$('nf').value.trim().toLowerCase(),games=allGames();
+  const total=games.reduce((a,G)=>a+G.list.length,0);
+  nb.textContent='Notes ('+total+')';
+  if(ov.style.display!=='block')return;
+  const html=games.map(G=>{
+    const list=G.list.filter(n=>!f||(n.text+' '+n.sit+' '+n.by).toLowerCase().includes(f));if(!list.length)return'';
+    const title=(G.team?esc(G.team)+' · ':'')+day(G.last)+(G.g===code?' · this game':'');
+    return `<section class="ng"><div class="gh"><b>${title}</b><span>${G.g==='solo'?'not in a game':'game '+fmt(G.g)} · ${G.list.length} note${G.list.length==1?'':'s'}</span></div>`+
+      list.slice().reverse().map(n=>`<div class="nb"><div class="m">${tm(n.at)} · ${esc(n.by)}${n.sit?' · '+esc(n.sit):''}</div><div>${esc(n.text)}</div></div>`).join('')+
+      `<div class="ga"><button type="button" data-gs="${esc(G.g)}">Share / copy</button><button type="button" data-gd="${esc(G.g)}">Delete from this device</button></div></section>`}).join('');
+  $('nlist').innerHTML=html||`<div class="ng">${total?'No notes match.':'No notes saved yet. Say "note …" or type one in the Notes panel.'}</div>`;
+}
+nb.addEventListener('click',()=>{ov.style.display='block';document.body.style.overflow='hidden';drawAll();});
+$('nx').addEventListener('click',()=>{ov.style.display='none';document.body.style.overflow=''});
+$('nf').addEventListener('input',drawAll);
+$('nlist').addEventListener('click',async e=>{
+  const gs=e.target.getAttribute&&e.target.getAttribute('data-gs'),gd=e.target.getAttribute&&e.target.getAttribute('data-gd');
+  if(gs){const G=allGames().find(x=>x.g===gs);if(!G)return;const txt=gameText(G);
+    try{if(navigator.share){await navigator.share({title:'Sideline notes',text:txt});return}}catch(x){if(x&&x.name==='AbortError')return}
+    try{await navigator.clipboard.writeText(txt);alert('Notes copied.')}catch(x){prompt('Copy your notes:',txt)}}
+  if(gd&&confirm('Delete these notes from this device only? Other devices keep their copy.')){
+    try{localStorage.removeItem('sl.notes.'+gd)}catch(x){}if(gd===(code||'solo')){notes=[];drawNotes()}drawAll()}
+});
 window.GAME={push:pushSit,pushSoon,voice,typed,isNote,typing,sound};
 
 /* ---------- start ---------- */
