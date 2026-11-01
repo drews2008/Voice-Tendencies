@@ -17,7 +17,7 @@
      save note for later check the punt team -> saved for later, never read out during the game
      what notes do I have / read my notes    -> reads your unread notes
      read all my notes / what's saved for later / read all notes */
-const SL_VERSION='notes-4';
+const SL_VERSION='talk-5';
 window.addEventListener('error',e=>{try{const h=document.getElementById('heard');if(h)h.textContent='⚠ App error ('+SL_VERSION+'): '+(e.message||e)+'. Send Drew a screenshot.'}catch(x){}});
 (()=>{
 const RELAY='https://ntfy.sh/';
@@ -447,6 +447,51 @@ $('nlist').addEventListener('click',async e=>{
   if(gd&&confirm('Delete these notes from this device only? Other devices keep their copy.')){
     try{localStorage.removeItem('sl.notes.'+gd)}catch(x){}if(gd===(code||'solo')){notes=[];drawNotes()}drawAll()}
 });
+/* ---------- natural speech: every spoken reply goes through here ----------
+   Lives in game.js so it survives the weekly index.html rewrite. Add shorthand to ABBR as new sheets use it. */
+const ABBR={tb:'tailback',fb:'fullback',wb:'wingback',hb:'halfback',sb:'slotback',qb:'quarterback',rb:'running back',
+  te:'tight end',tes:'tight ends',wr:'wide receiver',wrs:'wide receivers',rte:'route',rtes:'routes',
+  ol:'line',lb:'linebacker',lbs:'linebackers',cb:'corner',fs:'free safety',ss:'strong safety',de:'defensive end',dt:'defensive tackle',
+  pa:'play action',rpo:'R P O',ctr:'counter',opt:'option',qbs:'quarterbacks',
+  '2pt':'two point',int:'interception',td:'touchdown',fg:'field goal',yds:'yards',yd:'yard'};
+const ORDW={'1st':'first','2nd':'second','3rd':'third','4th':'fourth'};
+function words(t){
+  return t.replace(/\b(\d?[A-Za-z]+)\b/g,w=>{
+    if(w==='L')return'left';if(w==='R')return'right';
+    const k=w.toLowerCase();
+    if(ABBR[k]&&(w===w.toUpperCase()||k.length>=2&&!/^(int|opt|pa|de|ss|ol|ctr|yd|yds)$/.test(k)))return ABBR[k];
+    return w.length>=2&&w===w.toUpperCase()&&!/^[A-Z]$/.test(w)?k:w;   // SWEEP -> sweep, so it isn't spelled out letter by letter
+  });
+}
+const pct=x=>Math.round(+x);
+function natural(t){
+  t=String(t||'');if(!t.trim())return t;
+  t=t.replace(/\b(1st|2nd|3rd|4th)\b/g,m=>ORDW[m]).replace(/\b2-point\b/gi,'two point');
+  t=t.replace(/\bOpp 1(?:-| to )20\b/g,'red zone').replace(/\bOpp 21(?:-| to )40\b/g,'plus territory')
+     .replace(/\bOwn 1(?:-| to )20\b/g,'backed up').replace(/\bOwn 21(?:-| to )40\b/g,'own territory');
+  t=t.replace(/\b(Left|Middle|Right) hash\b/g,m=>m.toLowerCase());
+  t=t.replace(/No matching plays in the log\. Sheet: /g,'Nothing in the play log, but the scouting sheet has ');
+  t=t.replace(/No plays logged for that\./g,'Nothing logged for that.');
+  // "100% pass over 1 play. Top call: X, then Y."
+  t=t.replace(/(\d+(?:\.\d+)?)% (run|pass) over (\d+) plays?\.(?: Top call: ([^.]+?)(?:, then ([^.]+?))?\.)?/g,(m,p,k,n,c1,c2)=>{
+    p=pct(p);n=+n;const ran=k==='run';let out;
+    if(n===1)out='Only one play, '+(ran?'a run':'a pass')+(c1?', '+c1:'')+'.';
+    else{
+      if(p>=100)out=(ran?'They ran it ':'They threw it ')+(n===2?'both times.':'all '+n+' times.');
+      else if(p===50)out='Even split, half run, half pass, on '+n+' plays.';
+      else out=(ran?'They run it ':'They throw it ')+p+' percent, on '+n+' plays.';
+      if(c1)out+=' Most common is '+c1+(c2?', then '+c2:'')+'.';
+    }
+    return out;
+  });
+  t=t.replace(/ Small sample\./g,' Small sample, just a lean.');
+  t=t.replace(/(\d+(?:\.\d+)?)%/g,(m,x)=>pct(x)+' percent');
+  t=t.replace(/: /g,'. ').replace(/\s+·\s+/g,', ');
+  t=words(t).replace(/\bFirst play of drive\b/g,'First play of the drive');
+  return t.replace(/(^|[.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+}
+if(typeof window.say==='function'&&!window.say._nat){const raw=window.say;window.say=function(t){return raw(natural(t))};window.say._nat=true}
+
 document.getElementById('foot').textContent+=' · '+SL_VERSION;
 window.GAME={push:pushSit,pushSoon,voice,typed,isNote,typing,sound};
 
