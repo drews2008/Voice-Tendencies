@@ -17,7 +17,7 @@
      save note for later check the punt team -> saved for later, never read out during the game
      what notes do I have / read my notes    -> reads your unread notes
      read all my notes / what's saved for later / read all notes */
-const SL_VERSION='talk-5';
+const SL_VERSION='glance-6';
 window.addEventListener('error',e=>{try{const h=document.getElementById('heard');if(h)h.textContent='⚠ App error ('+SL_VERSION+'): '+(e.message||e)+'. Send Drew a screenshot.'}catch(x){}});
 (()=>{
 const RELAY='https://ntfy.sh/';
@@ -492,6 +492,85 @@ function natural(t){
 }
 if(typeof window.say==='function'&&!window.say._nat){const raw=window.say;window.say=function(t){return raw(natural(t))};window.say._nat=true}
 
+
+/* ---------- glance chart: big picture of the answer, highlighted while it's read out ---------- */
+const gcss=document.createElement('style');
+gcss.textContent=`
+#glance{display:none;background:var(--card);border:2.5px solid var(--ink);border-radius:12px;padding:10px 12px 12px;margin:2px 0 10px;scroll-margin-top:8px}
+#glance .gs{border-radius:8px;padding:4px 6px;margin:0 -6px;transition:background .25s,box-shadow .25s}
+#glance .gs.hl{background:rgba(244,208,99,.35);box-shadow:0 0 0 3px #e8a317}
+.gl-h{font:700 34px/1.05 'Barlow Condensed',system-ui,sans-serif}
+.gl-sub{font:600 18px/1.3 Barlow,system-ui,sans-serif;color:var(--mute)}
+.gl-src{font-size:13px;color:var(--mute);margin-top:2px}
+.gl-bar{display:flex;height:50px;border-radius:8px;overflow:hidden;margin-top:6px;font:700 24px/50px 'Barlow Condensed',system-ui,sans-serif;color:#fff}
+.gl-bar span{padding:0 10px;white-space:nowrap;overflow:hidden}
+.gl-none{font:700 22px 'Barlow Condensed',system-ui,sans-serif;padding:8px 0}
+.gl-lab{font:700 13px system-ui,sans-serif;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+.gl-dir{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:4px}
+.gl-dir div{border:1.5px solid var(--line);border-radius:8px;text-align:center;padding:6px 2px;font:700 22px 'Barlow Condensed',system-ui,sans-serif}
+.gl-dir div small{display:block;font:600 12px system-ui,sans-serif;color:var(--mute)}
+.gl-dir div.top{border-color:var(--ink);border-width:2.5px}
+.gl-call{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;margin-top:5px;font:600 18px/1.2 Barlow,system-ui,sans-serif}
+.gl-call i{grid-column:1/3;height:8px;border-radius:4px;background:var(--mute)}
+.gl-call i.kr{background:var(--run)}.gl-call i.kp{background:var(--pass)}
+.gl-call b{font:700 20px 'Barlow Condensed',system-ui,sans-serif}
+.gl-warn{margin-top:8px;background:var(--warn);color:var(--warnink);border-radius:6px;padding:6px 10px;font:600 15px system-ui,sans-serif}
+`;
+document.head.appendChild(gcss);
+const gl=document.createElement('div');gl.id='glance';gl.setAttribute('aria-hidden','true');
+$('heard').after(gl);
+const nice=c=>{const t=words(String(c||''));return t?t[0].toUpperCase()+t.slice(1):t};
+const callKind=c=>{const p=(typeof PL!=='undefined'?PL:[]).find(x=>x.name===c);return p?p.k:'km'};
+function glanceData(){
+  const o=S,sit=o.pt||o.fp||o.goal||o.down||o.hash||o.form||o.play||o.mo!=null||o.zone||o.sc;
+  if(!sit)return null;
+  const st=stats(filt(o,new Set())),key=bucket(o);
+  const sh=key?((o.hash&&TH[key]&&TH[key][o.hash])||DD[key]||null):null;
+  const narrow=o.form||o.play||o.mo!=null||o.zone||o.sc;
+  if(st.n||!sh||narrow){const t=st.dir.L+st.dir.M+st.dir.R;
+    return{src:'Play log',n:st.n,run:st.run,pass:st.pass,calls:st.calls,dir:t?{L:100*st.dir.L/t,M:100*st.dir.M/t,R:100*st.dir.R/t}:null,dn:t}}
+  const d=sh.d||{},has=Object.keys(d).length;
+  return{src:'Scouting sheet (nothing in the play log)',n:sh.n,run:sh.r,pass:sh.p,calls:sh.calls,dir:has?{L:d.L||0,M:d.M||0,R:d.R||0}:null}
+}
+let glCalls=[];
+function drawGlance(){
+  const g=glanceData();
+  if(!g){gl.style.display='none';glCalls=[];return}
+  const parts=human(S).split(' · '),head=parts.shift(),r=Math.round(g.run),p=Math.round(g.pass);
+  let h=`<div class="gs" id="gl-sit"><div class="gl-h">${esc(head)}</div>${parts.length?`<div class="gl-sub">${esc(parts.join(' · '))}</div>`:''}<div class="gl-src">${esc(g.src)} · ${g.n} play${g.n==1?'':'s'}</div></div>`;
+  if(!g.n){gl.innerHTML=h+`<div class="gs" id="gl-rp"><div class="gl-none">Nothing logged for that.</div></div>`;gl.style.display='block';glCalls=[];return}
+  h+=`<div class="gs" id="gl-rp"><div class="gl-bar" role="img" aria-label="${r}% run, ${p}% pass"><span class="r" style="width:${r}%">${r>=40?r+'% run':r>=14?r+'%':''}</span><span class="p" style="width:${p}%">${p>=40?p+'% pass':p>=14?p+'%':''}</span></div><div class="gl-src"><span style="color:var(--run)">■</span> run ${r}% · <span style="color:var(--pass)">■</span> pass ${p}%</div></div>`;
+  if(g.dir){const mx=Math.max(g.dir.L,g.dir.M,g.dir.R);
+    h+=`<div class="gl-lab">Direction</div><div class="gl-dir">`+['L','M','R'].map(k=>{const v=Math.round(g.dir[k]);const a=mx?g.dir[k]/mx:0;
+      return `<div class="${v&&g.dir[k]===mx?'top':''}" style="background:rgba(195,90,49,${(a*.45).toFixed(2)})">${v}%<small>${HW[k]}</small></div>`}).join('')+`</div>`}
+  const top=g.calls.slice(0,4),mxc=top.length?top[0][1]:1;glCalls=top.map(c=>c[0]);
+  if(top.length)h+=`<div class="gs" id="gl-calls"><div class="gl-lab">Top calls</div>`+top.map(([c,n])=>`<div class="gl-call"><span>${esc(nice(c))}</span><b>${n}</b><i class="${callKind(c)}" style="width:${Math.max(8,100*n/mxc)}%"></i></div>`).join('')+`</div>`;
+  if(g.n<5)h+=`<div class="gs" id="gl-warn"><div class="gl-warn">Small sample (${g.n}) — just a lean</div></div>`;
+  gl.innerHTML=h;gl.style.display='block';
+}
+if(typeof window.render==='function'&&!window.render._gl){const raw=window.render;window.render=function(){const r=raw.apply(this,arguments);try{drawGlance()}catch(e){}return r};window.render._gl=true}
+// highlight each part of the chart as the voice reaches it
+let hlT=[];
+function hl(id){gl.querySelectorAll('.gs.hl').forEach(e=>e.classList.remove('hl'));const e=id&&document.getElementById(id);if(e)e.classList.add('hl')}
+function track(u){
+  if(gl.style.display!=='block'||!u||!u.addEventListener)return;
+  const text=String(u.text||''),low=text.toLowerCase();
+  if(!/they (run|throw|ran|threw)|only one play|even split|nothing logged|nothing in the play log/i.test(text))return;
+  const marks=[{i:0,id:'gl-sit'},{i:low.search(/they (run|throw|ran|threw)|only one play|even split|nothing logged|nothing in the play log/),id:'gl-rp'}];
+  const c=glCalls[0]?low.indexOf(words(glCalls[0]).toLowerCase()):-1;if(c>=0)marks.push({i:c,id:'gl-calls'});
+  const w=low.indexOf('small sample');if(w>=0)marks.push({i:w,id:'gl-warn'});
+  marks.sort((a,b)=>a.i-b.i);
+  const clear=()=>{hlT.forEach(clearTimeout);hlT=[]};
+  let bnd=false;const cps=15*(u.rate||1);
+  u.addEventListener('start',()=>{clear();hl('gl-sit');
+    if(gl.getBoundingClientRect().top<0||gl.getBoundingClientRect().top>innerHeight*.5)gl.scrollIntoView({behavior:'smooth',block:'start'});
+    marks.slice(1).forEach(m=>hlT.push(setTimeout(()=>{if(!bnd)hl(m.id)},1000*m.i/cps)))});
+  u.addEventListener('boundary',e=>{if(e.charIndex==null)return;bnd=true;let id=null;marks.forEach(m=>{if(m.i<=e.charIndex)id=m.id});hl(id)});
+  const end=()=>{clear();hlT.push(setTimeout(()=>hl(null),700))};
+  u.addEventListener('end',end);u.addEventListener('error',end);
+}
+if(window.speechSynthesis&&!speechSynthesis._gl){const sp=speechSynthesis.speak.bind(speechSynthesis);speechSynthesis.speak=function(u){try{track(u)}catch(e){}return sp(u)};speechSynthesis._gl=true}
+drawGlance();
 document.getElementById('foot').textContent+=' · '+SL_VERSION;
 window.GAME={push:pushSit,pushSoon,voice,typed,isNote,typing,sound};
 
